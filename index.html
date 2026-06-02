@@ -2559,13 +2559,28 @@ async function loadGroups() {
         ${g.description ? `<div style="font-size:12px;color:var(--t2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${g.description}</div>` : ''}
       </div>
       ${isMember
-        ? `<button class="btn bv bsm" onclick="openGroupChat('${g.id}','${(g.name||'Grupo').replace(/'/g,'\\'')}','${emoji}')">Abrir</button>`
-        : `<button class="btn ba bsm" onclick="joinGroup('${g.id}',this)">Entrar</button>`}
+        ? `<button class="btn bv bsm grp-open-btn" data-id="${g.id}" data-name="${(g.name||'Grupo').replace(/"/g,'&quot;')}" data-emoji="${emoji}">Abrir</button>`
+        : `<button class="btn ba bsm grp-join-btn" data-id="${g.id}">Entrar</button>`}
     `;
     card.appendChild(div);
   });
 
   container.appendChild(card);
+
+  // Event delegation para botões de grupo
+  container.addEventListener('click', function(e) {
+    const openBtn = e.target.closest('.grp-open-btn');
+    const joinBtn = e.target.closest('.grp-join-btn');
+    if (openBtn) {
+      const id = openBtn.dataset.id;
+      const name = openBtn.dataset.name;
+      const emoji = openBtn.dataset.emoji;
+      openGroupChat(id, name, emoji);
+    } else if (joinBtn) {
+      const id = joinBtn.dataset.id;
+      joinGroup(id, joinBtn);
+    }
+  }, { once: true });
 }
 
 async function createGroup() {
@@ -2600,9 +2615,16 @@ async function joinGroup(groupId, btn) {
   if (!ME?.id) { toast('Faça login para entrar em grupos!'); return; }
   const { error } = await sb.from('conversation_members').insert({ conversation_id: groupId, user_id: ME.id });
   if (error && !error.message.includes('duplicate')) { toast('Erro ao entrar no grupo.'); return; }
+  // Atualiza botão para "Abrir" usando data-attributes
+  const groupItem = btn.closest('.group-item');
+  const name = groupItem?.querySelector('div:nth-child(2) div')?.textContent || 'Grupo';
+  const emoji = groupItem?.querySelector('.group-av')?.textContent || '👥';
   btn.textContent = 'Abrir';
-  btn.className = 'btn bv bsm';
-  btn.onclick = () => openGroupChat(groupId, btn.closest('.group-item').querySelector('div:nth-child(2) div').textContent, btn.closest('.group-item').querySelector('.group-av').textContent);
+  btn.className = 'btn bv bsm grp-open-btn';
+  btn.dataset.id = groupId;
+  btn.dataset.name = name;
+  btn.dataset.emoji = emoji;
+  btn.removeAttribute('onclick');
   toast('Você entrou no grupo! 🎉');
 }
 
