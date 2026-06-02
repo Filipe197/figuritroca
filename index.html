@@ -716,46 +716,12 @@ input,textarea{font-family:var(--font);}
         <button class="btn bv bsm" onclick="openModal('modal-troca')">+ Nova</button>
       </div>
       <div class="fbar">
-        <button class="fc on" onclick="filterFC(this)">Pendentes (2)</button>
-        <button class="fc" onclick="filterFC(this)">Em andamento (1)</button>
-        <button class="fc" onclick="filterFC(this)">Concluídas (12)</button>
+        <button class="fc on" onclick="filterFC(this)">Pendentes (0)</button>
+        <button class="fc" onclick="filterFC(this)">Em andamento (0)</button>
+        <button class="fc" onclick="filterFC(this)">Concluídas (0)</button>
       </div>
-      <div class="card" style="margin:12px 16px;" id="trocas-list">
-        <div class="tc">
-          <div class="rsb">
-            <div class="row">
-              <div class="av" style="width:38px;height:38px;background:var(--bl);color:var(--b);font-size:13px;">AM</div>
-              <div><div style="font-size:14px;font-weight:800;">Ana Martins</div><div style="font-size:11px;color:var(--t2);">⭐ 4.9 · 47 trocas</div></div>
-            </div>
-            <span class="tag ta">Aguardando</span>
-          </div>
-          <div class="swapa">
-            <div style="text-align:center;"><div class="sbig sg-give">147</div><div style="font-size:11px;color:var(--t2);margin-top:4px;font-weight:700;">Você dá</div></div>
-            <div style="font-size:24px;color:var(--t2);">⇄</div>
-            <div style="text-align:center;"><div class="sbig sg-get">089</div><div style="font-size:11px;color:var(--t2);margin-top:4px;font-weight:700;">Você recebe</div></div>
-          </div>
-          <div class="ta-row">
-            <button class="btn bv" style="flex:1;" onclick="toast('Troca aceita! Combinando local...')">Aceitar ✓</button>
-            <button class="btn bo" style="flex:1;" onclick="toast('Troca recusada.')">Recusar</button>
-          </div>
+      <div id="trades-container" style="padding:0 16px 16px;"><div style="padding:24px;text-align:center;color:var(--t2);">Carregando trocas... 🔄</div></div>
         </div>
-        <div class="tc">
-          <div class="rsb">
-            <div class="row">
-              <div class="av" style="width:38px;height:38px;background:var(--gl);color:var(--gd);font-size:13px;">CS</div>
-              <div><div style="font-size:14px;font-weight:800;">Carlos Silva</div><div style="font-size:11px;color:var(--t2);">⭐ 5.0 · 83 trocas</div></div>
-            </div>
-            <span class="tag tb">Em andamento</span>
-          </div>
-          <div class="swapa">
-            <div style="text-align:center;"><div class="sbig sg-give">213</div><div style="font-size:11px;color:var(--t2);margin-top:4px;font-weight:700;">Você dá</div></div>
-            <div style="font-size:24px;color:var(--t2);">⇄</div>
-            <div style="text-align:center;"><div class="sbig sg-get">056</div><div style="font-size:11px;color:var(--t2);margin-top:4px;font-weight:700;">Você recebe</div></div>
-          </div>
-          <div><div class="pbar"><div class="pfill" style="width:60%;"></div></div><div style="font-size:11px;color:var(--t2);margin-top:4px;">Encontro 08/Jun · Parque da Cidade</div></div>
-        </div>
-      </div>
-    </div>
 
     <!-- ===== COMUNIDADE ===== -->
     <div class="page" id="page-comunidade">
@@ -1025,7 +991,7 @@ input,textarea{font-family:var(--font);}
       <div><div class="mf-lbl">Tipo</div><select class="mf-sel"><option>Evento fixo (mensal)</option><option>Evento único</option><option>Ponto informal</option></select></div>
       <div><div class="mf-lbl">Horário / Frequência</div><input class="mf-inp" placeholder="Ex: Todo 1º sábado do mês, 9h–13h"></div>
       <div><div class="mf-lbl">Descrição</div><textarea class="mf-ta" rows="3" placeholder="Conta um pouco sobre o local..."></textarea></div>
-      <button class="btn bv" style="width:100%;padding:12px;" onclick="closeModal('modal-ponto');toast('Ponto cadastrado! Aparecerá no mapa em breve.')">Cadastrar ponto</button>
+      <button class="btn bv" style="width:100%;padding:12px;" onclick="saveMeetPoint()">Cadastrar ponto</button>
     </div>
   </div>
 </div>
@@ -1034,14 +1000,14 @@ input,textarea{font-family:var(--font);}
   <div class="modal">
     <div class="modal-h"><div class="modal-t">🔄 Propor troca</div><button class="modal-cl" onclick="closeModal('modal-troca')">✕</button></div>
     <div class="mform">
-      <div><div class="mf-lbl">Usuário para propor</div><input class="mf-inp" placeholder="@nome_do_usuario"></div>
+      <div><div class="mf-lbl">Usuário para propor</div><input class="mf-inp" placeholder="Usuário ou e-mail"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div><div class="mf-lbl">Figurinha que você dá</div><input class="mf-inp" type="number" placeholder="Ex: 147"></div>
         <div><div class="mf-lbl">Figurinha que quer</div><input class="mf-inp" type="number" placeholder="Ex: 089"></div>
       </div>
       <div><div class="mf-lbl">Álbum</div><select class="mf-sel"><option>Copa do Mundo 2026</option><option>Copa do Mundo 2022</option></select></div>
       <div><div class="mf-lbl">Mensagem (opcional)</div><textarea class="mf-ta" rows="2" placeholder="Escreva algo para o outro colecionador..."></textarea></div>
-      <button class="btn bv" style="width:100%;padding:12px;" onclick="closeModal('modal-troca');toast('Proposta enviada!')">Enviar proposta</button>
+      <button class="btn bv" style="width:100%;padding:12px;" onclick="sendTradeFromModal()">Enviar proposta</button>
     </div>
   </div>
 </div>
@@ -1201,6 +1167,7 @@ async function doLogout() {
 // ============================================================
 async function loadHomeData() {
   if (!ME?.id) return;
+  // Figurinhas
   const { data: stickers } = await sb.from('user_stickers').select('status,quantity').eq('user_id', ME.id);
   if (stickers) {
     const rep  = stickers.filter(s => s.status === 'have' && s.quantity > 1).length;
@@ -1208,8 +1175,543 @@ async function loadHomeData() {
     document.getElementById('h-rep').textContent  = rep;
     document.getElementById('h-need').textContent = need;
   }
+  // Trocas concluídas
   const { data: trades } = await sb.from('trades').select('id').or(`proposer_id.eq.${ME.id},receiver_id.eq.${ME.id}`).eq('status','completed');
   if (trades) document.getElementById('h-trades').textContent = trades.length;
+  // Matches reais
+  await loadMatches();
+  // Próximos pontos de troca
+  await loadNextEvents();
+  // Posts do feed
+  await loadPosts();
+  // Trocas pendentes
+  await loadTrades();
+  // Pontos de troca no mapa
+  await loadMeetPoints();
+  // Ranking
+  await loadRanking();
+  // Conquistas
+  await loadAchievements();
+}
+
+// ============================================================
+// MATCHES AUTOMÁTICOS (banco real)
+// ============================================================
+async function loadMatches() {
+  if (!ME?.id) return;
+  const container = document.getElementById('matches-list');
+
+  // Busca figurinhas que o usuário tem repetidas
+  const { data: myHave } = await sb.from('user_stickers')
+    .select('number,album_id').eq('user_id', ME.id).eq('status','have').gt('quantity',1);
+  // Busca figurinhas que o usuário precisa
+  const { data: myNeed } = await sb.from('user_stickers')
+    .select('number,album_id').eq('user_id', ME.id).eq('status','need');
+
+  if (!myHave?.length || !myNeed?.length) {
+    container.innerHTML = '<div style="padding:16px;text-align:center;color:var(--t2);font-size:13px;">Cadastre suas figurinhas repetidas e faltantes para ver matches!</div>';
+    return;
+  }
+
+  // Busca outros usuários que precisam do que eu tenho E têm o que eu preciso
+  const haveNums = myHave.map(s => s.number);
+  const needNums = myNeed.map(s => s.number);
+
+  const { data: potentialGivers } = await sb.from('user_stickers')
+    .select('user_id,number,album_id')
+    .eq('status','have').gt('quantity',1)
+    .in('number', needNums)
+    .neq('user_id', ME.id);
+
+  if (!potentialGivers?.length) {
+    container.innerHTML = '<div style="padding:16px;text-align:center;color:var(--t2);font-size:13px;">Nenhum match encontrado ainda. Convide amigos! 🤝</div>';
+    return;
+  }
+
+  // Filtra quem também precisa do que tenho
+  const giverIds = [...new Set(potentialGivers.map(p => p.user_id))];
+  const { data: giverNeeds } = await sb.from('user_stickers')
+    .select('user_id,number').eq('status','need')
+    .in('user_id', giverIds).in('number', haveNums);
+
+  const matches = [];
+  potentialGivers.forEach(giver => {
+    const giverWants = giverNeeds?.find(gn => gn.user_id === giver.user_id && haveNums.includes(gn.number));
+    if (giverWants) {
+      matches.push({ userId: giver.user_id, theyHave: giver.number, iNeed: giver.number, iGive: giverWants.number });
+    }
+  });
+
+  if (!matches.length) {
+    container.innerHTML = '<div style="padding:16px;text-align:center;color:var(--t2);font-size:13px;">Nenhum match perfeito ainda. Continue atualizando seu álbum!</div>';
+    return;
+  }
+
+  // Busca perfis dos matches
+  const matchUserIds = [...new Set(matches.map(m => m.userId))].slice(0,5);
+  const { data: profiles } = await sb.from('profiles').select('id,full_name,username,city,state').in('id', matchUserIds);
+
+  container.innerHTML = '';
+  matches.slice(0,5).forEach(match => {
+    const profile = profiles?.find(p => p.id === match.userId);
+    const name = profile?.full_name || profile?.username || 'Usuário';
+    const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const location = profile?.city ? `${profile.city}, ${profile.state || 'BR'}` : 'Brasil';
+    const div = document.createElement('div');
+    div.className = 'mi';
+    div.innerHTML = `
+      <div class="sth">${match.iNeed.toString().padStart(3,'0')}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:800;">Nº ${match.iNeed} ↔ Nº ${match.iGive}</div>
+        <div style="font-size:12px;color:var(--t2);">Match com ${name} · ${location}</div>
+      </div>
+      <button class="btn bv bsm" onclick="proposeTradeDB('${match.userId}','${match.iGive}','${match.iNeed}','${name}')">Propor</button>
+    `;
+    container.appendChild(div);
+  });
+
+  // Atualiza badge e texto do hero
+  const matchCount = matches.length;
+  document.querySelector('.hero-sub').innerHTML = `Você tem <strong>${matchCount} match${matchCount!==1?'es':''}</strong> disponíve${matchCount!==1?'is':'l'}!`;
+}
+
+// ============================================================
+// PROPOR TROCA (banco real)
+// ============================================================
+async function proposeTradeDB(receiverId, stickerGive, stickerGet, receiverName) {
+  if (!ME?.id) { toast('Faça login para propor trocas!'); return; }
+  const { data: album } = await sb.from('albums').select('id').eq('active',true).single();
+  if (!album) { toast('Álbum não encontrado.'); return; }
+  const { error } = await sb.from('trades').insert({
+    proposer_id: ME.id, receiver_id: receiverId,
+    album_id: album.id, sticker_give: parseInt(stickerGive), sticker_get: parseInt(stickerGet),
+    status: 'pending'
+  });
+  if (error) { toast('Erro ao propor troca: ' + error.message); return; }
+  toast(`Proposta enviada para ${receiverName}! 🤝`);
+  await loadTrades();
+}
+
+// ============================================================
+// TROCAS (banco real)
+// ============================================================
+async function loadTrades() {
+  if (!ME?.id) return;
+  const { data: trades } = await sb.from('trades')
+    .select('*,proposer:profiles!trades_proposer_id_fkey(full_name,username),receiver:profiles!trades_receiver_id_fkey(full_name,username)')
+    .or(`proposer_id.eq.${ME.id},receiver_id.eq.${ME.id}`)
+    .order('created_at',{ascending:false});
+
+  if (!trades) return;
+
+  const pending = trades.filter(t => t.status === 'pending');
+  const active  = trades.filter(t => t.status === 'accepted');
+  const done    = trades.filter(t => t.status === 'completed' || t.status === 'rejected' || t.status === 'cancelled');
+
+  // Atualiza badges
+  document.querySelectorAll('.fc')[0].textContent = `Pendentes (${pending.length})`;
+  document.querySelectorAll('.fc')[1].textContent = `Em andamento (${active.length})`;
+  document.querySelectorAll('.fc')[2].textContent = `Concluídas (${done.length})`;
+  if (pending.length > 0) {
+    document.querySelector('#ni-trocas .ni-badge').textContent = pending.length;
+    document.querySelector('#ni-trocas .ni-badge').style.display = 'flex';
+  }
+
+  const container = document.getElementById('trades-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const renderGroup = (list, label) => {
+    if (!list.length) return;
+    list.forEach(t => {
+      const isProposer = t.proposer_id === ME.id;
+      const otherName = isProposer ? (t.receiver?.full_name || t.receiver?.username || 'Usuário') : (t.proposer?.full_name || t.proposer?.username || 'Usuário');
+      const mySticker = isProposer ? t.sticker_give : t.sticker_get;
+      const theirSticker = isProposer ? t.sticker_get : t.sticker_give;
+      const statusTag = {pending:'⏳ Aguardando',accepted:'🤝 Em andamento',completed:'✅ Concluída',rejected:'❌ Recusada',cancelled:'🚫 Cancelada'}[t.status] || t.status;
+      const div = document.createElement('div');
+      div.className = 'tc';
+      div.innerHTML = `
+        <div class="rsb" style="margin-bottom:8px;">
+          <div class="row"><div class="av" style="width:32px;height:32px;background:var(--gl);color:var(--gd);font-size:11px;">${otherName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div><div style="font-size:14px;font-weight:800;margin-left:4px;">${otherName}</div></div>
+          <span class="tag ${t.status==='completed'?'tv':t.status==='pending'?'ta':'tr'}" style="font-size:10px;">${statusTag}</span>
+        </div>
+        <div class="swapa">
+          <div class="sbig sg-give"><div style="font-size:11px;color:var(--t2);margin-bottom:2px;">Dou</div>${mySticker.toString().padStart(3,'0')}</div>
+          <div style="font-size:20px;">⇄</div>
+          <div class="sbig sg-get"><div style="font-size:11px;color:var(--t2);margin-bottom:2px;">Recebo</div>${theirSticker.toString().padStart(3,'0')}</div>
+        </div>
+        ${t.status === 'pending' && !isProposer ? `
+        <div class="ta-row">
+          <button class="btn bv" style="flex:1;" onclick="respondTrade('${t.id}','accepted')">Aceitar ✓</button>
+          <button class="btn bo" style="flex:1;" onclick="respondTrade('${t.id}','rejected')">Recusar</button>
+        </div>` : ''}
+        ${t.status === 'accepted' ? `
+        <button class="btn bv" style="width:100%;" onclick="completeTrade('${t.id}')">✅ Marcar como concluída</button>` : ''}
+      `;
+      container.appendChild(div);
+    });
+  };
+
+  renderGroup(pending, 'Pendentes');
+  renderGroup(active, 'Em andamento');
+  renderGroup(done, 'Concluídas');
+  if (!trades.length) container.innerHTML = '<div style="padding:24px;text-align:center;color:var(--t2);">Nenhuma troca ainda. Explore os matches! 🔄</div>';
+}
+
+async function respondTrade(tradeId, status) {
+  await sb.from('trades').update({status}).eq('id', tradeId);
+  toast(status === 'accepted' ? 'Troca aceita! 🤝' : 'Troca recusada.');
+  await loadTrades();
+}
+
+async function completeTrade(tradeId) {
+  await sb.from('trades').update({status:'completed', proposer_confirmed:true, receiver_confirmed:true}).eq('id', tradeId);
+  // Incrementa contador de trocas no perfil
+  await sb.from('profiles').update({total_trades: (ME.total_trades||0)+1}).eq('id', ME.id);
+  ME.total_trades = (ME.total_trades||0)+1;
+  toast('Troca concluída! Parabéns! 🏆');
+  await loadTrades();
+  await loadHomeData();
+}
+
+// ============================================================
+// PONTOS DE TROCA (banco real)
+// ============================================================
+async function loadMeetPoints() {
+  const { data: points } = await sb.from('meet_points').select('*,confirmations:meet_confirmations(count)').eq('active',true).order('created_at',{ascending:false});
+  if (!points) return;
+
+  // Atualiza lista
+  const list = document.getElementById('pontos-list');
+  if (!list) return;
+  if (!points.length) {
+    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--t2);">Nenhum ponto cadastrado ainda. Seja o primeiro! 📍</div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  const count = document.querySelector('#page-pontos .rsb span');
+  if (count) count.textContent = `${points.length} ponto${points.length!==1?'s':''} encontrado${points.length!==1?'s':''}`;
+
+  points.forEach(p => {
+    const confirmCount = p.confirmations?.[0]?.count || 0;
+    const typeIcon = p.type === 'event' ? '🎪' : '📍';
+    const typeTag = p.type === 'event' ? '<span class="tag tv">Evento</span>' : '<span class="tag ta">Informal</span>';
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.style.cssText = 'margin:12px 16px;';
+    div.innerHTML = `
+      <div class="pc">
+        <div class="pi">${typeIcon}</div>
+        <div style="flex:1;">
+          <div class="rsb"><div style="font-size:15px;font-weight:800;">${p.name}</div>${typeTag}</div>
+          <div style="font-size:12px;color:var(--t2);margin-top:2px;">${p.city}, ${p.state}${p.schedule ? ' · ' + p.schedule : ''}</div>
+          <div class="rsb" style="margin-top:8px;">
+            <span style="font-size:12px;font-weight:700;color:var(--g);">✓ ${confirmCount} confirmado${confirmCount!==1?'s':''}</span>
+            <button class="cbtn" id="mp-${p.id}" onclick="confirmMeetPoint('${p.id}')">Confirmar presença</button>
+          </div>
+        </div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+async function confirmMeetPoint(pointId) {
+  if (!ME?.id) { toast('Faça login para confirmar presença!'); return; }
+  const btn = document.getElementById('mp-' + pointId);
+  const today = new Date().toISOString().split('T')[0];
+  const { error } = await sb.from('meet_confirmations').upsert({point_id:pointId, user_id:ME.id, event_date:today});
+  if (error && error.code !== '23505') { toast('Erro ao confirmar.'); return; }
+  btn.textContent = 'Confirmado ✓';
+  btn.classList.add('done');
+  toast('Presença confirmada! 🎉');
+}
+
+async function saveMeetPoint() {
+  if (!ME?.id) { toast('Faça login para cadastrar pontos!'); return; }
+  const name = document.querySelector('#modal-ponto .mf-inp[placeholder="Nome do local"]')?.value.trim();
+  const address = document.querySelector('#modal-ponto .mf-inp[placeholder="Endereço completo"]')?.value.trim();
+  const city = document.querySelector('#modal-ponto .mf-inp[placeholder="Cidade"]')?.value.trim();
+  const state = document.querySelector('#modal-ponto .mf-sel')?.value || 'PE';
+  const type = document.querySelector('#modal-ponto select:last-of-type')?.value || 'informal';
+  const schedule = document.querySelector('#modal-ponto .mf-inp[placeholder="Horário / Frequência"]')?.value.trim();
+  if (!name || !address || !city) { toast('Preencha os campos obrigatórios!'); return; }
+  const { error } = await sb.from('meet_points').insert({creator_id:ME.id, name, address, city, state, type, schedule: schedule || null, active:true});
+  if (error) { toast('Erro: ' + error.message); return; }
+  closeModal('modal-ponto');
+  toast('Ponto cadastrado! 📍');
+  await loadMeetPoints();
+}
+
+// ============================================================
+// PRÓXIMOS EVENTOS (home)
+// ============================================================
+async function loadNextEvents() {
+  const { data: events } = await sb.from('meet_points').select('*,confirmations:meet_confirmations(count)').eq('type','event').eq('active',true).order('created_at',{ascending:false}).limit(2);
+  if (!events?.length) return;
+  const container = document.querySelector('#page-home .card:last-child');
+}
+
+// ============================================================
+// POSTS (banco real)
+// ============================================================
+async function loadPosts() {
+  const { data: posts } = await sb.from('posts')
+    .select('*,author:profiles(full_name,username,avatar_url)')
+    .order('created_at',{ascending:false}).limit(20);
+  if (!posts) return;
+
+  const container = document.getElementById('posts-container');
+  if (!container) return;
+  // Mantém posts locais e adiciona os do banco no final
+  const existingLocal = container.querySelectorAll('.post.local-post');
+
+  // Limpa posts de banco anteriores
+  container.querySelectorAll('.post:not(.local-post)').forEach(p => p.remove());
+
+  posts.forEach(post => {
+    const author = post.author;
+    const name = author?.full_name || author?.username || 'Usuário';
+    const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const timeStr = timeAgo(post.created_at);
+    const div = document.createElement('div');
+    div.className = 'post';
+    div.innerHTML = `
+      <div class="post-h">
+        <div class="av" style="width:40px;height:40px;background:var(--gl);color:var(--gd);font-size:13px;">
+          ${author?.avatar_url ? `<img src="${author.avatar_url}" alt="">` : initials}
+        </div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:800;">${name}</div><div style="font-size:11px;color:var(--t2);">${timeStr}</div></div>
+      </div>
+      ${post.image_url ? `<div class="post-img-preview"><img src="${post.image_url}" alt="" onclick="openImgFull(this)"></div>` : ''}
+      <div class="post-bod">${post.content}</div>
+      <div class="pa-row">
+        <button class="pa" onclick="togglePostLike(this,'${post.id}',${post.likes})">❤️ ${post.likes}</button>
+        <button class="pa" onclick="toast('Comentários em breve!')">💬 0</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+async function togglePostLike(btn, postId, baseCount) {
+  btn.classList.toggle('liked');
+  const liked = btn.classList.contains('liked');
+  const newCount = liked ? baseCount + 1 : baseCount - 1;
+  btn.innerHTML = `❤️ ${newCount}`;
+  if (ME?.id) {
+    if (liked) await sb.from('post_likes').upsert({post_id:postId, user_id:ME.id});
+    else await sb.from('post_likes').delete().eq('post_id',postId).eq('user_id',ME.id);
+    await sb.from('posts').update({likes:newCount}).eq('id',postId);
+  }
+  if (liked) toast('Curtido! ❤️');
+}
+
+// ============================================================
+// RANKING (banco real)
+// ============================================================
+async function loadRanking() {
+  const { data: topUsers } = await sb.from('profiles')
+    .select('id,full_name,username,total_trades,points,avatar_url')
+    .order('total_trades',{ascending:false}).limit(10);
+  if (!topUsers) return;
+
+  const container = document.querySelector('#sub-ranking .card');
+  if (!container) return;
+
+  // Posição do usuário atual
+  let myRank = '-';
+  if (ME?.id) {
+    const myPos = topUsers.findIndex(u => u.id === ME.id);
+    myRank = myPos >= 0 ? myPos + 1 : '10+';
+  }
+
+  const medals = ['🥇','🥈','🥉'];
+  const medalColors = ['var(--yd)','var(--t2)','#993C1D'];
+
+  container.innerHTML = topUsers.slice(0,3).map((u,i) => {
+    const name = u.full_name || u.username || 'Usuário';
+    const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return `<div class="ri">
+      <div class="rp" style="color:${medalColors[i]};">${i+1}</div>
+      <div class="rm rm${i+1}">${medals[i]}</div>
+      <div class="av" style="width:36px;height:36px;background:var(--gl);color:var(--gd);font-size:12px;">${u.avatar_url?`<img src="${u.avatar_url}" alt="">`:initials}</div>
+      <div style="flex:1;"><div style="font-size:14px;font-weight:800;">${name}</div><div style="font-size:11px;color:var(--t2);">${u.total_trades} trocas</div></div>
+      <div style="text-align:right;"><div style="font-family:var(--display);font-size:18px;color:${medalColors[i]};">${u.total_trades}</div><div style="font-size:10px;color:var(--t2);font-weight:700;">trocas</div></div>
+    </div>`;
+  }).join('');
+
+  if (ME?.id) {
+    const me = topUsers.find(u => u.id === ME.id);
+    const myInitials = (ME.full_name||ME.username||'U').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    container.innerHTML += `<div style="margin:8px 14px 10px;padding:10px 12px;background:var(--gl);border-radius:var(--rsm);display:flex;align-items:center;gap:10px;border:0.5px solid rgba(0,156,59,.2);">
+      <div class="av" style="width:30px;height:30px;background:var(--y);color:var(--b);font-size:11px;">${myInitials}</div>
+      <div style="flex:1;font-size:13px;font-weight:800;color:var(--gd);">#${myRank} · Você · ${ME.total_trades||0} trocas</div>
+    </div>`;
+    // Atualiza painel topo do ranking
+    document.querySelector('#sub-ranking .rank-pod .rsb').innerHTML = `
+      <div><div style="font-size:11px;opacity:.75;font-weight:700;">Ranking</div><div style="font-family:var(--display);font-size:28px;letter-spacing:1px;">#${myRank}</div></div>
+      <div style="text-align:center;"><div style="font-size:11px;opacity:.75;font-weight:700;">Trocas</div><div style="font-family:var(--display);font-size:28px;">${ME.total_trades||0}</div></div>
+      <div style="text-align:right;"><div style="font-size:11px;opacity:.75;font-weight:700;">Pontos</div><div style="font-family:var(--display);font-size:28px;color:var(--y);">${ME.points||0}</div></div>
+    `;
+  }
+}
+
+// ============================================================
+// CONQUISTAS (banco real)
+// ============================================================
+async function loadAchievements() {
+  const { data: allAch } = await sb.from('achievements').select('*').order('points',{ascending:true});
+  if (!allAch) return;
+
+  let earned = [];
+  if (ME?.id) {
+    const { data: userAch } = await sb.from('user_achievements').select('achievement_id,earned_at').eq('user_id', ME.id);
+    earned = userAch || [];
+  }
+
+  const earnedIds = earned.map(e => e.achievement_id);
+  const container = document.querySelector('#sub-conquistas .card');
+  if (!container) return;
+
+  // Verifica conquistas automaticamente
+  await checkAchievements(earned, allAch);
+
+  container.innerHTML = allAch.map(ach => {
+    const done = earnedIds.includes(ach.id);
+    return `<div class="ci">
+      <div class="cic ${done?'cic-done':'cic-lock'}">${done?ach.icon:'🔒'}</div>
+      <div style="flex:1;${done?'':'opacity:.6'}">
+        <div style="font-size:14px;font-weight:800;">${ach.name}${done?'<span style="background:var(--g);color:#fff;font-size:10px;padding:1px 7px;border-radius:4px;margin-left:4px;">✓</span>':''}</div>
+        <div style="font-size:12px;color:var(--t2);">${ach.description}</div>
+      </div>
+      <div class="cpts">${done?'+'+ach.points:'?'}</div>
+    </div>`;
+  }).join('');
+
+  // Atualiza painel topo conquistas
+  const unlockedCount = earnedIds.length;
+  document.querySelector('#sub-conquistas .cb').innerHTML = `
+    <div style="font-size:11px;opacity:.75;font-weight:800;margin-bottom:4px;">Suas conquistas</div>
+    <div style="font-family:var(--display);font-size:22px;letter-spacing:.5px;">${unlockedCount} de ${allAch.length} desbloqueadas</div>
+    <div class="pbar" style="margin-top:10px;background:rgba(255,255,255,.2);"><div class="pfill" style="width:${Math.round(unlockedCount/allAch.length*100)}%;background:var(--y);"></div></div>
+    <div style="font-size:11px;opacity:.75;margin-top:4px;font-weight:700;">${ME?.points||0} pontos acumulados</div>
+  `;
+}
+
+async function checkAchievements(earned, allAch) {
+  if (!ME?.id) return;
+  const earnedIds = earned.map(e => e.achievement_id);
+
+  const { data: trades } = await sb.from('trades').select('id').or(`proposer_id.eq.${ME.id},receiver_id.eq.${ME.id}`).eq('status','completed');
+  const tradeCount = trades?.length || 0;
+
+  const toUnlock = [];
+  const achMap = {};
+  allAch.forEach(a => achMap[a.key] = a);
+
+  if (tradeCount >= 1 && !earnedIds.includes(achMap['first_trade']?.id)) toUnlock.push(achMap['first_trade']?.id);
+  if (tradeCount >= 10 && !earnedIds.includes(achMap['ten_trades']?.id)) toUnlock.push(achMap['ten_trades']?.id);
+  if (tradeCount >= 50 && !earnedIds.includes(achMap['fifty_trades']?.id)) toUnlock.push(achMap['fifty_trades']?.id);
+
+  for (const achId of toUnlock.filter(Boolean)) {
+    await sb.from('user_achievements').upsert({user_id:ME.id, achievement_id:achId});
+    const ach = allAch.find(a => a.id === achId);
+    if (ach) {
+      await sb.from('profiles').update({points: (ME.points||0)+ach.points}).eq('id', ME.id);
+      ME.points = (ME.points||0) + ach.points;
+      toast(`🏆 Conquista desbloqueada: ${ach.name}!`);
+    }
+  }
+}
+
+// ============================================================
+// ABRIR CONVERSA COM BANCO
+// ============================================================
+async function openConvDB(name, otherUserId, initials, bg, color) {
+  document.getElementById('cv-name').textContent = name;
+  const av = document.getElementById('cv-av');
+  av.innerHTML = '';
+  av.textContent = initials;
+  if (bg) av.style.background = bg;
+  if (color) av.style.color = color;
+  document.getElementById('chatconv').classList.add('on');
+  document.getElementById('msgs-wrap').innerHTML = '';
+  currentConvId = null;
+
+  if (ME?.id && otherUserId) {
+    // Busca ou cria conversa
+    const { data: existing } = await sb.from('conversation_members')
+      .select('conversation_id,conversation:conversations(id,type)')
+      .eq('user_id', ME.id);
+
+    let convId = null;
+    if (existing?.length) {
+      const { data: sharedConv } = await sb.from('conversation_members')
+        .select('conversation_id').eq('user_id', otherUserId)
+        .in('conversation_id', existing.map(e => e.conversation_id));
+      if (sharedConv?.length) convId = sharedConv[0].conversation_id;
+    }
+
+    if (!convId) {
+      const { data: newConv } = await sb.from('conversations').insert({type:'direct',created_by:ME.id}).select().single();
+      if (newConv) {
+        convId = newConv.id;
+        await sb.from('conversation_members').insert([
+          {conversation_id:convId, user_id:ME.id},
+          {conversation_id:convId, user_id:otherUserId}
+        ]);
+      }
+    }
+
+    currentConvId = convId;
+
+    // Carrega mensagens
+    const { data: msgs } = await sb.from('messages').select('*,sender:profiles(full_name,avatar_url)').eq('conversation_id',convId).order('created_at',{ascending:true}).limit(50);
+    const wrap = document.getElementById('msgs-wrap');
+    wrap.innerHTML = '';
+    msgs?.forEach(m => appendMessage(m));
+    wrap.scrollTop = wrap.scrollHeight;
+
+    // Realtime
+    if (msgChannel) sb.removeChannel(msgChannel);
+    msgChannel = sb.channel(`conv-${convId}`)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`conversation_id=eq.${convId}`}, payload => {
+        if (payload.new.sender_id !== ME.id) appendMessage(payload.new);
+      }).subscribe();
+  }
+
+  goTo('chat');
+}
+
+function appendMessage(msg) {
+  const wrap = document.getElementById('msgs-wrap');
+  const isMe = msg.sender_id === ME?.id;
+  const timeStr = new Date(msg.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const div = document.createElement('div');
+  div.className = isMe ? 'mo' : 'mi2';
+  let content = '';
+  if (msg.image_url) content += `<img src="${msg.image_url}" alt="" style="max-width:200px;border-radius:10px;display:block;" onclick="openImgFull(this)">`;
+  if (msg.content) content += (msg.image_url?'<div style="margin-top:6px;">':'')+msg.content+(msg.image_url?'</div>':'');
+  div.innerHTML = `<div class="bub ${isMe?'bo2':'bi'}">${content}<div class="btime">${timeStr}</div></div>`;
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+// ============================================================
+// HELPER: tempo relativo
+// ============================================================
+function timeAgo(dateStr) {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.floor((now - d) / 1000);
+  if (diff < 60) return 'agora mesmo';
+  if (diff < 3600) return `há ${Math.floor(diff/60)} min`;
+  if (diff < 86400) return `há ${Math.floor(diff/3600)}h`;
+  if (diff < 604800) return `há ${Math.floor(diff/86400)} dias`;
+  return d.toLocaleDateString('pt-BR');
 }
 
 // ============================================================
@@ -1400,29 +1902,13 @@ function openImgFull(img) {
 }
 
 // ============================================================
-// ABRIR CONVERSA
-// ============================================================
-async function openConv(name, initials, bg, color) {
-  document.getElementById('cv-name').textContent = name;
-  const av = document.getElementById('cv-av');
-  av.innerHTML = '';
-  av.textContent = typeof initials === 'string' && initials.length <= 2 ? initials : initials;
-  if (bg) av.style.background = bg;
-  if (color) av.style.color = color;
-  document.getElementById('chatconv').classList.add('on');
-
-  // Tenta achar/criar conversa no Supabase
-  if (ME?.id) {
-    // em produção: buscar/criar conversation + members
-    // Para demo, apenas abre UI
-  }
-  document.getElementById('msgs-wrap').scrollTop = 999999;
-  goTo('chat');
-}
 
 function closeConv() {
   document.getElementById('chatconv').classList.remove('on');
   document.getElementById('emoji-picker').classList.remove('on');
+async function openConv(name, initials, bg, color) {
+  await openConvDB(name, null, initials, bg, color);
+}
   document.getElementById('emoji-btn').classList.remove('on');
   if (msgChannel) { sb.removeChannel(msgChannel); msgChannel = null; }
 }
@@ -1568,6 +2054,22 @@ function proposeTradeUI(user, give, get) {
   document.querySelector('#modal-troca input[type="number"]').value = give;
   document.querySelectorAll('#modal-troca input[type="number"]')[1].value = get;
   openModal('modal-troca');
+}
+
+async function sendTradeFromModal() {
+  if (!ME?.id) { toast('Faça login para propor trocas!'); return; }
+  const inputs = document.querySelectorAll('#modal-troca input[type="number"]');
+  const give = parseInt(inputs[0]?.value);
+  const get  = parseInt(inputs[1]?.value);
+  const receiverInput = document.querySelector('#modal-troca input[placeholder="Usuário ou e-mail"]');
+  const receiverVal = receiverInput?.value?.trim();
+  if (!give || !get) { toast('Informe os números das figurinhas!'); return; }
+  if (!receiverVal) { toast('Informe o usuário para enviar a proposta!'); return; }
+  const { data: found } = await sb.from('profiles').select('id,full_name,username')
+    .or(`username.eq.${receiverVal},full_name.ilike.%${receiverVal}%`).limit(1).single();
+  if (!found) { toast('Usuário não encontrado.'); return; }
+  await proposeTradeDB(found.id, give, get, found.full_name || found.username);
+  closeModal('modal-troca');
 }
 
 // ============================================================
