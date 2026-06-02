@@ -505,6 +505,67 @@ input,textarea{font-family:var(--font);}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
 
 /* ======================================================
+   ÁLBUM DE FIGURINHAS
+====================================================== */
+#page-album{background:var(--f0);}
+.album-header{background:var(--g);padding:16px;color:#fff;}
+.album-search{display:flex;gap:8px;padding:12px 16px;background:#fff;border-bottom:0.5px solid var(--border);position:sticky;top:0;z-index:5;}
+.album-search input{flex:1;padding:9px 12px;border-radius:var(--rsm);border:1.5px solid var(--f2);font-size:14px;font-family:var(--font);background:var(--f0);outline:none;color:var(--t0);}
+.album-search input:focus{border-color:var(--g);}
+.album-tabs{display:flex;background:#fff;border-bottom:0.5px solid var(--border);}
+.album-tab{flex:1;padding:11px 8px;font-size:12px;font-weight:800;color:var(--t2);border:none;background:none;border-bottom:2.5px solid transparent;cursor:pointer;}
+.album-tab.on{color:var(--g);border-bottom-color:var(--g);}
+.sticker-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:14px 16px;}
+.stk-card{border-radius:var(--rxs);aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .1s;border:1.5px solid transparent;position:relative;}
+.stk-card:active{transform:scale(0.95);}
+.stk-card.stk-have{background:var(--gl);border-color:rgba(0,156,59,.25);}
+.stk-card.stk-need{background:var(--redl);border-color:rgba(229,57,53,.15);}
+.stk-card.stk-empty{background:var(--f1);border-color:var(--f2);}
+.stk-card.stk-dup{background:var(--yl);border-color:rgba(201,168,0,.25);}
+.stk-num{font-family:var(--display);font-size:15px;letter-spacing:.5px;line-height:1;}
+.stk-have .stk-num{color:var(--gd);}
+.stk-need .stk-num{color:var(--red);}
+.stk-empty .stk-num{color:var(--t2);}
+.stk-dup .stk-num{color:var(--yd);}
+.stk-lbl{font-size:8px;font-weight:800;margin-top:2px;}
+.stk-have .stk-lbl{color:var(--gd);}
+.stk-need .stk-lbl{color:var(--red);}
+.stk-empty .stk-lbl{color:var(--t2);}
+.stk-dup .stk-lbl{color:var(--yd);}
+.stk-badge{position:absolute;top:-4px;right:-4px;background:var(--g);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;border:1.5px solid #fff;}
+.album-progress{padding:12px 16px;background:#fff;border-bottom:0.5px solid var(--border);}
+.album-bulk{display:flex;gap:8px;padding:10px 16px;background:#fff;border-bottom:0.5px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+.album-bulk::-webkit-scrollbar{display:none;}
+
+/* ======================================================
+   COMENTÁRIOS NOS POSTS
+====================================================== */
+.comments-section{padding:10px 14px;border-top:0.5px solid var(--border);display:none;}
+.comments-section.open{display:block;}
+.comment-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.comment-item{display:flex;gap:8px;align-items:flex-start;}
+.comment-bubble{background:var(--f0);border-radius:0 var(--rsm) var(--rsm) var(--rsm);padding:8px 10px;flex:1;}
+.comment-name{font-size:12px;font-weight:800;color:var(--t0);margin-bottom:2px;}
+.comment-text{font-size:13px;color:var(--t0);line-height:1.5;}
+.comment-time{font-size:10px;color:var(--t2);margin-top:3px;}
+.comment-input-row{display:flex;gap:8px;align-items:center;}
+.comment-inp{flex:1;padding:9px 12px;border-radius:20px;border:1.5px solid var(--f2);font-size:13px;font-family:var(--font);background:var(--f0);outline:none;color:var(--t0);}
+.comment-inp:focus{border-color:var(--g);}
+.comment-send{width:34px;height:34px;border-radius:50%;background:var(--g);border:none;color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;}
+
+/* ======================================================
+   GRUPOS NO CHAT
+====================================================== */
+.group-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;}
+.group-item:active{background:var(--f0);}
+.group-av{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.group-av.gv1{background:var(--gl);}
+.group-av.gv2{background:var(--bl);}
+.group-av.gv3{background:var(--yl);}
+.group-badge{background:var(--g);color:#fff;border-radius:10px;font-size:10px;font-weight:800;padding:2px 7px;min-width:20px;text-align:center;}
+#modal-grupo .mf-inp, #modal-grupo .mf-ta{width:100%;}
+
+/* ======================================================
    INSTALL BANNER
 ====================================================== */
 #install-banner{
@@ -770,8 +831,15 @@ input,textarea{font-family:var(--font);}
             </div>
             <div class="pa-row">
               <button class="pa" id="lk1" onclick="toggleLike('lk1',247)">❤️ 247</button>
-              <button class="pa" onclick="toast('Comentários em breve!')">💬 38</button>
+              <button class="pa" onclick="toggleComments(this,'post-static-1')">💬 38</button>
               <button class="pa" onclick="toast('Link copiado!')">↗️</button>
+            </div>
+            <div class="comments-section" id="post-static-1">
+              <div class="comment-list" id="clist-post-static-1"></div>
+              <div class="comment-input-row">
+                <input class="comment-inp" placeholder="Escreva um comentário..." id="cinp-post-static-1">
+                <button class="comment-send" onclick="submitComment('post-static-1',null)">➤</button>
+              </div>
             </div>
           </div>
           <div class="post">
@@ -783,8 +851,15 @@ input,textarea{font-family:var(--font);}
             <div class="post-tags"><span class="tag tv">Conservação</span><span class="tag tb">Dica útil</span></div>
             <div class="pa-row">
               <button class="pa" id="lk2" onclick="toggleLike('lk2',89)">❤️ 89</button>
-              <button class="pa" onclick="toast('Comentários em breve!')">💬 14</button>
+              <button class="pa" onclick="toggleComments(this,'post-static-2')">💬 14</button>
               <button class="pa helpful">👍 Útil (56)</button>
+            </div>
+            <div class="comments-section" id="post-static-2">
+              <div class="comment-list" id="clist-post-static-2"></div>
+              <div class="comment-input-row">
+                <input class="comment-inp" placeholder="Escreva um comentário..." id="cinp-post-static-2">
+                <button class="comment-send" onclick="submitComment('post-static-2',null)">➤</button>
+              </div>
             </div>
           </div>
         </div>
@@ -836,22 +911,11 @@ input,textarea{font-family:var(--font);}
       <!-- GRUPOS -->
       <div id="sub-grupos" class="ss">
         <div class="rsb" style="padding:12px 16px;border-bottom:0.5px solid var(--border);">
-          <span style="font-size:14px;color:var(--t2);font-weight:700;">Você está em 2 grupos</span>
-          <button class="btn bv bsm" onclick="toast('Criar grupo — em breve!')">+ Criar</button>
+          <span style="font-size:14px;color:var(--t2);font-weight:700;" id="grp-count-lbl">Carregando grupos...</span>
+          <button class="btn bv bsm" onclick="openModal('modal-grupo')">+ Criar</button>
         </div>
-        <div class="card" style="margin:12px 16px;">
-          <div class="gi" style="background:var(--gl);" onclick="openConv('Brasil Copa 2026','🏆')">
-            <div class="gic" style="background:var(--g);"><svg width="30" height="30" viewBox="0 0 30 30"><rect width="30" height="30" rx="7" fill="#009C3B"/><polygon points="15,3 26,9 26,21 15,27 4,21 4,9" fill="#FFDF00"/><circle cx="15" cy="15" r="5" fill="#002776"/></svg></div>
-            <div style="flex:1;"><div style="font-size:14px;font-weight:800;color:var(--gd);">Brasil Copa 2026</div><div style="font-size:12px;color:var(--t2);">1.240 membros · 34 msgs</div></div>
-            <button class="btn bv bsm">Abrir</button>
-          </div>
-          <div class="gi" style="background:var(--bl);" onclick="openConv('Figurinhas raras','✦')">
-            <div class="gic" style="background:var(--b);color:var(--y);font-size:22px;">✦</div>
-            <div style="flex:1;"><div style="font-size:14px;font-weight:800;color:var(--b);">Figurinhas raras</div><div style="font-size:12px;color:var(--t2);">892 membros</div></div>
-            <button class="btn bsm" style="border:1.5px solid var(--b);color:var(--b);">Abrir</button>
-          </div>
-          <div class="gi"><div class="gic"><svg width="36" height="36" viewBox="0 0 36 36"><rect width="36" height="36" rx="8" fill="#74ACDF"/><ellipse cx="18" cy="18" rx="9" ry="9" fill="none" stroke="#F6B40E" stroke-width="2.5"/><circle cx="18" cy="18" r="4" fill="#F6B40E"/></svg></div><div style="flex:1;"><div style="font-size:14px;font-weight:800;">Argentina</div><div style="font-size:12px;color:var(--t2);">743 membros</div></div><button class="btn bv bsm" onclick="toast('Entrando no grupo!')">Entrar</button></div>
-          <div class="gi"><div class="gic" style="font-size:28px;">🗺️</div><div style="flex:1;"><div style="font-size:14px;font-weight:800;">Colecionadores Nordeste</div><div style="font-size:12px;color:var(--t2);">2.100 membros · Regional</div></div><button class="btn bv bsm" onclick="toast('Entrando no grupo!')">Entrar</button></div>
+        <div id="groups-list">
+          <div style="padding:24px;text-align:center;color:var(--t2);font-size:13px;">Carregando grupos...</div>
         </div>
       </div>
     </div>
@@ -861,7 +925,10 @@ input,textarea{font-family:var(--font);}
       <div id="chat-list">
         <div class="rsb" style="padding:12px 16px;border-bottom:0.5px solid var(--border);">
           <span style="font-size:16px;font-weight:800;">Mensagens</span>
-          <button class="btn bo bsm" onclick="toast('Nova conversa...')">✏️ Nova</button>
+          <div style="display:flex;gap:8px;">
+            <button class="btn bo bsm" onclick="openModal('modal-grupo')">👥 Grupo</button>
+            <button class="btn bv bsm" onclick="toast('Busque um usuário nas Trocas para iniciar conversa!')">✏️ Nova</button>
+          </div>
         </div>
         <div class="fbar"><button class="fc on">Trocas (3)</button><button class="fc">Grupos (2)</button><button class="fc">Comunidade</button></div>
         <div class="card" style="margin:12px 16px;">
@@ -965,15 +1032,56 @@ input,textarea{font-family:var(--font);}
       <div style="padding:0 16px 20px;"><button class="btn bo" style="width:100%;justify-content:center;" onclick="doLogout()">Sair da conta</button></div>
     </div>
 
+    <!-- ===== ÁLBUM ===== -->
+    <div class="page" id="page-album">
+      <div class="album-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div>
+            <div style="font-family:var(--display);font-size:22px;letter-spacing:1px;">Meu Álbum 2026</div>
+            <div style="font-size:12px;opacity:.8;margin-top:2px;">Copa do Mundo · 640 figurinhas</div>
+          </div>
+          <button class="btn bgh bsm" onclick="openModal('modal-figurinha')">+ Adicionar</button>
+        </div>
+        <div id="album-prog-bar">
+          <div style="display:flex;justify-content:space-between;font-size:12px;opacity:.85;margin-bottom:6px;">
+            <span id="alb-have-count">0 tenho</span>
+            <span id="alb-need-count">0 faltam</span>
+            <span id="alb-dup-count">0 repetidas</span>
+          </div>
+          <div class="pbar" style="height:8px;border-radius:4px;background:rgba(255,255,255,.25);">
+            <div class="pfill" id="alb-fill" style="width:0%;background:var(--y);"></div>
+          </div>
+          <div style="font-size:11px;opacity:.75;margin-top:4px;text-align:right;font-weight:700;" id="alb-pct">0% completo</div>
+        </div>
+      </div>
+      <div class="album-tabs">
+        <button class="album-tab on" id="atab-all" onclick="filterAlbum('all',this)">Todas</button>
+        <button class="album-tab" id="atab-have" onclick="filterAlbum('have',this)">Tenho ✓</button>
+        <button class="album-tab" id="atab-dup" onclick="filterAlbum('dup',this)">Repetidas</button>
+        <button class="album-tab" id="atab-need" onclick="filterAlbum('need',this)">Faltam</button>
+      </div>
+      <div class="album-search">
+        <input type="number" id="album-search-inp" placeholder="Buscar número ex: 147" oninput="renderAlbumGrid()">
+        <button class="btn bv bsm" onclick="document.getElementById('album-search-inp').value='';renderAlbumGrid()">✕</button>
+      </div>
+      <div class="album-bulk">
+        <button class="btn bv bxs" onclick="bulkAddStickers('have')">✓ Marcar como tenho</button>
+        <button class="btn ba bxs" onclick="bulkAddStickers('dup')">+ Repetida</button>
+        <button class="btn bo bxs" style="color:var(--red);border-color:var(--red);" onclick="bulkAddStickers('need')">✗ Marcar faltando</button>
+        <button class="btn bo bxs" onclick="clearBulkSelection()">Limpar seleção</button>
+      </div>
+      <div class="sticker-grid" id="sticker-grid"></div>
+    </div>
+
   </div><!-- /pages -->
 
   <!-- BOTTOM NAV -->
   <nav id="bnav">
     <button class="ni on" id="ni-home" onclick="goTo('home')"><span class="ni-ic">🏠</span><span>Início</span></button>
-    <button class="ni" id="ni-pontos" onclick="goTo('pontos')"><span class="ni-ic">📍</span><span>Pontos</span></button>
+    <button class="ni" id="ni-album" onclick="goTo('album')"><span class="ni-ic">📒</span><span>Álbum</span></button>
     <button class="ni" id="ni-trocas" onclick="goTo('trocas')"><span class="ni-ic">🔄</span><span>Trocas</span><span class="ni-badge">3</span></button>
     <button class="ni" id="ni-comunidade" onclick="goTo('comunidade')"><span class="ni-ic">👥</span><span>Comunidade</span></button>
-    <button class="ni" id="ni-chat" onclick="goTo('chat')"><span class="ni-ic">💬</span><span>Chat</span><span class="ni-badge">9</span></button>
+    <button class="ni" id="ni-chat" onclick="goTo('chat')"><span class="ni-ic">💬</span><span>Chat</span><span class="ni-badge" id="chat-badge">9</span></button>
   </nav>
 </div><!-- /app -->
 
@@ -1032,6 +1140,50 @@ input,textarea{font-family:var(--font);}
   </div>
 </div>
 
+<!-- MODAL FIGURINHA -->
+<div class="modal-bg" id="modal-figurinha">
+  <div class="modal">
+    <div class="modal-h"><div class="modal-t">📒 Adicionar figurinha</div><button class="modal-cl" onclick="closeModal('modal-figurinha')">✕</button></div>
+    <div class="mform">
+      <div><div class="mf-lbl">Número da figurinha</div><input class="mf-inp" id="fig-num" type="number" min="1" max="640" placeholder="Ex: 147"></div>
+      <div><div class="mf-lbl">Status</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px;">
+          <button class="btn bv bsm fig-status-btn on" data-status="have" onclick="selectFigStatus(this,'have')">✓ Tenho</button>
+          <button class="btn ba bsm fig-status-btn" data-status="dup" onclick="selectFigStatus(this,'dup')">+ Repetida</button>
+          <button class="btn bo bsm fig-status-btn" style="color:var(--red);border-color:var(--red);" data-status="need" onclick="selectFigStatus(this,'need')">✗ Falta</button>
+        </div>
+      </div>
+      <div id="fig-qty-wrap"><div class="mf-lbl">Quantidade de repetidas</div><input class="mf-inp" id="fig-qty" type="number" min="2" max="99" value="2" placeholder="2"></div>
+      <div style="padding:10px 12px;background:var(--f0);border-radius:var(--rsm);font-size:12px;color:var(--t2);font-weight:600;">
+        💡 <strong>Dica:</strong> Use a grade do álbum para marcar várias de uma vez. Toque em uma figurinha para marcar/desmarcar rapidamente.
+      </div>
+      <button class="btn bv" style="width:100%;padding:12px;" onclick="saveSingleSticker()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CRIAR GRUPO -->
+<div class="modal-bg" id="modal-grupo">
+  <div class="modal">
+    <div class="modal-h"><div class="modal-t">👥 Criar grupo</div><button class="modal-cl" onclick="closeModal('modal-grupo')">✕</button></div>
+    <div class="mform">
+      <div><div class="mf-lbl">Nome do grupo</div><input class="mf-inp" id="grp-name" placeholder="Ex: Colecionadores de Recife"></div>
+      <div><div class="mf-lbl">Emoji do grupo</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;" id="grp-emoji-pick">
+          <button class="btn bo bsm grp-em on" data-em="⚽" onclick="selectGrpEmoji(this,'⚽')">⚽</button>
+          <button class="btn bo bsm grp-em" data-em="🏆" onclick="selectGrpEmoji(this,'🏆')">🏆</button>
+          <button class="btn bo bsm grp-em" data-em="🇧🇷" onclick="selectGrpEmoji(this,'🇧🇷')">🇧🇷</button>
+          <button class="btn bo bsm grp-em" data-em="📒" onclick="selectGrpEmoji(this,'📒')">📒</button>
+          <button class="btn bo bsm grp-em" data-em="🤝" onclick="selectGrpEmoji(this,'🤝')">🤝</button>
+          <button class="btn bo bsm grp-em" data-em="🌟" onclick="selectGrpEmoji(this,'🌟')">🌟</button>
+        </div>
+      </div>
+      <div><div class="mf-lbl">Descrição (opcional)</div><textarea class="mf-ta" id="grp-desc" rows="2" placeholder="Sobre o grupo..."></textarea></div>
+      <button class="btn bv" style="width:100%;padding:12px;" onclick="createGroup()">Criar grupo</button>
+    </div>
+  </div>
+</div>
+
 <!-- INSTALL BANNER -->
 <div id="install-banner">
   <div style="width:40px;height:40px;border-radius:10px;background:var(--y);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -1057,15 +1209,7 @@ const SUPABASE_URL = 'https://xojrtrltjtamflilrdnb.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvanJ0cmx0anRhbWZsaWxyZG5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MTgxMjQsImV4cCI6MjA5NTk5NDEyNH0.8-Xw6wxluQ7zY7-rxF8ne5su5O6LsYA-gx4zbYlrXIE';
 // ============================================================
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    persistSession: true,
-    storageKey: 'figuritroca-session',
-    storage: window.localStorage,
-    autoRefreshToken: true,
-    detectSessionInUrl: false
-  }
-});
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let ME = null;          // perfil do usuário logado
 let currentConvId = null;
 let msgChannel = null;
@@ -1075,19 +1219,7 @@ let pendingChatImg = null;
 // BOOT
 // ============================================================
 async function boot() {
-  // escuta mudanças de auth (login, logout, refresh de token)
-  sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session && !ME) {
-      await loadProfile(session.user.id);
-      showApp();
-    } else if (event === 'SIGNED_OUT') {
-      ME = null;
-      document.getElementById('app').style.display = 'none';
-      document.getElementById('auth-overlay').style.display = 'flex';
-    }
-  });
-
-  // verifica sessão já existente
+  // verifica sessão
   const { data: { session } } = await sb.auth.getSession();
   document.getElementById('loading').style.display = 'none';
   if (session) {
@@ -1125,7 +1257,6 @@ function showApp() {
   document.getElementById('app').style.display = 'flex';
   loadHomeData();
 }
-
 function guestMode() {
   ME = { id: null, full_name: 'Visitante', username: 'visitante', city: '', state: '' };
   updateUIWithProfile();
@@ -2138,8 +2269,429 @@ if ('serviceWorker' in navigator) {
 }
 
 // ============================================================
-// INICIAR
+// ÁLBUM DE FIGURINHAS
 // ============================================================
+let albumStickers = {}; // { number: { status, quantity } }
+let albumFilter = 'all';
+let bulkSelected = new Set();
+let selectedFigStatus = 'have';
+
+async function loadAlbum() {
+  if (!ME?.id) return;
+  const { data } = await sb.from('user_stickers').select('*').eq('user_id', ME.id);
+  albumStickers = {};
+  if (data) {
+    data.forEach(s => {
+      albumStickers[s.number] = { status: s.status, quantity: s.quantity || 1, id: s.id };
+    });
+  }
+  renderAlbumGrid();
+  updateAlbumProgress();
+}
+
+function renderAlbumGrid() {
+  const grid = document.getElementById('sticker-grid');
+  if (!grid) return;
+  const search = parseInt(document.getElementById('album-search-inp')?.value) || 0;
+  grid.innerHTML = '';
+
+  for (let n = 1; n <= 640; n++) {
+    if (search && n !== search) continue;
+    const s = albumStickers[n];
+    const status = s ? (s.status === 'have' && s.quantity > 1 ? 'dup' : s.status) : 'empty';
+    if (albumFilter !== 'all' && status !== albumFilter) continue;
+
+    const card = document.createElement('div');
+    const selected = bulkSelected.has(n);
+    card.className = `stk-card stk-${status}${selected ? ' stk-selected' : ''}`;
+    if (selected) card.style.outline = '2.5px solid var(--b)';
+    const lbl = { have: 'TENHO', need: 'FALTA', empty: '', dup: `x${s?.quantity||2}` }[status] || '';
+    card.innerHTML = `
+      <div class="stk-num">${n.toString().padStart(3,'0')}</div>
+      ${lbl ? `<div class="stk-lbl">${lbl}</div>` : ''}
+      ${status==='dup' ? `<div class="stk-badge">${s?.quantity||2}</div>` : ''}
+    `;
+    card.onclick = () => toggleStickerQuick(n, card, status);
+    grid.appendChild(card);
+  }
+}
+
+async function toggleStickerQuick(num, card, currentStatus) {
+  if (!ME?.id) { toast('Faça login para gerenciar seu álbum!'); return; }
+
+  // Ciclo: empty → have → dup → need → empty
+  const cycle = { empty: 'have', have: 'dup', dup: 'need', need: 'empty' };
+  const newStatus = cycle[currentStatus] || 'have';
+
+  if (newStatus === 'empty') {
+    // Remove
+    await sb.from('user_stickers').delete().eq('user_id', ME.id).eq('number', num);
+    delete albumStickers[num];
+  } else {
+    const qty = newStatus === 'dup' ? 2 : 1;
+    await sb.from('user_stickers').upsert({ user_id: ME.id, number: num, status: newStatus === 'dup' ? 'have' : newStatus, quantity: qty }, { onConflict: 'user_id,number' });
+    albumStickers[num] = { status: newStatus === 'dup' ? 'have' : newStatus, quantity: qty };
+  }
+
+  const labels = { have: '✓ Tenho', dup: '+ Repetida', need: '✗ Falta', empty: '− Removida' };
+  toast(`#${num.toString().padStart(3,'0')} — ${labels[newStatus]}`);
+  renderAlbumGrid();
+  updateAlbumProgress();
+}
+
+function updateAlbumProgress() {
+  const have = Object.values(albumStickers).filter(s => s.status === 'have' && s.quantity === 1).length;
+  const dup  = Object.values(albumStickers).filter(s => s.status === 'have' && s.quantity > 1).length;
+  const need = Object.values(albumStickers).filter(s => s.status === 'need').length;
+  const total = have + dup;
+  const pct = Math.round(total / 640 * 100);
+  document.getElementById('alb-have-count').textContent = `${total} tenho`;
+  document.getElementById('alb-need-count').textContent = `${need} faltam`;
+  document.getElementById('alb-dup-count').textContent = `${dup} repetidas`;
+  document.getElementById('alb-fill').style.width = pct + '%';
+  document.getElementById('alb-pct').textContent = `${pct}% completo`;
+  // Atualiza contadores da home
+  document.getElementById('h-rep').textContent = dup;
+  document.getElementById('h-need').textContent = need;
+}
+
+function filterAlbum(f, btn) {
+  albumFilter = f;
+  document.querySelectorAll('.album-tab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderAlbumGrid();
+}
+
+function selectFigStatus(btn, status) {
+  selectedFigStatus = status;
+  document.querySelectorAll('.fig-status-btn').forEach(b => { b.className = b.className.replace(' on',''); b.style.background=''; });
+  btn.classList.add('on');
+  document.getElementById('fig-qty-wrap').style.display = status === 'dup' ? 'block' : 'none';
+}
+
+async function saveSingleSticker() {
+  const num = parseInt(document.getElementById('fig-num').value);
+  if (!num || num < 1 || num > 640) { toast('Número inválido (1-640)!'); return; }
+  if (!ME?.id) { toast('Faça login primeiro!'); return; }
+  const qty = selectedFigStatus === 'dup' ? parseInt(document.getElementById('fig-qty').value)||2 : 1;
+  const dbStatus = selectedFigStatus === 'dup' ? 'have' : selectedFigStatus;
+  await sb.from('user_stickers').upsert({ user_id: ME.id, number: num, status: dbStatus, quantity: qty }, { onConflict: 'user_id,number' });
+  albumStickers[num] = { status: dbStatus, quantity: qty };
+  renderAlbumGrid();
+  updateAlbumProgress();
+  closeModal('modal-figurinha');
+  document.getElementById('fig-num').value = '';
+  const labels = { have: 'Tenho', dup: 'Repetida', need: 'Falta' };
+  toast(`Figurinha #${num.toString().padStart(3,'0')} marcada como ${labels[selectedFigStatus]}!`);
+}
+
+async function bulkAddStickers(status) {
+  if (!bulkSelected.size) { toast('Toque nas figurinhas para selecionar primeiro!'); return; }
+  if (!ME?.id) { toast('Faça login primeiro!'); return; }
+  const rows = [...bulkSelected].map(num => ({ user_id: ME.id, number: num, status: status === 'dup' ? 'have' : status, quantity: status === 'dup' ? 2 : 1 }));
+  await sb.from('user_stickers').upsert(rows, { onConflict: 'user_id,number' });
+  rows.forEach(r => { albumStickers[r.number] = { status: r.status, quantity: r.quantity }; });
+  const count = bulkSelected.size;
+  bulkSelected.clear();
+  renderAlbumGrid();
+  updateAlbumProgress();
+  toast(`${count} figurinhas atualizadas! ✓`);
+}
+
+function clearBulkSelection() {
+  bulkSelected.clear();
+  renderAlbumGrid();
+  toast('Seleção limpa');
+}
+
+// ============================================================
+// COMENTÁRIOS NOS POSTS
+// ============================================================
+async function loadComments(postId, containerId) {
+  const listEl = document.getElementById('clist-' + containerId);
+  if (!listEl) return;
+  listEl.innerHTML = '<div style="font-size:12px;color:var(--t2);padding:4px 0;">Carregando...</div>';
+
+  if (!postId) {
+    // Post estático — carrega do localStorage como fallback
+    const stored = JSON.parse(localStorage.getItem('comments_' + containerId) || '[]');
+    renderCommentList(stored, listEl, containerId, null);
+    return;
+  }
+
+  const { data: comments } = await sb.from('post_comments')
+    .select('*,author:profiles(full_name,username,avatar_url)')
+    .eq('post_id', postId)
+    .order('created_at', { ascending: true })
+    .limit(50);
+  renderCommentList(comments || [], listEl, containerId, postId);
+}
+
+function renderCommentList(comments, listEl, containerId, postId) {
+  if (!comments.length) {
+    listEl.innerHTML = '<div style="font-size:12px;color:var(--t2);padding:4px 0;text-align:center;">Nenhum comentário ainda. Seja o primeiro!</div>';
+    return;
+  }
+  listEl.innerHTML = comments.map(c => {
+    const name = c.author?.full_name || c.author?.username || c.author_name || 'Usuário';
+    const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const timeStr = c.created_at ? timeAgo(c.created_at) : 'agora mesmo';
+    return `<div class="comment-item">
+      <div class="av" style="width:30px;height:30px;background:var(--gl);color:var(--gd);font-size:10px;flex-shrink:0;">
+        ${c.author?.avatar_url ? `<img src="${c.author.avatar_url}" alt="">` : initials}
+      </div>
+      <div class="comment-bubble">
+        <div class="comment-name">${name}</div>
+        <div class="comment-text">${c.content}</div>
+        <div class="comment-time">${timeStr}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleComments(btn, containerId, postId) {
+  const section = document.getElementById(containerId);
+  if (!section) return;
+  const isOpen = section.classList.contains('open');
+  if (!isOpen) {
+    section.classList.add('open');
+    loadComments(postId || null, containerId);
+    // Atualiza texto do botão
+    const currentText = btn.textContent;
+    const count = parseInt(currentText.replace(/\D/g,'')) || 0;
+    btn.setAttribute('data-count', count);
+  } else {
+    section.classList.remove('open');
+  }
+}
+
+async function submitComment(containerId, postId) {
+  const inp = document.getElementById('cinp-' + containerId);
+  const text = inp?.value?.trim();
+  if (!text) return;
+  if (!ME?.id) { toast('Faça login para comentar!'); return; }
+
+  // Adiciona otimisticamente na UI
+  const listEl = document.getElementById('clist-' + containerId);
+  const noComments = listEl.querySelector('[style*="text-align:center"]');
+  if (noComments) listEl.innerHTML = '';
+
+  const name = ME.full_name || ME.username || 'Você';
+  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const div = document.createElement('div');
+  div.className = 'comment-item';
+  div.innerHTML = `
+    <div class="av" style="width:30px;height:30px;background:var(--y);color:var(--b);font-size:10px;flex-shrink:0;">
+      ${ME.avatar_url ? `<img src="${ME.avatar_url}" alt="">` : initials}
+    </div>
+    <div class="comment-bubble">
+      <div class="comment-name">${name}</div>
+      <div class="comment-text">${text}</div>
+      <div class="comment-time">agora mesmo</div>
+    </div>`;
+  listEl.appendChild(div);
+  inp.value = '';
+
+  if (postId) {
+    await sb.from('post_comments').insert({ post_id: postId, author_id: ME.id, content: text });
+  } else {
+    // Estático — salva no localStorage
+    const key = 'comments_' + containerId;
+    const stored = JSON.parse(localStorage.getItem(key) || '[]');
+    stored.push({ content: text, author_name: name, created_at: new Date().toISOString() });
+    localStorage.setItem(key, JSON.stringify(stored));
+  }
+}
+
+// ============================================================
+// GRUPOS NO CHAT
+// ============================================================
+let selectedGrpEmoji = '⚽';
+
+function selectGrpEmoji(btn, em) {
+  selectedGrpEmoji = em;
+  document.querySelectorAll('.grp-em').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+async function loadGroups() {
+  const container = document.getElementById('groups-list');
+  if (!container) return;
+
+  const { data: groups } = await sb.from('conversations')
+    .select('*,members:conversation_members(count)')
+    .eq('type','group')
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  if (!groups?.length) {
+    container.innerHTML = '<div style="padding:24px;text-align:center;color:var(--t2);font-size:13px;">Nenhum grupo ainda. Crie o primeiro! 🚀</div>';
+    document.getElementById('grp-count-lbl').textContent = '0 grupos disponíveis';
+    return;
+  }
+
+  // Verifica se o usuário é membro
+  let myGroupIds = [];
+  if (ME?.id) {
+    const { data: myMemberships } = await sb.from('conversation_members').select('conversation_id').eq('user_id', ME.id);
+    myGroupIds = myMemberships?.map(m => m.conversation_id) || [];
+  }
+
+  document.getElementById('grp-count-lbl').textContent = `${groups.length} grupos disponíveis`;
+
+  const colors = ['gv1','gv2','gv3'];
+  container.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.style.cssText = 'margin:12px 16px;';
+
+  groups.forEach((g, i) => {
+    const memberCount = g.members?.[0]?.count || 0;
+    const isMember = myGroupIds.includes(g.id);
+    const emoji = g.emoji || '👥';
+    const div = document.createElement('div');
+    div.className = 'group-item';
+    div.innerHTML = `
+      <div class="group-av ${colors[i%3]}">${emoji}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:800;">${g.name || 'Grupo sem nome'}</div>
+        <div style="font-size:12px;color:var(--t2);">${memberCount} membro${memberCount!==1?'s':''}</div>
+        ${g.description ? `<div style="font-size:12px;color:var(--t2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${g.description}</div>` : ''}
+      </div>
+      ${isMember
+        ? `<button class="btn bv bsm" onclick="openGroupChat('${g.id}','${(g.name||'Grupo').replace(/'/g,'\\'')}','${emoji}')">Abrir</button>`
+        : `<button class="btn ba bsm" onclick="joinGroup('${g.id}',this)">Entrar</button>`}
+    `;
+    card.appendChild(div);
+  });
+
+  container.appendChild(card);
+}
+
+async function createGroup() {
+  if (!ME?.id) { toast('Faça login para criar grupos!'); return; }
+  const name = document.getElementById('grp-name').value.trim();
+  const desc = document.getElementById('grp-desc').value.trim();
+  if (!name) { toast('Dê um nome ao grupo!'); return; }
+
+  const { data: newConv, error } = await sb.from('conversations').insert({
+    type: 'group', name, description: desc || null, emoji: selectedGrpEmoji, created_by: ME.id
+  }).select().single();
+
+  if (error) { toast('Erro ao criar grupo: ' + error.message); return; }
+
+  // Adiciona criador como membro
+  await sb.from('conversation_members').insert({ conversation_id: newConv.id, user_id: ME.id, role: 'admin' });
+
+  closeModal('modal-grupo');
+  document.getElementById('grp-name').value = '';
+  document.getElementById('grp-desc').value = '';
+  toast(`Grupo "${name}" criado! 🎉`);
+
+  // Atualiza a lista
+  await loadGroups();
+
+  // Navega para Comunidade > Grupos
+  goTo('comunidade');
+  document.querySelector('[onclick="showSub(\'grupos\',this)"]')?.click();
+}
+
+async function joinGroup(groupId, btn) {
+  if (!ME?.id) { toast('Faça login para entrar em grupos!'); return; }
+  const { error } = await sb.from('conversation_members').insert({ conversation_id: groupId, user_id: ME.id });
+  if (error && !error.message.includes('duplicate')) { toast('Erro ao entrar no grupo.'); return; }
+  btn.textContent = 'Abrir';
+  btn.className = 'btn bv bsm';
+  btn.onclick = () => openGroupChat(groupId, btn.closest('.group-item').querySelector('div:nth-child(2) div').textContent, btn.closest('.group-item').querySelector('.group-av').textContent);
+  toast('Você entrou no grupo! 🎉');
+}
+
+async function openGroupChat(convId, name, emoji) {
+  document.getElementById('cv-name').textContent = emoji + ' ' + name;
+  const av = document.getElementById('cv-av');
+  av.innerHTML = emoji;
+  av.style.background = 'var(--g)';
+  av.style.color = '#fff';
+  document.getElementById('chatconv').classList.add('on');
+  document.getElementById('msgs-wrap').innerHTML = '';
+  currentConvId = convId;
+
+  const { data: msgs } = await sb.from('messages')
+    .select('*,sender:profiles(full_name,avatar_url)')
+    .eq('conversation_id', convId)
+    .order('created_at', { ascending: true })
+    .limit(50);
+  const wrap = document.getElementById('msgs-wrap');
+  msgs?.forEach(m => appendMessage(m));
+  wrap.scrollTop = wrap.scrollHeight;
+
+  if (msgChannel) sb.removeChannel(msgChannel);
+  msgChannel = sb.channel(`grp-${convId}`)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${convId}` }, payload => {
+      if (payload.new.sender_id !== ME?.id) appendMessage(payload.new);
+    }).subscribe();
+
+  goTo('chat');
+}
+
+// ============================================================
+// OVERRIDE goTo para carregar álbum e grupos
+// ============================================================
+const _origGoTo = goTo;
+goTo = function(page) {
+  _origGoTo(page);
+  if (page === 'album') loadAlbum();
+};
+
+// Sobrescrever showSub para carregar grupos quando abrir aba Grupos
+const _origShowSub = showSub;
+showSub = function(id, btn) {
+  _origShowSub(id, btn);
+  if (id === 'grupos') loadGroups();
+};
+
+// Atualizar loadPosts para incluir botão de comentários real
+const _origLoadPosts = loadPosts;
+loadPosts = async function() {
+  const { data: posts } = await sb.from('posts')
+    .select('*,author:profiles(full_name,username,avatar_url)')
+    .order('created_at', { ascending: false }).limit(20);
+  if (!posts) return;
+  const container = document.getElementById('posts-container');
+  if (!container) return;
+  container.querySelectorAll('.post:not(.local-post)').forEach(p => p.remove());
+  posts.forEach(post => {
+    const author = post.author;
+    const name = author?.full_name || author?.username || 'Usuário';
+    const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const timeStr = timeAgo(post.created_at);
+    const cid = 'post-db-' + post.id;
+    const div = document.createElement('div');
+    div.className = 'post';
+    div.innerHTML = `
+      <div class="post-h">
+        <div class="av" style="width:40px;height:40px;background:var(--gl);color:var(--gd);font-size:13px;">
+          ${author?.avatar_url ? `<img src="${author.avatar_url}" alt="">` : initials}
+        </div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:800;">${name}</div><div style="font-size:11px;color:var(--t2);">${timeStr}</div></div>
+      </div>
+      ${post.image_url ? `<div class="post-img-preview"><img src="${post.image_url}" alt="" onclick="openImgFull(this)"></div>` : ''}
+      <div class="post-bod">${post.content}</div>
+      <div class="pa-row">
+        <button class="pa" onclick="togglePostLike(this,'${post.id}',${post.likes})">❤️ ${post.likes}</button>
+        <button class="pa" onclick="toggleComments(this,'${cid}','${post.id}')">💬 ${post.comment_count||0}</button>
+      </div>
+      <div class="comments-section" id="${cid}">
+        <div class="comment-list" id="clist-${cid}"></div>
+        <div class="comment-input-row">
+          <input class="comment-inp" placeholder="Escreva um comentário..." id="cinp-${cid}">
+          <button class="comment-send" onclick="submitComment('${cid}','${post.id}')">➤</button>
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
+};
+
 window.addEventListener('DOMContentLoaded', boot);
 </script>
 </body>
