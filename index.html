@@ -1057,7 +1057,15 @@ const SUPABASE_URL = 'https://xojrtrltjtamflilrdnb.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvanJ0cmx0anRhbWZsaWxyZG5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MTgxMjQsImV4cCI6MjA5NTk5NDEyNH0.8-Xw6wxluQ7zY7-rxF8ne5su5O6LsYA-gx4zbYlrXIE';
 // ============================================================
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    persistSession: true,
+    storageKey: 'figuritroca-session',
+    storage: window.localStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: false
+  }
+});
 let ME = null;          // perfil do usuário logado
 let currentConvId = null;
 let msgChannel = null;
@@ -1067,7 +1075,19 @@ let pendingChatImg = null;
 // BOOT
 // ============================================================
 async function boot() {
-  // verifica sessão
+  // escuta mudanças de auth (login, logout, refresh de token)
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session && !ME) {
+      await loadProfile(session.user.id);
+      showApp();
+    } else if (event === 'SIGNED_OUT') {
+      ME = null;
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('auth-overlay').style.display = 'flex';
+    }
+  });
+
+  // verifica sessão já existente
   const { data: { session } } = await sb.auth.getSession();
   document.getElementById('loading').style.display = 'none';
   if (session) {
