@@ -2106,20 +2106,36 @@ async function submitPost() {
 
   // Adiciona localmente no topo
   const now = new Date();
-  const timeStr = `há alguns segundos`;
+  const timeStr = 'há alguns segundos';
   const initials = (ME?.full_name || 'Você').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   const imgSrc = document.getElementById('post-img-prev').src;
+  const localCid = 'post-local-' + Date.now();
   const newPost = document.createElement('div');
-  newPost.className = 'post';
-  newPost.innerHTML = `
-    <div class="post-h">
-      <div class="av" style="width:40px;height:40px;background:var(--y);color:var(--b);font-size:13px;">${initials}</div>
-      <div style="flex:1;"><div style="font-size:14px;font-weight:800;">${ME?.full_name || 'Você'} <span class="tag tv" style="font-size:10px;margin-left:4px;">Novo</span></div><div style="font-size:11px;color:var(--t2);">${timeStr}</div></div>
-    </div>
-    ${imgSrc && imgSrc !== '' ? `<div class="post-img-preview"><img src="${imgSrc}" alt="" onclick="openImgFull(this)"></div>` : ''}
-    <div class="post-bod">${text}</div>
-    <div class="pa-row"><button class="pa" onclick="this.classList.toggle('liked');this.textContent=this.classList.contains('liked')?'❤️ 1':'❤️ 0'">❤️ 0</button><button class="pa" onclick="toast('Comentários em breve!')">💬 0</button></div>
-  `;
+  newPost.className = 'post local-post';
+
+  // Monta HTML sem template literals aninhados para evitar erro de sintaxe
+  let postHtml = '';
+  postHtml += '<div class="post-h">';
+  postHtml += '<div class="av" style="width:40px;height:40px;background:var(--y);color:var(--b);font-size:13px;">' + initials + '</div>';
+  postHtml += '<div style="flex:1;"><div style="font-size:14px;font-weight:800;">' + (ME?.full_name || 'Você') + ' <span class="tag tv" style="font-size:10px;margin-left:4px;">Novo</span></div>';
+  postHtml += '<div style="font-size:11px;color:var(--t2);">' + timeStr + '</div></div>';
+  postHtml += '</div>';
+  if (imgSrc && imgSrc !== '') {
+    postHtml += '<div class="post-img-preview"><img src="' + imgSrc + '" alt="" onclick="openImgFull(this)"></div>';
+  }
+  postHtml += '<div class="post-bod">' + text + '</div>';
+  postHtml += '<div class="pa-row">';
+  postHtml += '<button class="pa" onclick="this.classList.toggle(&apos;liked&apos;);this.textContent=this.classList.contains(&apos;liked&apos;)?&apos;\u2764\uFE0F 1&apos;:&apos;\u2764\uFE0F 0&apos;">❤️ 0</button>';
+  postHtml += '<button class="pa" data-cid="' + localCid + '" onclick="toggleComments(this,this.dataset.cid,null)">\uD83D\uDCAC 0</button>';
+  postHtml += '</div>';
+  postHtml += '<div class="comments-section" id="' + localCid + '">';
+  postHtml += '<div class="comment-list" id="clist-' + localCid + '"></div>';
+  postHtml += '<div class="comment-input-row">';
+  postHtml += '<input class="comment-inp" placeholder="Escreva um coment\u00E1rio..." id="cinp-' + localCid + '">';
+  postHtml += '<button class="comment-send" data-cid="' + localCid + '" onclick="submitComment(this.dataset.cid,null)">\u27A4</button>';
+  postHtml += '</div></div>';
+  newPost.innerHTML = postHtml;
+
   const container = document.getElementById('posts-container');
   container.insertBefore(newPost, container.firstChild);
 
@@ -2137,7 +2153,7 @@ async function handleAvatarImg(input) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = async e => {
-    document.getElementById('edit-av-preview').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    document.getElementById('edit-av-preview').innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
     if (ME?.id) {
       const path = `${ME.id}/avatar.${file.name.split('.').pop()}`;
       const { data: up } = await sb.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
@@ -2455,7 +2471,9 @@ function toggleComments(btn, containerId, postId) {
   const isOpen = section.classList.contains('open');
   if (!isOpen) {
     section.classList.add('open');
-    loadComments(postId || null, containerId);
+    // Normaliza postId: string 'null'/'undefined' vira null de verdade
+    const realPostId = (!postId || postId === 'null' || postId === 'undefined') ? null : postId;
+    loadComments(realPostId, containerId);
     // Atualiza texto do botão
     const currentText = btn.textContent;
     const count = parseInt(currentText.replace(/\D/g,'')) || 0;
@@ -2470,6 +2488,9 @@ async function submitComment(containerId, postId) {
   const text = inp?.value?.trim();
   if (!text) return;
   if (!ME?.id) { toast('Faça login para comentar!'); return; }
+  // Normaliza postId
+  const realPostId = (!postId || postId === 'null' || postId === 'undefined') ? null : postId;
+  postId = realPostId;
 
   // Adiciona otimisticamente na UI
   const listEl = document.getElementById('clist-' + containerId);
