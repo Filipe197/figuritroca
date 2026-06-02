@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#009C3B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FiguriTroca">
+<meta name="description" content="Trocas de figurinhas Copa 2026">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>FiguriTroca</title>
+<style>
+/* ======================================================
+   RESET & TOKENS
+====================================================== */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --g:#009C3B; --gd:#007A2E; --gl:#E6F7ED; --g2:#C8F0DA;
+  --y:#FFDF00; --yd:#C9A800; --yl:#FFFBE0;
+  --b:#002776; --bl:#EAF0FF;
+  --red:#E53935; --redl:#FEECEC;
+  --white:#fff;
+  --f0:#F8F8F6; --f1:#EFEFED; --f2:#DDDDD8;
+  --t0:#1A1A18; --t1:#555550; --t2:#9A9A95;
+  --border:rgba(0,0,0,0.08);
+  --r:14px; --rsm:10px; --rxs:7px;
+  --font:'Nunito',sans-serif;
+  --display:'Bebas Neue',sans-serif;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+  --topbar-h:64px;
+  --strip-h:28px;
+  --nav-h:60px;
+}
+html,body{height:100%;overflow:hidden;background:#1a1a18;}
+body{font-family:var(--font);color:var(--t0);-webkit-font-smoothing:antialiased;}
+button{font-family:var(--font);cursor:pointer;}
+input,textarea{font-family:var(--font);}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--f2);border-radius:2px;}
+
+/* ======================================================
+   APP SHELL
+====================================================== */
+#app{
+  display:flex;flex-direction:column;
+  height:100%;max-width:430px;margin:0 auto;
+  background:var(--white);position:relative;
+  box-shadow:0 0 60px rgba(0,0,0,0.3);
+}
+
+/* ---- TOPBAR ---- */
+#topbar{
+  background:var(--g);
+  padding:calc(var(--safe-top) + 10px) 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;position:relative;overflow:hidden;
+  min-height:calc(var(--topbar-h) + var(--safe-top));
+}
+#topbar::before,#topbar::after{
+  content:'';position:absolute;border-radius:50%;pointer-events:none;
+}
+#topbar::before{right:-30px;top:-30px;width:120px;height:120px;background:rgba(255,223,0,0.1);}
+#topbar::after{right:50px;bottom:-40px;width:80px;height:80px;background:rgba(0,39,118,0.12);}
+.logo-wrap{display:flex;align-items:center;gap:10px;z-index:1;}
+.logo-em{
+  width:40px;height:40px;border-radius:50%;background:var(--y);
+  display:flex;align-items:center;justify-content:center;
+  border:2.5px solid rgba(255,255,255,0.3);flex-shrink:0;
+}
+.logo-name{font-family:var(--display);font-size:22px;color:#fff;letter-spacing:1px;line-height:1;}
+.logo-sub{font-size:10px;color:rgba(255,255,255,0.72);font-weight:700;margin-top:1px;}
+.topbar-r{display:flex;align-items:center;gap:8px;z-index:1;}
+.iBtn{
+  width:36px;height:36px;border-radius:10px;
+  background:rgba(255,255,255,0.15);border:none;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:17px;position:relative;flex-shrink:0;
+}
+.iBtn .dot{
+  position:absolute;top:6px;right:6px;width:7px;height:7px;
+  background:var(--y);border-radius:50%;border:1.5px solid var(--g);
+}
+.uav{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--y);color:var(--b);
+  font-size:13px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid rgba(255,255,255,0.3);flex-shrink:0;overflow:hidden;
+}
+.uav img{width:100%;height:100%;object-fit:cover;}
+
+/* ---- COPA STRIP ---- */
+#copa-strip{
+  background:var(--y);padding:5px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.cs-t{font-size:11px;font-weight:800;color:var(--b);}
+
+/* ---- BOTTOM NAV ---- */
+#bnav{
+  display:flex;background:var(--white);
+  border-top:0.5px solid var(--border);
+  padding-bottom:var(--safe-bot);flex-shrink:0;
+}
+.ni{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:8px 2px 6px;border:none;background:none;
+  color:var(--t2);font-size:10px;font-weight:800;gap:2px;
+  position:relative;transition:color .15s;
+}
+.ni.on{color:var(--g);}
+.ni.on::before{
+  content:'';position:absolute;top:0;left:25%;right:25%;
+  height:2.5px;background:var(--g);border-radius:0 0 3px 3px;
+}
+.ni-ic{font-size:21px;line-height:1;}
+.ni-badge{
+  position:absolute;top:4px;right:calc(50% - 22px);
+  background:var(--red);color:#fff;border-radius:10px;
+  font-size:9px;font-weight:800;padding:1px 5px;
+  border:1.5px solid var(--white);min-width:16px;text-align:center;
+}
+
+/* ---- PAGES ---- */
+#pages{flex:1;overflow:hidden;position:relative;}
+.page{position:absolute;inset:0;overflow-y:auto;display:none;-webkit-overflow-scrolling:touch;}
+.page.on{display:block;}
+@keyframes pgIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.page.on>*{animation:pgIn .18s ease both;}
+
+/* ======================================================
+   SHARED ATOMS
+====================================================== */
+.sec{padding:14px 16px 0;}
+.sec-t{font-size:11px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
+.card{background:var(--white);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.cp{padding:14px;}
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.tv{background:var(--gl);color:var(--gd);}
+.ta{background:var(--yl);color:var(--yd);}
+.tb{background:var(--bl);color:var(--b);}
+.tr{background:var(--redl);color:var(--red);}
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;overflow:hidden;}
+.av img{width:100%;height:100%;object-fit:cover;}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 18px;border-radius:var(--rsm);border:none;
+  font-size:13px;font-weight:800;transition:opacity .15s,transform .1s;
+}
+.btn:active{transform:scale(0.97);}
+.bv{background:var(--g);color:#fff;}
+.ba{background:var(--y);color:var(--b);}
+.bo{background:transparent;border:1.5px solid var(--f2);color:var(--t0);}
+.bgh{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);color:#fff;}
+.bsm{padding:6px 13px;font-size:12px;border-radius:var(--rxs);}
+.bxs{padding:4px 10px;font-size:11px;border-radius:6px;}
+.row{display:flex;align-items:center;gap:8px;}
+.rsb{display:flex;align-items:center;justify-content:space-between;}
+.pbar{height:6px;background:var(--f1);border-radius:3px;overflow:hidden;}
+.pfill{height:100%;background:var(--g);border-radius:3px;}
+.div{border:none;border-top:0.5px solid var(--border);margin:10px 0;}
+
+/* FLAG */
+.flag{border-radius:3px;display:inline-block;overflow:hidden;flex-shrink:0;}
+
+/* ======================================================
+   AUTH OVERLAY
+====================================================== */
+#auth-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:var(--g);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;
+}
+.auth-logo{
+  width:80px;height:80px;border-radius:50%;
+  background:var(--y);display:flex;align-items:center;justify-content:center;
+  border:4px solid rgba(255,255,255,0.3);margin-bottom:20px;
+}
+.auth-title{font-family:var(--display);font-size:36px;color:#fff;letter-spacing:2px;margin-bottom:6px;}
+.auth-sub{font-size:14px;color:rgba(255,255,255,.75);font-weight:600;margin-bottom:32px;text-align:center;}
+.auth-card{
+  background:#fff;border-radius:var(--r);padding:24px;
+  width:100%;max-width:360px;
+}
+.auth-tabs{display:flex;gap:0;border-bottom:1px solid var(--f1);margin-bottom:20px;}
+.auth-tab{
+  flex:1;padding:10px;text-align:center;font-weight:800;font-size:14px;
+  color:var(--t2);border:none;background:none;
+  border-bottom:2.5px solid transparent;
+}
+.auth-tab.on{color:var(--g);border-bottom-color:var(--g);}
+.auth-form{display:flex;flex-direction:column;gap:12px;}
+.auth-inp{
+  padding:12px 14px;border-radius:var(--rsm);
+  border:1.5px solid var(--f1);font-size:14px;
+  color:var(--t0);background:var(--f0);outline:none;
+  transition:border-color .15s;
+}
+.auth-inp:focus{border-color:var(--g);}
+.auth-err{font-size:12px;color:var(--red);font-weight:700;text-align:center;min-height:16px;}
+.auth-sep{display:flex;align-items:center;gap:10px;margin:4px 0;}
+.auth-sep span{font-size:12px;color:var(--t2);white-space:nowrap;}
+.auth-sep::before,.auth-sep::after{content:'';flex:1;height:1px;background:var(--f1);}
+
+/* ======================================================
+   LOADING SPINNER
+====================================================== */
+#loading{
+  position:fixed;inset:0;z-index:100;background:var(--g);
+  display:flex;align-items:center;justify-content:center;
+}
+.spinner{
+  width:44px;height:44px;border:4px solid rgba(255,255,255,0.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ======================================================
+   HOME PAGE
+====================================================== */
+.hero{background:var(--g);padding:20px 16px 22px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;right:-40px;bottom:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,223,0,.08);}
+.hero::after{content:'';position:absolute;right:30px;bottom:-20px;width:100px;height:100px;border-radius:50%;background:rgba(0,39,118,.15);}
+.hero-greet{font-size:13px;color:rgba(255,255,255,.72);font-weight:700;margin-bottom:3px;}
+.hero-name{font-family:var(--display);font-size:30px;color:#fff;letter-spacing:1px;line-height:1.1;margin-bottom:6px;}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.8);line-height:1.5;margin-bottom:16px;max-width:260px;}
+.hero-btns{display:flex;gap:8px;position:relative;z-index:1;}
+.hero-stripe{height:5px;display:flex;}
+.hs-g{flex:1;background:var(--gd);}
+.hs-y{flex:2;background:var(--y);}
+.hs-b{flex:1;background:var(--b);}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 16px;}
+.sc{background:var(--f0);border-radius:var(--rsm);padding:12px 10px;text-align:center;}
+.sn{font-family:var(--display);font-size:28px;letter-spacing:1px;line-height:1;}
+.sl{font-size:11px;font-weight:700;color:var(--t2);margin-top:2px;}
+.mi{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:0.5px solid var(--border);}
+.mi:last-child{border-bottom:none;}
+.sth{width:40px;height:40px;border-radius:var(--rxs);background:var(--gl);border:0.5px solid rgba(0,156,59,.2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--gd);flex-shrink:0;}
+.ei{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:0.5px solid var(--border);}
+.ei:last-child{border-bottom:none;}
+.edb{background:var(--gl);border-radius:var(--rxs);padding:6px 10px;text-align:center;min-width:46px;border:0.5px solid rgba(0,156,59,.2);}
+.edb-d{font-family:var(--display);font-size:22px;color:var(--g);line-height:1;}
+.edb-m{font-size:9px;font-weight:800;color:var(--gd);text-transform:uppercase;}
+
+/* ======================================================
+   PONTOS PAGE
+====================================================== */
+#map-cont{height:220px;background:var(--f1);position:relative;overflow:hidden;border-bottom:0.5px solid var(--border);}
+.map-bg{position:absolute;inset:0;background-color:#e8f0e0;background-image:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(0,0,0,.04) 28px,rgba(0,0,0,.04) 29px),repeating-linear-gradient(90deg,transparent,transparent 28px,rgba(0,0,0,.04) 28px,rgba(0,0,0,.04) 29px);}
+.map-road-h{position:absolute;height:6px;background:rgba(255,255,255,.7);left:0;right:0;}
+.map-road-v{position:absolute;width:6px;background:rgba(255,255,255,.7);top:0;bottom:0;}
+.map-pin{position:absolute;transform:translate(-50%,-100%);cursor:pointer;}
+.pin-dot{width:22px;height:22px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);}
+.pin-lbl{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:800;padding:3px 8px;border-radius:5px;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.map-leg{position:absolute;bottom:8px;left:8px;background:rgba(255,255,255,.92);border-radius:8px;padding:5px 10px;display:flex;gap:10px;border:0.5px solid var(--border);}
+.map-filt{position:absolute;top:8px;left:8px;display:flex;gap:6px;}
+.mfb{background:rgba(255,255,255,.92);border:0.5px solid var(--border);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:800;cursor:pointer;color:var(--t0);}
+.mfb.on{background:var(--g);color:#fff;border-color:var(--g);}
+.map-zc{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;background:#fff;border-radius:8px;border:0.5px solid var(--border);overflow:hidden;}
+.mzb{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:18px;border:none;background:none;color:var(--t0);}
+.mzb:first-child{border-bottom:0.5px solid var(--border);}
+.pc{display:flex;gap:12px;padding:14px;border-bottom:0.5px solid var(--border);}
+.pc:last-child{border-bottom:none;}
+.pi{width:48px;height:48px;border-radius:12px;background:var(--gl);border:0.5px solid rgba(0,156,59,.15);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.pi.am{background:var(--yl);border-color:rgba(201,168,0,.2);}
+.avmini{display:flex;}
+.avm{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--white);margin-left:-5px;font-size:8px;display:flex;align-items:center;justify-content:center;font-weight:800;overflow:hidden;}
+.avm:first-child{margin-left:0;}
+.avm img{width:100%;height:100%;object-fit:cover;}
+.cbtn{background:var(--y);border:none;color:var(--b);font-weight:800;font-size:12px;padding:6px 14px;border-radius:var(--rxs);cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0;}
+.cbtn.done{background:var(--g);color:#fff;}
+
+/* ======================================================
+   TROCAS PAGE
+====================================================== */
+.fbar{display:flex;gap:6px;padding:10px 16px;overflow-x:auto;scrollbar-width:none;border-bottom:0.5px solid var(--border);}
+.fbar::-webkit-scrollbar{display:none;}
+.fc{white-space:nowrap;padding:6px 14px;border-radius:20px;border:1.5px solid var(--f2);background:var(--white);font-size:12px;font-weight:800;cursor:pointer;color:var(--t2);flex-shrink:0;}
+.fc.on{background:var(--g);color:#fff;border-color:var(--g);}
+.tc{padding:14px;border-bottom:0.5px solid var(--border);}
+.tc:last-child{border-bottom:none;}
+.swapa{display:flex;align-items:center;justify-content:center;gap:14px;padding:12px;background:var(--f0);border-radius:var(--rsm);margin:10px 0;}
+.sbig{width:54px;height:54px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;border:0.5px solid var(--border);}
+.sg-give{background:var(--gl);color:var(--gd);border-color:rgba(0,156,59,.2);}
+.sg-get{background:var(--redl);color:var(--red);border-color:rgba(229,57,53,.15);}
+.ta-row{display:flex;gap:8px;}
+
+/* ======================================================
+   COMUNIDADE PAGE
+====================================================== */
+.stabs{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:0.5px solid var(--border);background:var(--white);position:sticky;top:0;z-index:5;}
+.stabs::-webkit-scrollbar{display:none;}
+.stab{white-space:nowrap;padding:11px 15px;font-size:13px;font-weight:800;color:var(--t2);cursor:pointer;border:none;background:none;border-bottom:2.5px solid transparent;flex-shrink:0;}
+.stab.on{color:var(--g);border-bottom-color:var(--g);}
+.ss{display:none;}
+.ss.on{display:block;}
+.csg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 16px;}
+.csb{background:var(--f0);border-radius:var(--rsm);padding:10px;text-align:center;}
+.csn{font-family:var(--display);font-size:24px;letter-spacing:.5px;}
+.csl{font-size:10px;font-weight:800;color:var(--t2);margin-top:1px;}
+/* composer */
+.composer{margin:0 16px 14px;background:var(--white);border:0.5px solid var(--border);border-radius:var(--r);padding:12px;}
+.comp-ta{width:100%;border:0.5px solid var(--f2);border-radius:var(--rsm);padding:10px 12px;font-size:13px;font-family:var(--font);background:var(--f0);resize:none;outline:none;color:var(--t0);line-height:1.5;}
+.comp-tools{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+.ctool{width:32px;height:32px;border-radius:8px;border:0.5px solid var(--border);background:none;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;}
+/* post */
+.post{padding:14px 16px;border-bottom:0.5px solid var(--border);}
+.post-h{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.post-bod{font-size:14px;line-height:1.6;color:var(--t0);margin-bottom:10px;}
+.post-ach{background:var(--g);border-radius:var(--rsm);padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;color:#fff;}
+.post-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.post-rep{background:var(--f0);border-radius:var(--rsm);padding:10px 12px;margin-bottom:10px;}
+.post-img-preview{border-radius:var(--rsm);overflow:hidden;margin-bottom:10px;max-height:200px;}
+.post-img-preview img{width:100%;object-fit:cover;}
+.pa-row{display:flex;gap:6px;flex-wrap:wrap;}
+.pa{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;border:0.5px solid var(--border);background:none;font-size:12px;font-weight:800;color:var(--t2);cursor:pointer;font-family:var(--font);}
+.pa.liked{background:var(--gl);border-color:rgba(0,156,59,.2);color:var(--gd);}
+.pa.helpful{background:var(--yl);border-color:rgba(201,168,0,.2);color:var(--yd);}
+/* ranking */
+.rank-pod{background:var(--g);border-radius:var(--r);margin:14px 16px;padding:14px 16px;color:#fff;}
+.ri{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:0.5px solid var(--border);}
+.ri:last-child{border-bottom:none;}
+.rp{width:24px;text-align:center;font-size:15px;font-weight:800;flex-shrink:0;}
+.rm{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.rm1{background:var(--yl);}
+.rm2{background:#F1EFE8;}
+.rm3{background:#FAECE7;}
+/* conquistas */
+.cb{background:var(--g);border-radius:var(--r);margin:14px 16px;padding:14px 16px;color:#fff;}
+.ci{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:0.5px solid var(--border);}
+.ci:last-child{border-bottom:none;}
+.cic{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
+.cic-new{background:var(--gl);border:1.5px solid var(--g);}
+.cic-done{background:var(--f0);border:0.5px solid var(--border);}
+.cic-lock{background:var(--f0);border:0.5px solid var(--border);opacity:.5;}
+.cpts{font-family:var(--display);font-size:18px;color:var(--yd);flex-shrink:0;}
+/* notícias */
+.nc{display:flex;border-bottom:0.5px solid var(--border);cursor:pointer;}
+.nc:last-child{border-bottom:none;}
+.nth{width:96px;min-height:88px;flex-shrink:0;background:var(--f1);display:flex;align-items:center;justify-content:center;border-right:0.5px solid var(--border);}
+.nb{padding:12px;flex:1;}
+.nt{font-size:13px;font-weight:700;line-height:1.4;margin-bottom:4px;}
+/* grupos */
+.gi{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:0.5px solid var(--border);}
+.gi:last-child{border-bottom:none;}
+.gic{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;overflow:hidden;}
+
+/* ======================================================
+   CHAT PAGE
+====================================================== */
+.cli{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;}
+.cli:last-child{border-bottom:none;}
+.cu{background:var(--g);color:#fff;border-radius:12px;font-size:11px;font-weight:800;padding:2px 7px;min-width:20px;text-align:center;flex-shrink:0;}
+
+/* CONVERSATION */
+#chatconv{
+  display:none;flex-direction:column;
+  position:absolute;inset:0;background:var(--f0);z-index:20;
+}
+#chatconv.on{display:flex;}
+.ch{
+  background:var(--g);padding:10px 14px;
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.cback{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.15);border:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;}
+.mo{display:flex;justify-content:flex-end;}
+.mi2{display:flex;justify-content:flex-start;align-items:flex-end;gap:6px;}
+.bub{padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.5;max-width:78%;}
+.bo2{background:var(--g);color:#fff;border-bottom-right-radius:4px;}
+.bi{background:var(--white);color:var(--t0);border-bottom-left-radius:4px;border:0.5px solid var(--border);}
+.btime{font-size:10px;opacity:.6;margin-top:4px;text-align:right;}
+.bub img{max-width:200px;border-radius:10px;display:block;margin-top:4px;cursor:pointer;}
+
+/* CHAT INPUT AREA */
+.cia{
+  background:var(--white);padding:8px 12px;
+  border-top:0.5px solid var(--border);
+  padding-bottom:calc(8px + var(--safe-bot));
+  flex-shrink:0;position:relative;
+}
+/* EMOJI PICKER */
+.ep{
+  position:absolute;bottom:100%;left:0;right:0;
+  background:var(--white);border-top:0.5px solid var(--border);
+  padding:10px 12px;display:none;
+  max-height:200px;overflow-y:auto;
+}
+.ep.on{display:block;}
+.ep-cats{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px;padding-bottom:6px;border-bottom:0.5px solid var(--border);}
+.ep-cats::-webkit-scrollbar{display:none;}
+.epc{padding:5px 10px;border-radius:20px;border:0.5px solid var(--border);background:none;font-size:13px;cursor:pointer;flex-shrink:0;}
+.epc.on{background:var(--gl);border-color:rgba(0,156,59,.2);}
+.ep-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;}
+.emo{width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;border-radius:8px;border:none;background:none;}
+.emo:hover{background:var(--f0);}
+/* input row */
+.ci-row{display:flex;gap:8px;align-items:flex-end;}
+.ci-tools{display:flex;gap:4px;align-items:center;}
+.ci-tb{width:34px;height:34px;border-radius:8px;border:0.5px solid var(--border);background:none;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;}
+.ci-tb.on{background:var(--gl);border-color:rgba(0,156,59,.2);}
+.ci-in{
+  flex:1;padding:9px 14px;border-radius:20px;
+  border:0.5px solid var(--f2);background:var(--f0);
+  font-size:14px;font-family:var(--font);color:var(--t0);outline:none;
+  max-height:100px;resize:none;overflow-y:auto;line-height:1.4;
+}
+.ci-send{width:40px;height:40px;border-radius:50%;background:var(--g);border:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;cursor:pointer;flex-shrink:0;}
+
+/* image preview in input */
+.img-preview-wrap{
+  display:none;margin-bottom:8px;
+  position:relative;display:none;
+}
+.img-preview-wrap.on{display:block;}
+.img-preview-wrap img{max-height:120px;border-radius:10px;border:0.5px solid var(--border);}
+.img-remove{
+  position:absolute;top:4px;right:4px;
+  width:22px;height:22px;border-radius:50%;
+  background:rgba(0,0,0,.5);color:#fff;
+  border:none;font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+/* reactions */
+.reactions{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;}
+.rxn{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:2px 7px;border-radius:12px;
+  background:var(--f0);border:0.5px solid var(--border);
+  font-size:12px;cursor:pointer;
+}
+.rxn.mine{background:var(--gl);border-color:rgba(0,156,59,.2);}
+
+/* ======================================================
+   PERFIL PAGE
+====================================================== */
+.ph{background:var(--g);padding:20px 16px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;}
+.ph::before{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,223,0,.12);}
+.pav{width:68px;height:68px;border-radius:50%;background:var(--y);color:var(--b);font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center;border:3px solid rgba(255,255,255,.3);flex-shrink:0;overflow:hidden;}
+.pav img{width:100%;height:100%;object-fit:cover;}
+.pname{font-family:var(--display);font-size:26px;color:#fff;letter-spacing:.5px;line-height:1.1;}
+.pstars{color:var(--y);font-size:14px;margin-top:3px;}
+.pbadges{display:flex;gap:6px;flex-wrap:wrap;padding:12px 16px;border-bottom:0.5px solid var(--border);}
+.bdg{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:800;}
+.bdg-o{background:var(--yl);color:var(--yd);}
+.bdg-v{background:var(--gl);color:var(--gd);}
+.bdg-b{background:var(--bl);color:var(--b);}
+.sr{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:0.5px solid var(--border);}
+.sr:last-child{border-bottom:none;}
+.spg{flex:1;display:flex;flex-direction:column;gap:4px;}
+.spl{display:flex;justify-content:space-between;font-size:12px;}
+.spn{font-weight:800;}
+.spc{color:var(--t2);}
+.skg{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;padding:10px 14px;}
+.stk{height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;}
+.sh{background:var(--gl);color:var(--gd);}
+.sn2{background:var(--redl);color:var(--red);}
+.sm{background:var(--f1);color:var(--t2);}
+
+/* ======================================================
+   MODAL
+====================================================== */
+.modal-bg{
+  display:none;position:fixed;inset:0;z-index:80;
+  background:rgba(0,0,0,.45);align-items:flex-end;justify-content:center;
+}
+.modal-bg.on{display:flex;}
+.modal{
+  background:var(--white);border-radius:var(--r) var(--r) 0 0;
+  width:100%;max-width:430px;padding:0;
+  max-height:85vh;overflow-y:auto;
+}
+.modal-h{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 12px;border-bottom:0.5px solid var(--border);}
+.modal-t{font-size:16px;font-weight:800;}
+.modal-cl{width:32px;height:32px;border-radius:8px;border:0.5px solid var(--border);background:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.mform{padding:16px;display:flex;flex-direction:column;gap:12px;}
+.mf-lbl{font-size:12px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.mf-inp{padding:11px 14px;border-radius:var(--rsm);border:1.5px solid var(--f2);font-size:14px;color:var(--t0);background:var(--f0);outline:none;width:100%;font-family:var(--font);}
+.mf-inp:focus{border-color:var(--g);}
+.mf-sel{padding:11px 14px;border-radius:var(--rsm);border:1.5px solid var(--f2);font-size:14px;color:var(--t0);background:var(--f0);outline:none;width:100%;font-family:var(--font);}
+.mf-ta{padding:11px 14px;border-radius:var(--rsm);border:1.5px solid var(--f2);font-size:14px;color:var(--t0);background:var(--f0);outline:none;width:100%;font-family:var(--font);resize:none;line-height:1.5;}
+.mf-ta:focus,.mf-inp:focus,.mf-sel:focus{border-color:var(--g);}
+
+/* ======================================================
+   TOAST
+====================================================== */
+.toast{
+  position:fixed;bottom:calc(70px + var(--safe-bot) + 10px);
+  left:50%;transform:translateX(-50%) translateY(20px);
+  background:rgba(26,26,24,.92);color:#fff;
+  padding:10px 20px;border-radius:24px;
+  font-size:13px;font-weight:700;pointer-events:none;opacity:0;
+  transition:all .25s;z-index:150;white-space:nowrap;
+  backdrop-filter:blur(8px);max-width:calc(100vw - 32px);text-align:center;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ======================================================
+   INSTALL BANNER
+====================================================== */
+#install-banner{
+  position:fixed;bottom:calc(var(--safe-bot) + 68px);left:8px;right:8px;
+  background:var(--b);color:#fff;border-radius:var(--r);
+  padding:12px 16px;display:none;align-items:center;gap:10px;
+  box-shadow:0 4px 20px rgba(0,39,118,.4);z-index:50;
+  max-width:414px;margin:0 auto;
+}
+#install-banner.on{display:flex;}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading"><div class="spinner"></div></div>
+
+<!-- AUTH -->
+<div id="auth-overlay" style="display:none;">
+  <div class="auth-logo">
+    <svg width="44" height="44" viewBox="0 0 44 44"><polygon points="22,3 41,13 41,31 22,41 3,31 3,13" fill="#009C3B" stroke="#fff" stroke-width="2"/><circle cx="22" cy="22" r="8" fill="#002776"/><line x1="14" y1="22" x2="30" y2="22" stroke="#fff" stroke-width="2"/></svg>
+  </div>
+  <div class="auth-title">FiguriTroca</div>
+  <div class="auth-sub">A comunidade de trocas<br>da Copa do Mundo 2026 🇧🇷</div>
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab on" onclick="authTab('login',this)">Entrar</button>
+      <button class="auth-tab" onclick="authTab('register',this)">Cadastrar</button>
+    </div>
+    <!-- LOGIN -->
+    <div id="auth-login">
+      <div class="auth-form">
+        <input class="auth-inp" id="l-email" type="email" placeholder="E-mail" autocomplete="email">
+        <input class="auth-inp" id="l-pass" type="password" placeholder="Senha" autocomplete="current-password">
+        <div class="auth-err" id="l-err"></div>
+        <button class="btn bv" style="width:100%;padding:12px;font-size:15px;" onclick="doLogin()">Entrar</button>
+      </div>
+    </div>
+    <!-- REGISTER -->
+    <div id="auth-register" style="display:none;">
+      <div class="auth-form">
+        <input class="auth-inp" id="r-name" type="text" placeholder="Nome completo">
+        <input class="auth-inp" id="r-user" type="text" placeholder="Nome de usuário">
+        <input class="auth-inp" id="r-email" type="email" placeholder="E-mail">
+        <input class="auth-inp" id="r-pass" type="password" placeholder="Senha (mín. 6 caracteres)">
+        <input class="auth-inp" id="r-city" type="text" placeholder="Cidade — ex: Recife, PE">
+        <div class="auth-err" id="r-err"></div>
+        <button class="btn bv" style="width:100%;padding:12px;font-size:15px;" onclick="doRegister()">Criar conta</button>
+      </div>
+    </div>
+    <div class="auth-sep"><span>ou continue como visitante</span></div>
+    <button class="btn bo" style="width:100%;padding:10px;" onclick="guestMode()">Explorar sem conta</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="logo-wrap">
+      <div class="logo-em">
+        <svg width="24" height="24" viewBox="0 0 24 24"><polygon points="12,2 22,8 22,16 12,22 2,16 2,8" fill="#009C3B" stroke="#fff" stroke-width="1.5"/><circle cx="12" cy="12" r="5" fill="#002776"/><line x1="8" y1="12" x2="16" y2="12" stroke="#fff" stroke-width="1.2"/></svg>
+      </div>
+      <div><div class="logo-name">FiguriTroca</div><div class="logo-sub">Copa do Mundo 2026</div></div>
+    </div>
+    <div class="topbar-r">
+      <button class="iBtn" onclick="toast('3 notificações novas!')"><span>🔔</span><span class="dot"></span></button>
+      <div class="uav" id="top-av" onclick="goTo('perfil')">FS</div>
+    </div>
+  </div>
+  <div id="copa-strip">
+    <span class="cs-t">🏆 Copa 2026 · USA / CAN / MEX</span>
+    <span class="cs-t" style="opacity:.65;">640 fig · 32 seleções</span>
+  </div>
+
+  <!-- PAGES -->
+  <div id="pages">
+
+    <!-- ===== HOME ===== -->
+    <div class="page on" id="page-home">
+      <div class="hero">
+        <div class="hero-greet">Bem-vindo de volta!</div>
+        <div class="hero-name" id="hero-name">Filipe Santos 🇧🇷</div>
+        <div class="hero-sub">Você tem <strong>3 matches</strong> novos e um evento em 6 dias!</div>
+        <div class="hero-btns">
+          <button class="btn ba" onclick="goTo('trocas')">✦ Ver matches</button>
+          <button class="btn bgh" onclick="goTo('perfil')">Meu álbum</button>
+        </div>
+      </div>
+      <div class="hero-stripe"><div class="hs-g"></div><div class="hs-y"></div><div class="hs-b"></div></div>
+      <div class="sg">
+        <div class="sc"><div class="sn" style="color:var(--g);" id="h-rep">47</div><div class="sl">Repetidas</div></div>
+        <div class="sc"><div class="sn" style="color:var(--red);" id="h-need">23</div><div class="sl">Faltando</div></div>
+        <div class="sc"><div class="sn" style="color:var(--yd);" id="h-trades">12</div><div class="sl">Trocas</div></div>
+      </div>
+      <div class="sec">
+        <div class="sec-t">✦ Matches automáticos</div>
+        <div class="card" id="matches-list">
+          <div class="mi">
+            <div class="sth">147</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:14px;font-weight:800;">Vini Jr. <svg width="20" height="14" viewBox="0 0 20 14" style="vertical-align:-2px;margin-left:3px;border-radius:2px;"><rect width="20" height="14" fill="#009C3B"/><polygon points="10,1.5 18,7 10,12.5 2,7" fill="#FFDF00"/><circle cx="10" cy="7" r="3" fill="#002776"/></svg></div>
+              <div style="font-size:12px;color:var(--t2);">Match com Carlos M.</div>
+            </div>
+            <button class="btn bv bsm" onclick="proposeTradeUI('Carlos M.','147','089')">Propor</button>
+          </div>
+          <div class="mi">
+            <div class="sth">089</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:14px;font-weight:800;">Mbappé <svg width="20" height="14" viewBox="0 0 20 14" style="vertical-align:-2px;margin-left:3px;border-radius:2px;"><rect width="20" height="14" fill="#fff"/><rect width="7" height="14" fill="#002395"/><rect x="13" width="7" height="14" fill="#ED2939"/></svg></div>
+              <div style="font-size:12px;color:var(--t2);">Match com Ana P.</div>
+            </div>
+            <button class="btn bv bsm" onclick="proposeTradeUI('Ana P.','089','147')">Propor</button>
+          </div>
+        </div>
+      </div>
+      <div class="sec" style="margin-bottom:16px;">
+        <div class="sec-t">📍 Próximos eventos</div>
+        <div class="card">
+          <div class="ei">
+            <div class="edb"><div class="edb-d">08</div><div class="edb-m">Jun</div></div>
+            <div style="flex:1;"><div style="font-size:14px;font-weight:800;">Troca no Parque da Cidade</div><div style="font-size:12px;color:var(--t2);">📍 Recife, PE · 34 confirmados</div></div>
+            <span class="tag tv">6 dias</span>
+          </div>
+          <div class="ei">
+            <div class="edb"><div class="edb-d">15</div><div class="edb-m">Jun</div></div>
+            <div style="flex:1;"><div style="font-size:14px;font-weight:800;">FiguriFest Nordeste 2026</div><div style="font-size:12px;color:var(--t2);">📍 Caruaru, PE · 128 confirmados</div></div>
+            <span class="tag ta">13 dias</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PONTOS ===== -->
+    <div class="page" id="page-pontos">
+      <div id="map-cont">
+        <div class="map-bg"></div>
+        <div class="map-road-h" style="top:40%;"></div>
+        <div class="map-road-h" style="top:70%;"></div>
+        <div class="map-road-v" style="left:35%;"></div>
+        <div class="map-road-v" style="left:65%;"></div>
+        <div class="map-pin" style="top:42%;left:38%;" onclick="toast('Parque da Cidade — 34 confirmados')">
+          <div class="pin-lbl" style="background:var(--g);">Parque da Cidade</div>
+          <div class="pin-dot" style="background:var(--g);"></div>
+        </div>
+        <div class="map-pin" style="top:36%;left:64%;" onclick="toast('Livraria Cultura — 8 confirmados')">
+          <div class="pin-lbl" style="background:var(--yd);">Livraria Cultura</div>
+          <div class="pin-dot" style="background:var(--yd);"></div>
+        </div>
+        <div class="map-pin" style="top:68%;left:30%;" onclick="toast('Shopping RioMar — 21 confirmados')">
+          <div class="pin-lbl" style="background:var(--g);">Shopping RioMar</div>
+          <div class="pin-dot" style="background:var(--g);"></div>
+        </div>
+        <div class="map-leg">
+          <div class="row" style="gap:5px;"><div style="width:9px;height:9px;border-radius:50%;background:var(--g);flex-shrink:0;"></div><span style="font-size:10px;font-weight:800;">Evento</span></div>
+          <div class="row" style="gap:5px;"><div style="width:9px;height:9px;border-radius:50%;background:var(--yd);flex-shrink:0;"></div><span style="font-size:10px;font-weight:800;">Informal</span></div>
+        </div>
+        <div class="map-filt">
+          <button class="mfb on">Todos</button>
+          <button class="mfb" onclick="toast('Localizando...')">Perto de mim</button>
+        </div>
+        <div class="map-zc">
+          <button class="mzb">+</button>
+          <button class="mzb">−</button>
+        </div>
+      </div>
+      <div class="rsb" style="padding:12px 16px;border-bottom:0.5px solid var(--border);">
+        <span style="font-size:15px;font-weight:800;">4 pontos encontrados</span>
+        <button class="btn bv bsm" onclick="openModal('modal-ponto')">+ Cadastrar</button>
+      </div>
+      <div id="pontos-list">
+        <div class="card" style="margin:12px 16px;">
+          <div class="pc">
+            <div class="pi">🌳</div>
+            <div style="flex:1;">
+              <div class="rsb"><div style="font-size:15px;font-weight:800;">Parque da Cidade</div><span class="tag tv">Evento</span></div>
+              <div style="font-size:12px;color:var(--t2);margin-top:2px;">Recife, PE · 1º sáb. do mês · 9h–13h</div>
+              <div class="rsb" style="margin-top:8px;">
+                <div class="row" style="gap:5px;">
+                  <div class="avmini"><div class="avm" style="background:var(--gl);color:var(--gd);">CS</div><div class="avm" style="background:var(--bl);color:var(--b);">AP</div><div class="avm" style="background:var(--yl);color:var(--yd);">JM</div></div>
+                  <span style="font-size:12px;color:var(--t2);" id="c1-count">34</span>
+                </div>
+                <button class="cbtn" id="c1-btn" onclick="toggleConfirm('c1')">Confirmar</button>
+              </div>
+            </div>
+          </div>
+          <div class="pc">
+            <div class="pi am">📚</div>
+            <div style="flex:1;">
+              <div class="rsb"><div style="font-size:15px;font-weight:800;">Livraria Cultura</div><span class="tag ta">Informal</span></div>
+              <div style="font-size:12px;color:var(--t2);margin-top:2px;">Shopping Recife · Sáb. 10h–13h</div>
+              <div class="rsb" style="margin-top:8px;">
+                <div class="row" style="gap:5px;">
+                  <div class="avmini"><div class="avm" style="background:var(--gl);color:var(--gd);">RF</div><div class="avm" style="background:var(--yl);color:var(--yd);">LM</div></div>
+                  <span style="font-size:12px;color:var(--t2);" id="c2-count">8</span>
+                </div>
+                <button class="cbtn" id="c2-btn" onclick="toggleConfirm('c2')">Confirmar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TROCAS ===== -->
+    <div class="page" id="page-trocas">
+      <div class="rsb" style="padding:12px 16px;border-bottom:0.5px solid var(--border);">
+        <span style="font-size:16px;font-weight:800;">Minhas trocas</span>
+        <button class="btn bv bsm" onclick="openModal('modal-troca')">+ Nova</button>
+      </div>
+      <div class="fbar">
+        <button class="fc on" onclick="filterFC(this)">Pendentes (2)</button>
+        <button class="fc" onclick="filterFC(this)">Em andamento (1)</button>
+        <button class="fc" onclick="filterFC(this)">Concluídas (12)</button>
+      </div>
+      <div class="card" style="margin:12px 16px;" id="trocas-list">
+        <div class="tc">
+          <div class="rsb">
+            <div class="row">
+              <div class="av" style="width:38px;height:38px;background:var(--bl);color:var(--b);font-size:13px;">AM</div>
+              <div><div style="font-size:14px;font-weight:800;">Ana Martins</div><div style="font-size:11px;color:var(--t2);">⭐ 4.9 · 47 trocas</div></div>
+            </div>
+            <span class="tag ta">Aguardando</span>
+          </div>
+          <div class="swapa">
+            <div style="text-align:center;"><div class="sbig sg-give">147</div><div style="font-size:11px;color:var(--t2);margin-top:4px;font-weight:700;">Você dá</div></div>
+            <div style="font-size:24px;color:var(--t2);">⇄</div>
+            <div style="text-align:center;"><div class="sbig sg-get">089</div><div style="font-size:11px;color:var(--t2);margin-top:4px;font-weight:700;">Você recebe</div></div>
+          </div>
+          <div class="ta-row">
+            <button class="btn bv" style="flex:1;" onclick="toast('Troca aceita! Combinando local...')">Aceitar ✓</button>
+            <button class="btn bo" style="flex:1;" onclick="toast('Troca recusada.')">Recusar</button>
+          </div>
+        </div>
+        <div class="tc">
+          <div class="rsb">
+            <div class="row">
+              <div class="av" style="width:38px;height:38px;background:var(--gl);color:var(--gd);font-size:13px;">CS</div>
+              <div><div style="font-size:14px;font-weight:800;">Carlos Silva</div><div style="font-size:11px;color:var(--t2);">⭐ 5.0 · 83 trocas</div></div>
+            </div>
+            <span class="tag tb">Em andamento</span>
+          </div>
+          <div class="swapa">
+            <div style="text-align:center;"><div class="sbig sg-give">213</div><div style="font-size:11px;color:var(--t2);margin-top:4px;font-weight:700;">Você dá</div></div>
+            <div style="font-size:24px;color:var(--t2);">⇄</div>
+            <div style="text-align:center;"><div class="sbig sg-get">056</div><div style="font-size:11px;color:var(--t2);margin-top:4px;font-weight:700;">Você recebe</div></div>
+          </div>
+          <div><div class="pbar"><div class="pfill" style="width:60%;"></div></div><div style="font-size:11px;color:var(--t2);margin-top:4px;">Encontro 08/Jun · Parque da Cidade</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== COMUNIDADE ===== -->
+    <div class="page" id="page-comunidade">
+      <div class="stabs">
+        <button class="stab on" onclick="showSub('feed',this)">Feed</button>
+        <button class="stab" onclick="showSub('ranking',this)">Ranking</button>
+        <button class="stab" onclick="showSub('conquistas',this)">Conquistas</button>
+        <button class="stab" onclick="showSub('noticias',this)">Notícias</button>
+        <button class="stab" onclick="showSub('grupos',this)">Grupos</button>
+      </div>
+      <!-- FEED -->
+      <div id="sub-feed" class="ss on">
+        <div class="csg">
+          <div class="csb"><div class="csn" style="color:var(--g);">8,4k</div><div class="csl">Coletores</div></div>
+          <div class="csb"><div class="csn" style="color:var(--yd);">32k</div><div class="csl">Trocas</div></div>
+          <div class="csb"><div class="csn" style="color:var(--b);">127</div><div class="csl">Álbuns completos</div></div>
+        </div>
+        <div class="composer">
+          <div class="row" style="align-items:flex-start;gap:10px;">
+            <div class="av" style="width:36px;height:36px;background:var(--y);color:var(--b);font-size:12px;margin-top:2px;" id="comp-av">FS</div>
+            <textarea id="post-ta" class="comp-ta" rows="2" placeholder="Compartilhe uma experiência, dica ou conquista..."></textarea>
+          </div>
+          <div id="post-img-wrap" class="img-preview-wrap">
+            <img id="post-img-prev" src="" alt="">
+            <button class="img-remove" onclick="clearPostImg()">✕</button>
+          </div>
+          <div class="comp-tools">
+            <div class="row" style="gap:6px;">
+              <button class="ctool" onclick="triggerPostImg()">📷</button>
+              <input type="file" id="post-img-inp" accept="image/*" style="display:none;" onchange="handlePostImg(this)">
+              <button class="ctool" onclick="toast('Selecione uma tag abaixo')">🏷️</button>
+            </div>
+            <button class="btn bv bsm" onclick="submitPost()">Publicar</button>
+          </div>
+        </div>
+        <div id="posts-container">
+          <div class="post">
+            <div class="post-h">
+              <div class="av" style="width:40px;height:40px;background:var(--yl);color:var(--yd);font-size:13px;">MC</div>
+              <div style="flex:1;"><div style="font-size:14px;font-weight:800;">Marina Costa <span class="tag ta" style="font-size:10px;margin-left:4px;">Conquista</span></div><div style="font-size:11px;color:var(--t2);">há 2 horas · Recife, PE</div></div>
+            </div>
+            <div class="post-bod">Finalmente completei o álbum da Copa 2026! 😭🎉 Levei 4 meses e 312 trocas. A última foi a do Neymar brilhante (#640). Obrigada a toda a comunidade!</div>
+            <div class="post-ach">
+              <svg width="40" height="40" viewBox="0 0 40 40"><rect width="40" height="40" rx="10" fill="#FFDF00"/><polygon points="20,5 35,13 35,27 20,35 5,27 5,13" fill="#009C3B"/><circle cx="20" cy="20" r="7" fill="#002776"/></svg>
+              <div><div style="font-size:13px;font-weight:800;">Álbum 100% completo! 🏆</div><div style="font-size:12px;opacity:.85;">640 de 640 · 312 trocas</div></div>
+            </div>
+            <div class="pa-row">
+              <button class="pa" id="lk1" onclick="toggleLike('lk1',247)">❤️ 247</button>
+              <button class="pa" onclick="toast('Comentários em breve!')">💬 38</button>
+              <button class="pa" onclick="toast('Link copiado!')">↗️</button>
+            </div>
+          </div>
+          <div class="post">
+            <div class="post-h">
+              <div class="av" style="width:40px;height:40px;background:var(--bl);color:var(--b);font-size:13px;">RO</div>
+              <div style="flex:1;"><div style="font-size:14px;font-weight:800;">Rafael Oliveira <span class="tag tb" style="font-size:10px;margin-left:4px;">Dica</span></div><div style="font-size:11px;color:var(--t2);">há 5 horas · Caruaru, PE</div></div>
+            </div>
+            <div class="post-bod">Dica de conservação: envelopes plásticos individuais, longe da umidade. As brilhantes perdem o efeito com sol direto. Aprendi da pior forma 😅</div>
+            <div class="post-tags"><span class="tag tv">Conservação</span><span class="tag tb">Dica útil</span></div>
+            <div class="pa-row">
+              <button class="pa" id="lk2" onclick="toggleLike('lk2',89)">❤️ 89</button>
+              <button class="pa" onclick="toast('Comentários em breve!')">💬 14</button>
+              <button class="pa helpful">👍 Útil (56)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- RANKING -->
+      <div id="sub-ranking" class="ss">
+        <div class="rank-pod">
+          <div style="font-size:11px;opacity:.75;font-weight:800;margin-bottom:8px;">Sua posição · Junho 2026</div>
+          <div class="rsb">
+            <div><div style="font-size:11px;opacity:.75;font-weight:700;">Ranking</div><div style="font-family:var(--display);font-size:28px;letter-spacing:1px;">#47 <span style="font-size:14px;opacity:.8;">de 8.400</span></div></div>
+            <div style="text-align:center;"><div style="font-size:11px;opacity:.75;font-weight:700;">Trocas</div><div style="font-family:var(--display);font-size:28px;">12</div></div>
+            <div style="text-align:right;"><div style="font-size:11px;opacity:.75;font-weight:700;">Pontos</div><div style="font-family:var(--display);font-size:28px;color:var(--y);">840</div></div>
+          </div>
+        </div>
+        <div class="card" style="margin:0 16px 12px;">
+          <div class="ri"><div class="rp" style="color:var(--yd);">1</div><div class="rm rm1">🥇</div><div class="av" style="width:36px;height:36px;background:var(--yl);color:var(--yd);font-size:12px;">MC</div><div style="flex:1;"><div style="font-size:14px;font-weight:800;">Marina Costa</div><div style="font-size:11px;color:var(--t2);">Álbum completo ✓</div></div><div style="text-align:right;"><div style="font-family:var(--display);font-size:18px;color:var(--yd);">312</div><div style="font-size:10px;color:var(--t2);font-weight:700;">trocas</div></div></div>
+          <div class="ri"><div class="rp" style="color:var(--t2);">2</div><div class="rm rm2">🥈</div><div class="av" style="width:36px;height:36px;background:var(--bl);color:var(--b);font-size:12px;">CS</div><div style="flex:1;"><div style="font-size:14px;font-weight:800;">Carlos Silva</div><div style="font-size:11px;color:var(--t2);">598/640</div></div><div style="text-align:right;"><div style="font-family:var(--display);font-size:18px;">287</div><div style="font-size:10px;color:var(--t2);font-weight:700;">trocas</div></div></div>
+          <div class="ri"><div class="rp" style="color:#993C1D;">3</div><div class="rm rm3">🥉</div><div class="av" style="width:36px;height:36px;background:var(--gl);color:var(--gd);font-size:12px;">AP</div><div style="flex:1;"><div style="font-size:14px;font-weight:800;">Ana Paula</div><div style="font-size:11px;color:var(--t2);">571/640</div></div><div style="text-align:right;"><div style="font-family:var(--display);font-size:18px;">241</div><div style="font-size:10px;color:var(--t2);font-weight:700;">trocas</div></div></div>
+          <div style="margin:8px 14px 10px;padding:10px 12px;background:var(--gl);border-radius:var(--rsm);display:flex;align-items:center;gap:10px;border:0.5px solid rgba(0,156,59,.2);">
+            <div class="av" style="width:30px;height:30px;background:var(--y);color:var(--b);font-size:11px;">FS</div>
+            <div style="flex:1;font-size:13px;font-weight:800;color:var(--gd);">#47 · Você · 840 pts</div>
+            <span class="tag tv" style="font-size:10px;">+5 esta semana</span>
+          </div>
+        </div>
+      </div>
+      <!-- CONQUISTAS -->
+      <div id="sub-conquistas" class="ss">
+        <div class="cb">
+          <div style="font-size:11px;opacity:.75;font-weight:800;margin-bottom:4px;">Suas conquistas</div>
+          <div style="font-family:var(--display);font-size:22px;letter-spacing:.5px;">3 de 24 desbloqueadas</div>
+          <div class="pbar" style="margin-top:10px;background:rgba(255,255,255,.2);"><div class="pfill" style="width:12.5%;background:var(--y);"></div></div>
+          <div style="font-size:11px;opacity:.75;margin-top:4px;font-weight:700;">840 pontos acumulados</div>
+        </div>
+        <div class="card" style="margin:0 16px 12px;">
+          <div class="ci"><div class="cic cic-new">🤝</div><div style="flex:1;"><div style="font-size:14px;font-weight:800;">Primeira troca! <span style="background:var(--g);color:#fff;font-size:10px;padding:1px 7px;border-radius:4px;margin-left:4px;">Desbloqueada</span></div><div style="font-size:12px;color:var(--t2);">Complete sua primeira troca</div></div><div class="cpts">+100</div></div>
+          <div class="ci"><div class="cic cic-done">🌟</div><div style="flex:1;"><div style="font-size:14px;font-weight:800;">Colecionador dedicado</div><div style="font-size:12px;color:var(--t2);">10 trocas concluídas ✓</div></div><div class="cpts">+200</div></div>
+          <div class="ci"><div class="cic cic-done">⭐</div><div style="flex:1;"><div style="font-size:14px;font-weight:800;">Reputação 5 estrelas</div><div style="font-size:12px;color:var(--t2);">5 avaliações máximas ✓</div></div><div class="cpts">+150</div></div>
+          <div class="ci"><div class="cic cic-lock">🔒</div><div style="flex:1;opacity:.6;"><div style="font-size:14px;font-weight:800;">Mestre das trocas</div><div style="font-size:12px;color:var(--t2);">50 trocas — 12/50</div><div class="pbar" style="margin-top:5px;"><div class="pfill" style="width:24%;background:var(--yd);"></div></div></div><div class="cpts" style="opacity:.5;">+500</div></div>
+        </div>
+      </div>
+      <!-- NOTÍCIAS -->
+      <div id="sub-noticias" class="ss">
+        <div class="card" style="margin:12px 16px;">
+          <div class="nc"><div class="nth"><svg width="56" height="56" viewBox="0 0 56 56"><rect width="56" height="56" fill="#E6F7ED"/><polygon points="28,6 50,18 50,38 28,50 6,38 6,18" fill="#009C3B" opacity=".35"/><circle cx="28" cy="28" r="9" fill="#002776"/></svg></div><div class="nb"><span class="tag tv" style="font-size:10px;margin-bottom:5px;display:inline-block;">Panini</span><div class="nt">Figurinhas brilhantes: lista das 48 especiais da Copa 2026</div><div style="font-size:11px;color:var(--t2);">há 1 dia · 2,3k views</div></div></div>
+          <div class="nc"><div class="nth"><svg width="56" height="56" viewBox="0 0 56 56"><rect width="56" height="56" fill="#FFFBE0"/><rect x="16" y="20" width="24" height="16" rx="3" fill="#FFDF00"/></svg></div><div class="nb"><span class="tag ta" style="font-size:10px;margin-bottom:5px;display:inline-block;">Mercado</span><div class="nt">Preço dos pacotinhos sobe 15% em junho</div><div style="font-size:11px;color:var(--t2);">há 3 dias · 4,1k views</div></div></div>
+          <div class="nc"><div class="nth"><svg width="56" height="56" viewBox="0 0 56 56"><rect width="56" height="56" fill="#EAF0FF"/><text x="28" y="36" text-anchor="middle" font-size="28">🏆</text></svg></div><div class="nb"><span class="tag tb" style="font-size:10px;margin-bottom:5px;display:inline-block;">Copa 2026</span><div class="nt">Brasil terá página especial com 24 figurinhas no álbum</div><div style="font-size:11px;color:var(--t2);">há 5 dias · 8,7k views</div></div></div>
+        </div>
+      </div>
+      <!-- GRUPOS -->
+      <div id="sub-grupos" class="ss">
+        <div class="rsb" style="padding:12px 16px;border-bottom:0.5px solid var(--border);">
+          <span style="font-size:14px;color:var(--t2);font-weight:700;">Você está em 2 grupos</span>
+          <button class="btn bv bsm" onclick="toast('Criar grupo — em breve!')">+ Criar</button>
+        </div>
+        <div class="card" style="margin:12px 16px;">
+          <div class="gi" style="background:var(--gl);" onclick="openConv('Brasil Copa 2026','🏆')">
+            <div class="gic" style="background:var(--g);"><svg width="30" height="30" viewBox="0 0 30 30"><rect width="30" height="30" rx="7" fill="#009C3B"/><polygon points="15,3 26,9 26,21 15,27 4,21 4,9" fill="#FFDF00"/><circle cx="15" cy="15" r="5" fill="#002776"/></svg></div>
+            <div style="flex:1;"><div style="font-size:14px;font-weight:800;color:var(--gd);">Brasil Copa 2026</div><div style="font-size:12px;color:var(--t2);">1.240 membros · 34 msgs</div></div>
+            <button class="btn bv bsm">Abrir</button>
+          </div>
+          <div class="gi" style="background:var(--bl);" onclick="openConv('Figurinhas raras','✦')">
+            <div class="gic" style="background:var(--b);color:var(--y);font-size:22px;">✦</div>
+            <div style="flex:1;"><div style="font-size:14px;font-weight:800;color:var(--b);">Figurinhas raras</div><div style="font-size:12px;color:var(--t2);">892 membros</div></div>
+            <button class="btn bsm" style="border:1.5px solid var(--b);color:var(--b);">Abrir</button>
+          </div>
+          <div class="gi"><div class="gic"><svg width="36" height="36" viewBox="0 0 36 36"><rect width="36" height="36" rx="8" fill="#74ACDF"/><ellipse cx="18" cy="18" rx="9" ry="9" fill="none" stroke="#F6B40E" stroke-width="2.5"/><circle cx="18" cy="18" r="4" fill="#F6B40E"/></svg></div><div style="flex:1;"><div style="font-size:14px;font-weight:800;">Argentina</div><div style="font-size:12px;color:var(--t2);">743 membros</div></div><button class="btn bv bsm" onclick="toast('Entrando no grupo!')">Entrar</button></div>
+          <div class="gi"><div class="gic" style="font-size:28px;">🗺️</div><div style="flex:1;"><div style="font-size:14px;font-weight:800;">Colecionadores Nordeste</div><div style="font-size:12px;color:var(--t2);">2.100 membros · Regional</div></div><button class="btn bv bsm" onclick="toast('Entrando no grupo!')">Entrar</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CHAT ===== -->
+    <div class="page" id="page-chat" style="position:relative;">
+      <div id="chat-list">
+        <div class="rsb" style="padding:12px 16px;border-bottom:0.5px solid var(--border);">
+          <span style="font-size:16px;font-weight:800;">Mensagens</span>
+          <button class="btn bo bsm" onclick="toast('Nova conversa...')">✏️ Nova</button>
+        </div>
+        <div class="fbar"><button class="fc on">Trocas (3)</button><button class="fc">Grupos (2)</button><button class="fc">Comunidade</button></div>
+        <div class="card" style="margin:12px 16px;">
+          <div class="cli" onclick="openConv('Ana Martins','AM','var(--bl)','var(--b)')">
+            <div class="av" style="width:44px;height:44px;background:var(--bl);color:var(--b);">AM</div>
+            <div style="flex:1;min-width:0;"><div class="rsb"><div style="font-size:14px;font-weight:800;">Ana Martins</div><div style="font-size:11px;color:var(--t2);">14:32</div></div><div style="font-size:12px;color:var(--t2);">Nos encontramos no sábado?</div></div>
+            <div class="cu">2</div>
+          </div>
+          <div class="cli" onclick="openConv('Carlos Silva','CS','var(--gl)','var(--gd)')">
+            <div class="av" style="width:44px;height:44px;background:var(--gl);color:var(--gd);">CS</div>
+            <div style="flex:1;min-width:0;"><div class="rsb"><div style="font-size:14px;font-weight:800;">Carlos Silva</div><div style="font-size:11px;color:var(--t2);">11:15</div></div><div style="font-size:12px;color:var(--t2);">Perfeito, confirmado então!</div></div>
+          </div>
+          <div class="cli" onclick="openConv('Brasil Copa 2026','🏆','var(--yl)','var(--yd)')">
+            <div class="av" style="width:44px;height:44px;background:var(--yl);color:var(--yd);font-size:22px;">🏆</div>
+            <div style="flex:1;min-width:0;"><div class="rsb"><div style="font-size:14px;font-weight:800;">Brasil Copa 2026</div><div style="font-size:11px;color:var(--t2);">Ontem</div></div><div style="font-size:12px;color:var(--t2);">João: Alguém tem a 312?</div></div>
+            <div class="cu">7</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONVERSA -->
+      <div id="chatconv">
+        <div class="ch">
+          <button class="cback" onclick="closeConv()">←</button>
+          <div id="cv-av" class="av" style="width:36px;height:36px;font-size:14px;background:var(--bl);color:var(--b);">AM</div>
+          <div style="flex:1;"><div style="font-size:15px;font-weight:800;color:#fff;" id="cv-name">Ana Martins</div><div style="font-size:11px;color:rgba(255,255,255,.72);" id="cv-status">Online agora</div></div>
+          <button class="iBtn" onclick="toast('Opções da conversa')">···</button>
+        </div>
+        <div class="msgs" id="msgs-wrap">
+          <div class="mi2"><div class="bub bi">Oi! Vi que você tem a figurinha 147 🇧🇷<div class="btime">14:28</div></div></div>
+          <div class="mo"><div class="bub bo2">Tenho! Você tem a 089 do Vini?<div class="btime">14:30</div></div></div>
+          <div class="mi2"><div class="bub bi">Tenho sim, topas trocar? 🤝<div class="btime">14:31</div></div></div>
+          <div class="mo"><div class="bub bo2">Toppo! Sábado no Parque da Cidade?<div class="btime">14:31</div></div></div>
+          <div class="mi2"><div class="bub bi">Combinado! Nos vemos lá 😊<div class="btime">14:32</div></div></div>
+        </div>
+        <!-- INPUT ÁREA COMPLETA -->
+        <div class="cia">
+          <!-- EMOJI PICKER -->
+          <div class="ep" id="emoji-picker">
+            <div class="ep-cats" id="ep-cats"></div>
+            <div class="ep-grid" id="ep-grid"></div>
+          </div>
+          <!-- IMG PREVIEW -->
+          <div class="img-preview-wrap" id="chat-img-wrap">
+            <img id="chat-img-prev" src="" alt="">
+            <button class="img-remove" onclick="clearChatImg()">✕</button>
+          </div>
+          <!-- INPUT ROW -->
+          <div class="ci-row">
+            <div class="ci-tools">
+              <button class="ci-tb" id="emoji-btn" onclick="toggleEmojiPicker()" title="Emojis">😊</button>
+              <button class="ci-tb" onclick="triggerChatImg()" title="Imagem">📷</button>
+              <input type="file" id="chat-img-inp" accept="image/*" style="display:none;" onchange="handleChatImg(this)">
+            </div>
+            <textarea class="ci-in" id="ci-inp" placeholder="Mensagem..." rows="1"
+              oninput="autoResize(this)"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"></textarea>
+            <button class="ci-send" onclick="sendMsg()">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PERFIL ===== -->
+    <div class="page" id="page-perfil">
+      <div class="ph">
+        <div class="pav" id="pav">FS</div>
+        <div style="flex:1;position:relative;z-index:1;">
+          <div class="pname" id="p-name">Filipe Santos</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.72);font-weight:700;margin-top:2px;" id="p-city">📍 Vitória de Santo Antão, PE</div>
+          <div class="pstars">★★★★★ <span style="font-size:12px;opacity:.72;color:#fff;">5.0 · 12 trocas</span></div>
+        </div>
+        <button class="iBtn" onclick="openModal('modal-editperfil')">✏️</button>
+      </div>
+      <div class="pbadges">
+        <span class="bdg bdg-o">🏆 Colecionador Ativo</span>
+        <span class="bdg bdg-v">✓ Trocas Confiáveis</span>
+        <span class="bdg bdg-b">⚡ Resposta Rápida</span>
+      </div>
+      <div class="sec">
+        <div class="sec-t">Álbum Copa 2026</div>
+        <div class="card">
+          <div style="padding:12px 14px;">
+            <div class="rsb" style="margin-bottom:8px;"><span style="font-size:15px;font-weight:800;">Copa do Mundo 2026</span><span style="font-size:15px;font-weight:800;color:var(--g);">311 / 640</span></div>
+            <div class="pbar" style="height:8px;border-radius:4px;"><div class="pfill" style="width:49%;"></div></div>
+            <div style="font-size:12px;color:var(--t2);margin-top:4px;text-align:right;font-weight:700;">49% completo</div>
+          </div>
+          <div class="div" style="margin:0;"></div>
+          <div style="padding:8px 14px 4px;font-size:11px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;">Progresso por seleção</div>
+          <div class="sr"><svg width="30" height="21" viewBox="0 0 30 21" style="border-radius:3px;"><rect width="30" height="21" fill="#009C3B"/><polygon points="15,2 27,10.5 15,19 3,10.5" fill="#FFDF00"/><circle cx="15" cy="10.5" r="4.5" fill="#002776"/></svg><div class="spg"><div class="spl"><span class="spn">Brasil</span><span class="spc">18/20</span></div><div class="pbar"><div class="pfill" style="width:90%;"></div></div></div></div>
+          <div class="sr"><svg width="30" height="21" viewBox="0 0 30 21" style="border-radius:3px;"><rect width="30" height="21" fill="#74ACDF"/><rect y="7.5" width="30" height="6" fill="#fff"/><ellipse cx="15" cy="10.5" rx="5" ry="5" fill="none" stroke="#F6B40E" stroke-width="1.5"/><circle cx="15" cy="10.5" r="2" fill="#F6B40E"/></svg><div class="spg"><div class="spl"><span class="spn">Argentina</span><span class="spc">14/20</span></div><div class="pbar"><div class="pfill" style="width:70%;"></div></div></div></div>
+          <div class="sr"><svg width="30" height="21" viewBox="0 0 30 21" style="border-radius:3px;"><rect width="30" height="21" fill="#fff"/><rect width="10" height="21" fill="#002395"/><rect x="20" width="10" height="21" fill="#ED2939"/></svg><div class="spg"><div class="spl"><span class="spn">França</span><span class="spc">11/20</span></div><div class="pbar"><div class="pfill" style="width:55%;"></div></div></div></div>
+          <div class="div" style="margin:0;"></div>
+          <div style="padding:8px 14px 4px;font-size:11px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;">Repetidas para trocar</div>
+          <div class="skg"><div class="stk sh">89</div><div class="stk sh">147</div><div class="stk sh">213</div><div class="stk sh">04</div><div class="stk sh">312</div><div class="stk sh">78</div><div class="stk sh">33</div><div class="stk sh">201</div><div class="stk sm">+39</div></div>
+          <div style="padding:8px 14px 4px;font-size:11px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;">Me faltam</div>
+          <div class="skg"><div class="stk sn2">23</div><div class="stk sn2">56</div><div class="stk sn2">101</div><div class="stk sn2">189</div><div class="stk sn2">234</div><div class="stk sn2">298</div><div class="stk sn2">319</div><div class="stk sn2">412</div><div class="stk sm">+15</div></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 16px;"><div style="background:var(--f0);border-radius:var(--rsm);padding:12px;text-align:center;"><div style="font-family:var(--display);font-size:26px;color:var(--g);">12</div><div style="font-size:11px;font-weight:800;color:var(--t2);">Trocas concluídas</div></div><div style="background:var(--f0);border-radius:var(--rsm);padding:12px;text-align:center;"><div style="font-family:var(--display);font-size:26px;color:var(--b);">3</div><div style="font-size:11px;font-weight:800;color:var(--t2);">Eventos confirmados</div></div></div>
+      <div style="padding:0 16px 20px;"><button class="btn bo" style="width:100%;justify-content:center;" onclick="doLogout()">Sair da conta</button></div>
+    </div>
+
+  </div><!-- /pages -->
+
+  <!-- BOTTOM NAV -->
+  <nav id="bnav">
+    <button class="ni on" id="ni-home" onclick="goTo('home')"><span class="ni-ic">🏠</span><span>Início</span></button>
+    <button class="ni" id="ni-pontos" onclick="goTo('pontos')"><span class="ni-ic">📍</span><span>Pontos</span></button>
+    <button class="ni" id="ni-trocas" onclick="goTo('trocas')"><span class="ni-ic">🔄</span><span>Trocas</span><span class="ni-badge">3</span></button>
+    <button class="ni" id="ni-comunidade" onclick="goTo('comunidade')"><span class="ni-ic">👥</span><span>Comunidade</span></button>
+    <button class="ni" id="ni-chat" onclick="goTo('chat')"><span class="ni-ic">💬</span><span>Chat</span><span class="ni-badge">9</span></button>
+  </nav>
+</div><!-- /app -->
+
+<!-- MODALS -->
+<div class="modal-bg" id="modal-ponto">
+  <div class="modal">
+    <div class="modal-h"><div class="modal-t">📍 Cadastrar ponto de troca</div><button class="modal-cl" onclick="closeModal('modal-ponto')">✕</button></div>
+    <div class="mform">
+      <div><div class="mf-lbl">Nome do local</div><input class="mf-inp" placeholder="Ex: Praça Central de Recife"></div>
+      <div><div class="mf-lbl">Endereço completo</div><input class="mf-inp" placeholder="Rua, número, bairro"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div><div class="mf-lbl">Cidade</div><input class="mf-inp" placeholder="Recife"></div>
+        <div><div class="mf-lbl">Estado</div><input class="mf-inp" placeholder="PE" maxlength="2"></div>
+      </div>
+      <div><div class="mf-lbl">Tipo</div><select class="mf-sel"><option>Evento fixo (mensal)</option><option>Evento único</option><option>Ponto informal</option></select></div>
+      <div><div class="mf-lbl">Horário / Frequência</div><input class="mf-inp" placeholder="Ex: Todo 1º sábado do mês, 9h–13h"></div>
+      <div><div class="mf-lbl">Descrição</div><textarea class="mf-ta" rows="3" placeholder="Conta um pouco sobre o local..."></textarea></div>
+      <button class="btn bv" style="width:100%;padding:12px;" onclick="closeModal('modal-ponto');toast('Ponto cadastrado! Aparecerá no mapa em breve.')">Cadastrar ponto</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-troca">
+  <div class="modal">
+    <div class="modal-h"><div class="modal-t">🔄 Propor troca</div><button class="modal-cl" onclick="closeModal('modal-troca')">✕</button></div>
+    <div class="mform">
+      <div><div class="mf-lbl">Usuário para propor</div><input class="mf-inp" placeholder="@nome_do_usuario"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div><div class="mf-lbl">Figurinha que você dá</div><input class="mf-inp" type="number" placeholder="Ex: 147"></div>
+        <div><div class="mf-lbl">Figurinha que quer</div><input class="mf-inp" type="number" placeholder="Ex: 089"></div>
+      </div>
+      <div><div class="mf-lbl">Álbum</div><select class="mf-sel"><option>Copa do Mundo 2026</option><option>Copa do Mundo 2022</option></select></div>
+      <div><div class="mf-lbl">Mensagem (opcional)</div><textarea class="mf-ta" rows="2" placeholder="Escreva algo para o outro colecionador..."></textarea></div>
+      <button class="btn bv" style="width:100%;padding:12px;" onclick="closeModal('modal-troca');toast('Proposta enviada!')">Enviar proposta</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-editperfil">
+  <div class="modal">
+    <div class="modal-h"><div class="modal-t">✏️ Editar perfil</div><button class="modal-cl" onclick="closeModal('modal-editperfil')">✕</button></div>
+    <div class="mform">
+      <div style="text-align:center;margin-bottom:4px;">
+        <div style="position:relative;display:inline-block;">
+          <div class="pav" style="width:72px;height:72px;font-size:24px;margin:0 auto;" id="edit-av-preview">FS</div>
+          <button onclick="triggerAvatarImg()" style="position:absolute;bottom:0;right:0;width:24px;height:24px;border-radius:50%;background:var(--g);color:#fff;border:none;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">📷</button>
+          <input type="file" id="avatar-inp" accept="image/*" style="display:none;" onchange="handleAvatarImg(this)">
+        </div>
+      </div>
+      <div><div class="mf-lbl">Nome completo</div><input class="mf-inp" id="edit-name" value="Filipe Santos"></div>
+      <div><div class="mf-lbl">Nome de usuário</div><input class="mf-inp" id="edit-user" value="@filipe_santos"></div>
+      <div><div class="mf-lbl">Cidade</div><input class="mf-inp" id="edit-city" value="Vitória de Santo Antão, PE"></div>
+      <div><div class="mf-lbl">Bio</div><textarea class="mf-ta" rows="2" placeholder="Conte um pouco sobre você...">Colecionador apaixonado desde 2002. Copa 2026 vai ser completada! 🇧🇷</textarea></div>
+      <button class="btn bv" style="width:100%;padding:12px;" onclick="saveProfile()">Salvar perfil</button>
+    </div>
+  </div>
+</div>
+
+<!-- INSTALL BANNER -->
+<div id="install-banner">
+  <div style="width:40px;height:40px;border-radius:10px;background:var(--y);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+    <svg width="24" height="24" viewBox="0 0 24 24"><polygon points="12,2 22,8 22,16 12,22 2,16 2,8" fill="#009C3B"/><circle cx="12" cy="12" r="4" fill="#002776"/></svg>
+  </div>
+  <div style="flex:1;"><div style="font-size:13px;font-weight:800;color:#fff;">Instalar FiguriTroca</div><div style="font-size:11px;color:rgba(255,255,255,.72);">Adicione à tela inicial</div></div>
+  <button id="install-btn" style="background:var(--y);border:none;color:var(--b);font-weight:800;font-size:12px;padding:7px 14px;border-radius:8px;cursor:pointer;font-family:var(--font);">Instalar</button>
+  <button onclick="document.getElementById('install-banner').classList.remove('on')" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:18px;cursor:pointer;padding:4px;">✕</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="the-toast"></div>
+
+<!-- ===================================================
+     SUPABASE + APP SCRIPT
+=================================================== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// ============================================================
+// CONFIG — SUBSTITUA PELOS SEUS DADOS DO SUPABASE
+// ============================================================
+const SUPABASE_URL = 'https://SEU_PROJETO.supabase.co';
+const SUPABASE_KEY = 'SUA_ANON_KEY_AQUI';
+// ============================================================
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let ME = null;          // perfil do usuário logado
+let currentConvId = null;
+let msgChannel = null;
+let pendingChatImg = null;
+
+// ============================================================
+// BOOT
+// ============================================================
+async function boot() {
+  // verifica sessão
+  const { data: { session } } = await sb.auth.getSession();
+  document.getElementById('loading').style.display = 'none';
+  if (session) {
+    await loadProfile(session.user.id);
+    showApp();
+  } else {
+    document.getElementById('auth-overlay').style.display = 'flex';
+  }
+}
+
+async function loadProfile(uid) {
+  const { data } = await sb.from('profiles').select('*').eq('id', uid).single();
+  ME = data || { id: uid, full_name: 'Usuário', username: 'user', city: '', state: '' };
+  updateUIWithProfile();
+}
+
+function updateUIWithProfile() {
+  if (!ME) return;
+  const initials = (ME.full_name || ME.username || 'U').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('top-av').textContent = initials;
+  document.getElementById('hero-name').textContent = (ME.full_name || ME.username) + ' 🇧🇷';
+  document.getElementById('p-name').textContent = ME.full_name || ME.username;
+  if (ME.city) document.getElementById('p-city').textContent = '📍 ' + ME.city + (ME.state ? ', ' + ME.state : '');
+  document.getElementById('pav').textContent = initials;
+  document.getElementById('comp-av').textContent = initials;
+  if (ME.avatar_url) {
+    [document.getElementById('top-av'), document.getElementById('pav')].forEach(el => {
+      el.innerHTML = `<img src="${ME.avatar_url}" alt="">`;
+    });
+  }
+}
+
+function showApp() {
+  document.getElementById('auth-overlay').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  loadHomeData();
+}
+
+function guestMode() {
+  ME = { id: null, full_name: 'Visitante', username: 'visitante', city: '', state: '' };
+  updateUIWithProfile();
+  showApp();
+  toast('Modo visitante — funcionalidades limitadas');
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+function authTab(tab, btn) {
+  document.querySelectorAll('.auth-tab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('auth-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('auth-register').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  document.getElementById('l-err').textContent = '';
+  if (!email || !pass) { document.getElementById('l-err').textContent = 'Preencha todos os campos.'; return; }
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) { document.getElementById('l-err').textContent = error.message; return; }
+  await loadProfile(data.user.id);
+  showApp();
+}
+
+async function doRegister() {
+  const name  = document.getElementById('r-name').value.trim();
+  const uname = document.getElementById('r-user').value.trim().replace('@','');
+  const email = document.getElementById('r-email').value.trim();
+  const pass  = document.getElementById('r-pass').value;
+  const city  = document.getElementById('r-city').value.trim();
+  document.getElementById('r-err').textContent = '';
+  if (!name || !uname || !email || !pass) { document.getElementById('r-err').textContent = 'Preencha todos os campos.'; return; }
+  if (pass.length < 6) { document.getElementById('r-err').textContent = 'Senha mínima de 6 caracteres.'; return; }
+  const { data, error } = await sb.auth.signUp({
+    email, password: pass,
+    options: { data: { full_name: name, username: uname } }
+  });
+  if (error) { document.getElementById('r-err').textContent = error.message; return; }
+  // aguarda trigger criar profile, então faz upsert manual com city
+  await sb.from('profiles').upsert({ id: data.user.id, full_name: name, username: uname, city: city.split(',')[0]?.trim(), state: city.split(',')[1]?.trim() || 'PE' });
+  await loadProfile(data.user.id);
+  showApp();
+  toast('Bem-vindo ao FiguriTroca! 🇧🇷');
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  ME = null;
+  document.getElementById('auth-overlay').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+// ============================================================
+// HOME DATA
+// ============================================================
+async function loadHomeData() {
+  if (!ME?.id) return;
+  const { data: stickers } = await sb.from('user_stickers').select('status,quantity').eq('user_id', ME.id);
+  if (stickers) {
+    const rep  = stickers.filter(s => s.status === 'have' && s.quantity > 1).length;
+    const need = stickers.filter(s => s.status === 'need').length;
+    document.getElementById('h-rep').textContent  = rep;
+    document.getElementById('h-need').textContent = need;
+  }
+  const { data: trades } = await sb.from('trades').select('id').or(`proposer_id.eq.${ME.id},receiver_id.eq.${ME.id}`).eq('status','completed');
+  if (trades) document.getElementById('h-trades').textContent = trades.length;
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+  document.getElementById('page-' + page).classList.add('on');
+  document.getElementById('ni-' + page).classList.add('on');
+}
+
+// ============================================================
+// SUBTABS COMUNIDADE
+// ============================================================
+function showSub(id, btn) {
+  document.querySelectorAll('.ss').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.stab').forEach(b => b.classList.remove('on'));
+  document.getElementById('sub-' + id).classList.add('on');
+  btn.classList.add('on');
+}
+
+// ============================================================
+// EMOJI PICKER
+// ============================================================
+const EMOJI_CATS = {
+  '😊': ['😀','😁','😂','🤣','😊','😍','🥰','😘','😎','🤩','😅','😆','🙂','🙃','😉','😋','🥳','🤗','😏','😐','😑','😶','🤔','😮','😯','😲','🥺','😢','😭','😤','😠','😡','🤬','🤯','😱','😨','😰','😴','🥱'],
+  '🏆': ['⚽','🏆','🎖️','🥇','🥈','🥉','🎯','🎪','🎨','🃏','🎴','🀄','🎲','🎭','🎬','🎤','🎵','🎶','🎸','🥁','🎺','🎻','🎹'],
+  '🇧🇷': ['🇧🇷','🇦🇷','🇵🇹','🇫🇷','🇩🇪','🇪🇸','🏴󠁧󠁢󠁥󠁮󠁧󠁿','🇮🇹','🇺🇸','🇲🇽','🇳🇱','🇧🇪','🇨🇷','🇯🇵','🇰🇷','🇦🇺','🇲🇦','🇸🇳'],
+  '👍': ['👍','👎','👏','🙌','🤝','✌️','🤞','🤟','🤙','👋','🤚','✋','🖐️','👌','🤌','💪','🦵','🦶','👀','💀','❤️','🧡','💛','💚','💙','💜','🖤','❤️‍🔥'],
+  '🌟': ['⭐','🌟','✨','💫','🔥','❄️','🌈','⚡','🌊','🌸','🌺','🌻','🍀','🏠','🏟️','🎭','🌍','🗺️','📍','💎','🎁','🎉','🎊']
+};
+
+function buildEmojiPicker() {
+  const cats = document.getElementById('ep-cats');
+  const grid = document.getElementById('ep-grid');
+  cats.innerHTML = '';
+  const catKeys = Object.keys(EMOJI_CATS);
+  catKeys.forEach((cat, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'epc' + (i === 0 ? ' on' : '');
+    btn.textContent = cat;
+    btn.onclick = () => {
+      document.querySelectorAll('.epc').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      renderEmojis(cat);
+    };
+    cats.appendChild(btn);
+  });
+  renderEmojis(catKeys[0]);
+}
+
+function renderEmojis(cat) {
+  const grid = document.getElementById('ep-grid');
+  grid.innerHTML = '';
+  EMOJI_CATS[cat].forEach(em => {
+    const btn = document.createElement('button');
+    btn.className = 'emo';
+    btn.textContent = em;
+    btn.onclick = () => insertEmoji(em);
+    grid.appendChild(btn);
+  });
+}
+
+function toggleEmojiPicker() {
+  const ep = document.getElementById('emoji-picker');
+  const btn = document.getElementById('emoji-btn');
+  if (!ep.classList.contains('on')) {
+    buildEmojiPicker();
+    ep.classList.add('on');
+    btn.classList.add('on');
+  } else {
+    ep.classList.remove('on');
+    btn.classList.remove('on');
+  }
+}
+
+function insertEmoji(em) {
+  const inp = document.getElementById('ci-inp');
+  const start = inp.selectionStart;
+  const val = inp.value;
+  inp.value = val.slice(0, start) + em + val.slice(inp.selectionEnd);
+  inp.selectionStart = inp.selectionEnd = start + em.length;
+  inp.focus();
+  autoResize(inp);
+}
+
+// ============================================================
+// CHAT — IMAGEM
+// ============================================================
+function triggerChatImg() { document.getElementById('chat-img-inp').click(); }
+function handleChatImg(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { toast('Imagem muito grande. Máx 5MB.'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    pendingChatImg = { file, dataUrl: e.target.result };
+    const wrap = document.getElementById('chat-img-wrap');
+    const prev = document.getElementById('chat-img-prev');
+    prev.src = e.target.result;
+    wrap.classList.add('on');
+  };
+  reader.readAsDataURL(file);
+}
+function clearChatImg() {
+  pendingChatImg = null;
+  document.getElementById('chat-img-wrap').classList.remove('on');
+  document.getElementById('chat-img-prev').src = '';
+  document.getElementById('chat-img-inp').value = '';
+}
+
+// ============================================================
+// CHAT — ENVIAR MENSAGEM
+// ============================================================
+async function sendMsg() {
+  const inp = document.getElementById('ci-inp');
+  const text = inp.value.trim();
+  const ep = document.getElementById('emoji-picker');
+  ep.classList.remove('on');
+  document.getElementById('emoji-btn').classList.remove('on');
+
+  if (!text && !pendingChatImg) return;
+
+  const msgs = document.getElementById('msgs-wrap');
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+
+  // Adiciona localmente
+  const div = document.createElement('div');
+  div.className = 'mo';
+  let bubbleContent = '';
+  if (pendingChatImg) {
+    bubbleContent += `<img src="${pendingChatImg.dataUrl}" alt="" style="max-width:200px;border-radius:10px;display:block;" onclick="openImgFull(this)">`;
+  }
+  if (text) bubbleContent += (pendingChatImg ? '<div style="margin-top:6px;">' : '') + text + (pendingChatImg ? '</div>' : '');
+  div.innerHTML = `<div class="bub bo2">${bubbleContent}<div class="btime">${timeStr}</div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  inp.value = '';
+  autoResize(inp);
+  clearChatImg();
+
+  // Salva no Supabase se logado
+  if (ME?.id && currentConvId) {
+    let imageUrl = null;
+    if (pendingChatImg?.file) {
+      const ext = pendingChatImg.file.name.split('.').pop();
+      const path = `${ME.id}/${Date.now()}.${ext}`;
+      const { data: up } = await sb.storage.from('chat-images').upload(path, pendingChatImg.file, { contentType: pendingChatImg.file.type });
+      if (up) {
+        const { data: pu } = sb.storage.from('chat-images').getPublicUrl(path);
+        imageUrl = pu?.publicUrl;
+      }
+    }
+    await sb.from('messages').insert({
+      conversation_id: currentConvId,
+      sender_id: ME.id,
+      content: text || null,
+      type: imageUrl ? (text ? 'image' : 'image') : 'text',
+      image_url: imageUrl
+    });
+  }
+
+  // Resposta automática demo
+  if (!ME?.id || !currentConvId) {
+    setTimeout(() => {
+      const r = document.createElement('div');
+      r.className = 'mi2';
+      const responses = ['👍 Combinado!','Ok, te vejo lá!','Boa ideia! 🤝','Que figurinha incrível! 🌟','Tenho essa repetida sim!','Topei a troca!'];
+      r.innerHTML = `<div class="bub bi">${responses[Math.floor(Math.random()*responses.length)]}<div class="btime">${timeStr}</div></div>`;
+      msgs.appendChild(r);
+      msgs.scrollTop = msgs.scrollHeight;
+    }, 900);
+  }
+}
+
+function openImgFull(img) {
+  const o = document.createElement('div');
+  o.style.cssText = 'position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;';
+  const i = document.createElement('img');
+  i.src = img.src;
+  i.style.cssText = 'max-width:95%;max-height:95%;border-radius:10px;';
+  o.appendChild(i);
+  o.onclick = () => o.remove();
+  document.body.appendChild(o);
+}
+
+// ============================================================
+// ABRIR CONVERSA
+// ============================================================
+async function openConv(name, initials, bg, color) {
+  document.getElementById('cv-name').textContent = name;
+  const av = document.getElementById('cv-av');
+  av.innerHTML = '';
+  av.textContent = typeof initials === 'string' && initials.length <= 2 ? initials : initials;
+  if (bg) av.style.background = bg;
+  if (color) av.style.color = color;
+  document.getElementById('chatconv').classList.add('on');
+
+  // Tenta achar/criar conversa no Supabase
+  if (ME?.id) {
+    // em produção: buscar/criar conversation + members
+    // Para demo, apenas abre UI
+  }
+  document.getElementById('msgs-wrap').scrollTop = 999999;
+  goTo('chat');
+}
+
+function closeConv() {
+  document.getElementById('chatconv').classList.remove('on');
+  document.getElementById('emoji-picker').classList.remove('on');
+  document.getElementById('emoji-btn').classList.remove('on');
+  if (msgChannel) { sb.removeChannel(msgChannel); msgChannel = null; }
+}
+
+// ============================================================
+// POST COMUNIDADE — IMAGEM
+// ============================================================
+function triggerPostImg() { document.getElementById('post-img-inp').click(); }
+function handlePostImg(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('post-img-prev').src = e.target.result;
+    document.getElementById('post-img-wrap').classList.add('on');
+  };
+  reader.readAsDataURL(file);
+}
+function clearPostImg() {
+  document.getElementById('post-img-wrap').classList.remove('on');
+  document.getElementById('post-img-prev').src = '';
+  document.getElementById('post-img-inp').value = '';
+}
+
+async function submitPost() {
+  const ta = document.getElementById('post-ta');
+  const text = ta.value.trim();
+  if (!text) { toast('Escreva algo para publicar!'); return; }
+
+  if (ME?.id) {
+    let imageUrl = null;
+    const imgInp = document.getElementById('post-img-inp');
+    if (imgInp.files[0]) {
+      const file = imgInp.files[0];
+      const path = `${ME.id}/${Date.now()}.${file.name.split('.').pop()}`;
+      const { data: up } = await sb.storage.from('post-images').upload(path, file, { contentType: file.type });
+      if (up) {
+        const { data: pu } = sb.storage.from('post-images').getPublicUrl(path);
+        imageUrl = pu?.publicUrl;
+      }
+    }
+    await sb.from('posts').insert({ author_id: ME.id, content: text, type: 'general', image_url: imageUrl });
+  }
+
+  // Adiciona localmente no topo
+  const now = new Date();
+  const timeStr = `há alguns segundos`;
+  const initials = (ME?.full_name || 'Você').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const imgSrc = document.getElementById('post-img-prev').src;
+  const newPost = document.createElement('div');
+  newPost.className = 'post';
+  newPost.innerHTML = `
+    <div class="post-h">
+      <div class="av" style="width:40px;height:40px;background:var(--y);color:var(--b);font-size:13px;">${initials}</div>
+      <div style="flex:1;"><div style="font-size:14px;font-weight:800;">${ME?.full_name || 'Você'} <span class="tag tv" style="font-size:10px;margin-left:4px;">Novo</span></div><div style="font-size:11px;color:var(--t2);">${timeStr}</div></div>
+    </div>
+    ${imgSrc && imgSrc !== '' ? `<div class="post-img-preview"><img src="${imgSrc}" alt="" onclick="openImgFull(this)"></div>` : ''}
+    <div class="post-bod">${text}</div>
+    <div class="pa-row"><button class="pa" onclick="this.classList.toggle('liked');this.textContent=this.classList.contains('liked')?'❤️ 1':'❤️ 0'">❤️ 0</button><button class="pa" onclick="toast('Comentários em breve!')">💬 0</button></div>
+  `;
+  const container = document.getElementById('posts-container');
+  container.insertBefore(newPost, container.firstChild);
+
+  ta.value = '';
+  clearPostImg();
+  toast('Post publicado! 🎉');
+}
+
+// ============================================================
+// AVATAR — PERFIL
+// ============================================================
+function triggerAvatarImg() { document.getElementById('avatar-inp').click(); }
+async function handleAvatarImg(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    document.getElementById('edit-av-preview').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    if (ME?.id) {
+      const path = `${ME.id}/avatar.${file.name.split('.').pop()}`;
+      const { data: up } = await sb.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
+      if (up) {
+        const { data: pu } = sb.storage.from('avatars').getPublicUrl(path);
+        await sb.from('profiles').update({ avatar_url: pu.publicUrl }).eq('id', ME.id);
+        ME.avatar_url = pu.publicUrl;
+      }
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveProfile() {
+  const name = document.getElementById('edit-name').value.trim();
+  const city = document.getElementById('edit-city').value.trim();
+  if (ME?.id) {
+    await sb.from('profiles').update({ full_name: name, city: city.split(',')[0]?.trim(), state: city.split(',')[1]?.trim() || 'PE' }).eq('id', ME.id);
+    ME.full_name = name;
+    ME.city = city.split(',')[0]?.trim();
+    ME.state = city.split(',')[1]?.trim() || 'PE';
+    updateUIWithProfile();
+  }
+  closeModal('modal-editperfil');
+  toast('Perfil atualizado!');
+}
+
+// ============================================================
+// MISC UI
+// ============================================================
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function toggleConfirm(id) {
+  const btn = document.getElementById(id + '-btn');
+  const cnt = document.getElementById(id + '-count');
+  const cur = parseInt(cnt.textContent);
+  if (btn.classList.contains('done')) {
+    btn.classList.remove('done'); btn.textContent = 'Confirmar';
+    cnt.textContent = cur - 1;
+    toast('Presença cancelada.');
+  } else {
+    btn.classList.add('done'); btn.textContent = 'Confirmado ✓';
+    cnt.textContent = cur + 1;
+    toast('Presença confirmada! 🎉');
+  }
+}
+
+function toggleLike(id, base) {
+  const btn = document.getElementById(id);
+  const n = btn.classList.toggle('liked') ? base + 1 : base;
+  btn.innerHTML = '❤️ ' + n;
+  if (btn.classList.contains('liked')) toast('Curtido!');
+}
+
+function filterFC(btn) {
+  document.querySelectorAll('.fc').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+  toast('Filtro: ' + btn.textContent);
+}
+
+function proposeTradeUI(user, give, get) {
+  document.querySelector('#modal-troca input[type="number"]').value = give;
+  document.querySelectorAll('#modal-troca input[type="number"]')[1].value = get;
+  openModal('modal-troca');
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(id) { document.getElementById(id).classList.add('on'); }
+function closeModal(id) { document.getElementById(id).classList.remove('on'); }
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('on'); });
+});
+
+// ============================================================
+// TOAST
+// ============================================================
+let _tt;
+function toast(msg) {
+  const el = document.getElementById('the-toast');
+  el.textContent = msg; el.classList.add('on');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('on'), 2400);
+}
+
+// ============================================================
+// PWA INSTALL
+// ============================================================
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  setTimeout(() => document.getElementById('install-banner').classList.add('on'), 4000);
+});
+document.getElementById('install-btn').addEventListener('click', async () => {
+  if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; }
+  document.getElementById('install-banner').classList.remove('on');
+  toast('App instalado! 🇧🇷');
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').classList.remove('on');
+  toast('FiguriTroca instalado com sucesso! 🏆');
+});
+
+// ============================================================
+// SERVICE WORKER
+// ============================================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+}
+
+// ============================================================
+// INICIAR
+// ============================================================
+window.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>
