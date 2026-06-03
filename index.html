@@ -111,18 +111,18 @@ input,textarea{font-family:var(--font);}
 }
 .ni{
   flex:1;display:flex;flex-direction:column;align-items:center;
-  padding:8px 2px 6px;border:none;background:none;
-  color:var(--t2);font-size:10px;font-weight:800;gap:2px;
-  position:relative;transition:color .15s;
+  padding:7px 1px 5px;border:none;background:none;
+  color:var(--t2);font-size:9px;font-weight:800;gap:2px;
+  position:relative;transition:color .15s;min-width:0;
 }
 .ni.on{color:var(--g);}
 .ni.on::before{
-  content:'';position:absolute;top:0;left:25%;right:25%;
+  content:'';position:absolute;top:0;left:20%;right:20%;
   height:2.5px;background:var(--g);border-radius:0 0 3px 3px;
 }
-.ni-ic{font-size:21px;line-height:1;}
+.ni-ic{font-size:19px;line-height:1;}
 .ni-badge{
-  position:absolute;top:4px;right:calc(50% - 22px);
+  position:absolute;top:3px;right:calc(50% - 20px);
   background:var(--red);color:#fff;border-radius:10px;
   font-size:9px;font-weight:800;padding:1px 5px;
   border:1.5px solid var(--white);min-width:16px;text-align:center;
@@ -652,7 +652,7 @@ input,textarea{font-family:var(--font);}
         <div class="hero-sub">Você tem <strong>3 matches</strong> novos e um evento em 6 dias!</div>
         <div class="hero-btns">
           <button class="btn ba" onclick="goTo('trocas')">✦ Ver matches</button>
-          <button class="btn bgh" onclick="goTo('perfil')">Meu álbum</button>
+          <button class="btn bgh" onclick="goTo('album')">📒 Meu álbum</button>
         </div>
       </div>
       <div class="hero-stripe"><div class="hs-g"></div><div class="hs-y"></div><div class="hs-b"></div></div>
@@ -724,12 +724,12 @@ input,textarea{font-family:var(--font);}
           <div class="row" style="gap:5px;"><div style="width:9px;height:9px;border-radius:50%;background:var(--yd);flex-shrink:0;"></div><span style="font-size:10px;font-weight:800;">Informal</span></div>
         </div>
         <div class="map-filt">
-          <button class="mfb on" id="map-btn-todos" onclick="mapFilterAll(this)">Todos</button>
-          <button class="mfb" id="map-btn-nearby" onclick="mapFilterNearby(this)">📍 Perto de mim</button>
+          <button class="mfb on">Todos</button>
+          <button class="mfb" onclick="toast('Localizando...')">Perto de mim</button>
         </div>
         <div class="map-zc">
-          <button class="mzb" onclick="toast('Zoom + (integração com mapa real em breve)')">+</button>
-          <button class="mzb" onclick="toast('Zoom - (integração com mapa real em breve)')">−</button>
+          <button class="mzb">+</button>
+          <button class="mzb">−</button>
         </div>
       </div>
       <div class="rsb" style="padding:12px 16px;border-bottom:0.5px solid var(--border);">
@@ -1078,7 +1078,7 @@ input,textarea{font-family:var(--font);}
   <!-- BOTTOM NAV -->
   <nav id="bnav">
     <button class="ni on" id="ni-home" onclick="goTo('home')"><span class="ni-ic">🏠</span><span>Início</span></button>
-    <button class="ni" id="ni-album" onclick="goTo('album')"><span class="ni-ic">📒</span><span>Álbum</span></button>
+    <button class="ni" id="ni-pontos" onclick="goTo('pontos')"><span class="ni-ic">📍</span><span>Pontos</span></button>
     <button class="ni" id="ni-trocas" onclick="goTo('trocas')"><span class="ni-ic">🔄</span><span>Trocas</span><span class="ni-badge">3</span></button>
     <button class="ni" id="ni-comunidade" onclick="goTo('comunidade')"><span class="ni-ic">👥</span><span>Comunidade</span></button>
     <button class="ni" id="ni-chat" onclick="goTo('chat')"><span class="ni-ic">💬</span><span>Chat</span><span class="ni-badge" id="chat-badge">9</span></button>
@@ -1090,16 +1090,15 @@ input,textarea{font-family:var(--font);}
   <div class="modal">
     <div class="modal-h"><div class="modal-t">📍 Cadastrar ponto de troca</div><button class="modal-cl" onclick="closeModal('modal-ponto')">✕</button></div>
     <div class="mform">
-      <div><div class="mf-lbl">Nome do local *</div><input class="mf-inp" id="ponto-name" placeholder="Ex: Praça Central de Recife"></div>
-      <div><div class="mf-lbl">Endereço completo</div><input class="mf-inp" id="ponto-address" placeholder="Rua, número, bairro"></div>
+      <div><div class="mf-lbl">Nome do local</div><input class="mf-inp" placeholder="Ex: Praça Central de Recife"></div>
+      <div><div class="mf-lbl">Endereço completo</div><input class="mf-inp" placeholder="Rua, número, bairro"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div><div class="mf-lbl">Cidade *</div><input class="mf-inp" id="ponto-city" placeholder="Recife"></div>
-        <div><div class="mf-lbl">Estado *</div><input class="mf-inp" id="ponto-state" placeholder="PE" maxlength="2" value="PE"></div>
+        <div><div class="mf-lbl">Cidade</div><input class="mf-inp" placeholder="Recife"></div>
+        <div><div class="mf-lbl">Estado</div><input class="mf-inp" placeholder="PE" maxlength="2"></div>
       </div>
-      <button class="btn bv bsm" style="width:100%;justify-content:center;" onclick="usarMinhaLocalizacao()">📍 Usar minha localização atual</button>
-      <div><div class="mf-lbl">Tipo</div><select class="mf-sel" id="ponto-type"><option value="event">Evento fixo (mensal)</option><option value="event">Evento único</option><option value="informal">Ponto informal</option></select></div>
-      <div><div class="mf-lbl">Horário / Frequência</div><input class="mf-inp" id="ponto-schedule" placeholder="Ex: Todo 1º sábado do mês, 9h–13h"></div>
-      <div><div class="mf-lbl">Descrição</div><textarea class="mf-ta" id="ponto-desc" rows="3" placeholder="Conta um pouco sobre o local..."></textarea></div>
+      <div><div class="mf-lbl">Tipo</div><select class="mf-sel"><option>Evento fixo (mensal)</option><option>Evento único</option><option>Ponto informal</option></select></div>
+      <div><div class="mf-lbl">Horário / Frequência</div><input class="mf-inp" placeholder="Ex: Todo 1º sábado do mês, 9h–13h"></div>
+      <div><div class="mf-lbl">Descrição</div><textarea class="mf-ta" rows="3" placeholder="Conta um pouco sobre o local..."></textarea></div>
       <button class="btn bv" style="width:100%;padding:12px;" onclick="saveMeetPoint()">Cadastrar ponto</button>
     </div>
   </div>
@@ -2708,371 +2707,27 @@ async function openGroupChat(convId, name, emoji) {
 }
 
 // ============================================================
-// GEOLOCALIZAÇÃO — PERTO DE MIM + MODAL DE PONTO
-// ============================================================
-let _userLat = null, _userLng = null, _geoSortActive = false;
-
-function distKm(lat1, lng1, lat2, lng2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lng2 - lng1) * Math.PI / 180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
-function mapFilterAll(btn) {
-  _geoSortActive = false; _userLat = null; _userLng = null;
-  document.querySelectorAll('.mfb').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  loadMeetPoints();
-}
-
-function mapFilterNearby(btn) {
-  if (!navigator.geolocation) { toast('Geolocalização não suportada neste navegador.'); return; }
-  btn.textContent = '⏳ Localizando...';
-  navigator.geolocation.getCurrentPosition(
-    pos => {
-      _userLat = pos.coords.latitude;
-      _userLng = pos.coords.longitude;
-      _geoSortActive = true;
-      document.querySelectorAll('.mfb').forEach(b => b.classList.remove('on'));
-      btn.classList.add('on');
-      btn.textContent = '📍 Perto de mim';
-      toast('Mostrando pontos mais próximos! 📍');
-      loadMeetPoints();
-    },
-    err => {
-      btn.textContent = '📍 Perto de mim';
-      if (err.code === 1) toast('Permissão de localização negada. Habilite nas configurações do navegador.');
-      else if (err.code === 2) toast('Não foi possível obter sua localização. Tente novamente.');
-      else toast('Tempo esgotado ao obter localização. Tente novamente.');
-    },
-    { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
-  );
-}
-
-async function usarMinhaLocalizacao() {
-  if (!navigator.geolocation) { toast('Geolocalização não suportada neste navegador.'); return; }
-  const btn = event.target;
-  const original = btn.textContent;
-  btn.textContent = '⏳ Obtendo localização...';
-  btn.disabled = true;
-  navigator.geolocation.getCurrentPosition(
-    async pos => {
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-      // Salva no dataset do campo cidade para uso no save
-      const cityEl = document.getElementById('ponto-city');
-      if (cityEl) { cityEl.dataset.lat = lat; cityEl.dataset.lng = lng; }
-      try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pt-BR`);
-        const data = await res.json();
-        const addr = data.address || {};
-        const city = addr.city || addr.town || addr.village || addr.municipality || addr.suburb || '';
-        const rawState = addr.state || '';
-        // Mapeia nome de estado para sigla
-        const stateMap = {'Pernambuco':'PE','São Paulo':'SP','Rio de Janeiro':'RJ','Bahia':'BA','Minas Gerais':'MG','Ceará':'CE','Paraná':'PR','Rio Grande do Sul':'RS','Santa Catarina':'SC','Paraíba':'PB','Alagoas':'AL','Sergipe':'SE','Piauí':'PI','Maranhão':'MA','Rio Grande do Norte':'RN','Tocantins':'TO','Goiás':'GO','Mato Grosso':'MT','Mato Grosso do Sul':'MS','Pará':'PA','Amazonas':'AM','Acre':'AC','Rondônia':'RO','Roraima':'RR','Amapá':'AP','Espírito Santo':'ES','Distrito Federal':'DF'};
-        const stateAbbr = stateMap[rawState] || rawState.slice(0,2).toUpperCase() || 'PE';
-        if (cityEl && city) cityEl.value = city;
-        const stateEl = document.getElementById('ponto-state');
-        if (stateEl) stateEl.value = stateAbbr;
-        const addrEl = document.getElementById('ponto-address');
-        if (addrEl && !addrEl.value) {
-          const street = addr.road || addr.pedestrian || '';
-          const num = addr.house_number || '';
-          const neigh = addr.suburb || addr.neighbourhood || '';
-          addrEl.value = [street, num, neigh].filter(Boolean).join(', ');
-        }
-        toast('Localização preenchida! Confira os dados. ✓');
-      } catch(e) {
-        toast('Localização obtida. Preencha a cidade manualmente.');
-      }
-      btn.textContent = original;
-      btn.disabled = false;
-    },
-    err => {
-      btn.textContent = original;
-      btn.disabled = false;
-      if (err.code === 1) toast('Permissão negada. Habilite a localização no navegador.');
-      else toast('Não foi possível obter localização. Tente novamente.');
-    },
-    { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
-  );
-}
-
-// ============================================================
-// PONTOS DE TROCA — REESCRITA COMPLETA COM GEO E MAPA DINÂMICO
-// ============================================================
-async function loadMeetPoints() {
-  const { data: points, error } = await sb.from('meet_points')
-    .select('*,confirmations:meet_confirmations(count)')
-    .eq('active', true)
-    .order('created_at', { ascending: false });
-
-  const list = document.getElementById('pontos-list');
-  const countEl = document.querySelector('#page-pontos .rsb span');
-  if (!points || error) {
-    if (list) list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--t2);">Erro ao carregar pontos. Tente novamente.</div>';
-    return;
-  }
-
-  // Calcula distância e ordena se geoloc ativa
-  let sorted = points.map(p => ({
-    ...p,
-    _dist: (_geoSortActive && _userLat !== null && p.lat && p.lng)
-      ? distKm(_userLat, _userLng, parseFloat(p.lat), parseFloat(p.lng))
-      : null
-  }));
-  if (_geoSortActive && _userLat !== null) {
-    sorted.sort((a, b) => {
-      if (a._dist === null && b._dist === null) return 0;
-      if (a._dist === null) return 1;
-      if (b._dist === null) return -1;
-      return a._dist - b._dist;
-    });
-  }
-
-  if (countEl) countEl.textContent = `${sorted.length} ponto${sorted.length!==1?'s':''} encontrado${sorted.length!==1?'s':''}`;
-
-  // Atualiza mapa — remove pins antigos de banco, mantém HTML estático
-  const mapCont = document.getElementById('map-cont');
-  mapCont && mapCont.querySelectorAll('.map-pin-db').forEach(el => el.remove());
-
-  // Renderiza pins do banco se tiverem lat/lng
-  const withCoords = sorted.filter(p => p.lat && p.lng);
-  if (withCoords.length >= 1) {
-    // Quando há pontos reais com coords, remove os pins estáticos
-    mapCont && mapCont.querySelectorAll('.map-pin:not(.map-pin-db)').forEach(el => el.remove());
-    if (withCoords.length >= 2) {
-      const lats = withCoords.map(p => parseFloat(p.lat));
-      const lngs = withCoords.map(p => parseFloat(p.lng));
-      const minLat = Math.min(...lats) - 0.008, maxLat = Math.max(...lats) + 0.008;
-      const minLng = Math.min(...lngs) - 0.008, maxLng = Math.max(...lngs) + 0.008;
-      withCoords.forEach(p => {
-        const lat = parseFloat(p.lat), lng = parseFloat(p.lng);
-        const top  = Math.min(85, Math.max(10, 85 - ((lat - minLat) / (maxLat - minLat)) * 72));
-        const left = Math.min(90, Math.max(5,  10  + ((lng - minLng) / (maxLng - minLng)) * 80));
-        addMapPin(mapCont, p, top, left);
-      });
-    } else {
-      addMapPin(mapCont, withCoords[0], 42, 50);
-    }
-  }
-
-  if (list) {
-    if (!sorted.length) {
-      list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--t2);">Nenhum ponto cadastrado ainda. Seja o primeiro! 📍</div>';
-      return;
-    }
-    list.innerHTML = '';
-
-    // Verifica confirmações do usuário
-    let myConfirmed = new Set();
-    if (ME?.id) {
-      const { data: myConfs } = await sb.from('meet_confirmations').select('point_id').eq('user_id', ME.id);
-      myConfs?.forEach(c => myConfirmed.add(c.point_id));
-    }
-
-    sorted.forEach(p => {
-      const confirmCount = p.confirmations?.[0]?.count || 0;
-      const typeIcon = p.type === 'event' ? '🎪' : '📍';
-      const typeTag = p.type === 'event' ? '<span class="tag tv">Evento</span>' : '<span class="tag ta">Informal</span>';
-      const isConfirmed = myConfirmed.has(p.id);
-      let distStr = '';
-      if (p._dist !== null) {
-        distStr = p._dist < 1 ? ` · ${Math.round(p._dist * 1000)}m` : ` · ${p._dist.toFixed(1)}km`;
-      }
-      const div = document.createElement('div');
-      div.className = 'card';
-      div.style.cssText = 'margin:12px 16px;';
-      div.innerHTML = `
-        <div class="pc">
-          <div class="pi ${p.type !== 'event' ? 'am' : ''}">${typeIcon}</div>
-          <div style="flex:1;">
-            <div class="rsb"><div style="font-size:15px;font-weight:800;">${p.name}</div>${typeTag}</div>
-            <div style="font-size:12px;color:var(--t2);margin-top:2px;">${p.city}${p.state ? ', '+p.state : ''}${distStr}${p.schedule ? ' · '+p.schedule : ''}</div>
-            ${p.address ? `<div style="font-size:11px;color:var(--t2);margin-top:1px;">📌 ${p.address}</div>` : ''}
-            <div class="rsb" style="margin-top:8px;">
-              <span style="font-size:12px;font-weight:700;color:var(--g);" id="conf-count-${p.id}">✓ ${confirmCount} confirmado${confirmCount!==1?'s':''}</span>
-              <button class="cbtn ${isConfirmed?'done':''}" id="mp-${p.id}" onclick="toggleMeetConfirm('${p.id}',this)">${isConfirmed?'Confirmado ✓':'Confirmar presença'}</button>
-            </div>
-          </div>
-        </div>`;
-      list.appendChild(div);
-    });
-  }
-}
-
-function addMapPin(container, p, top, left) {
-  const isEvent = p.type === 'event';
-  const bg = isEvent ? 'var(--g)' : 'var(--yd)';
-  const pin = document.createElement('div');
-  pin.className = 'map-pin map-pin-db';
-  pin.style.cssText = `position:absolute;top:${top.toFixed(1)}%;left:${left.toFixed(1)}%;transform:translate(-50%,-100%);cursor:pointer;`;
-  pin.innerHTML = `<div class="pin-lbl" style="background:${bg};">${p.name}</div><div class="pin-dot" style="background:${bg};"></div>`;
-  pin.onclick = () => toast(`${p.name} — ${p.confirmations?.[0]?.count||0} confirmados`);
-  container.appendChild(pin);
-}
-
-async function toggleMeetConfirm(pointId, btn) {
-  if (!ME?.id) { toast('Faça login para confirmar presença!'); return; }
-  const isDone = btn.classList.contains('done');
-  const countEl = document.getElementById('conf-count-' + pointId);
-  const currentCount = parseInt(countEl?.textContent?.replace(/\D/g,'') || '0');
-  if (isDone) {
-    const { error } = await sb.from('meet_confirmations').delete().eq('point_id', pointId).eq('user_id', ME.id);
-    if (error) { toast('Erro ao cancelar. Tente novamente.'); return; }
-    btn.classList.remove('done'); btn.textContent = 'Confirmar presença';
-    if (countEl) countEl.textContent = `✓ ${Math.max(0,currentCount-1)} confirmado${(currentCount-1)!==1?'s':''}`;
-    toast('Presença cancelada.');
-  } else {
-    const today = new Date().toISOString().split('T')[0];
-    const { error } = await sb.from('meet_confirmations').upsert({point_id:pointId, user_id:ME.id, event_date:today}, {onConflict:'point_id,user_id,event_date'});
-    if (error && !error.message?.includes('duplicate') && !error.message?.includes('23505')) { toast('Erro ao confirmar. Tente novamente.'); return; }
-    btn.classList.add('done'); btn.textContent = 'Confirmado ✓';
-    if (countEl) countEl.textContent = `✓ ${currentCount+1} confirmado${(currentCount+1)!==1?'s':''}`;
-    toast('Presença confirmada! 🎉');
-  }
-}
-
-// Compatibilidade com HTML estático
-function toggleConfirm(id) {
-  const btn = document.getElementById(id + '-btn');
-  const cnt = document.getElementById(id + '-count');
-  if (!btn || !cnt) return;
-  const cur = parseInt(cnt.textContent);
-  if (btn.classList.contains('done')) {
-    btn.classList.remove('done'); btn.textContent = 'Confirmar';
-    cnt.textContent = cur - 1; toast('Presença cancelada.');
-  } else {
-    btn.classList.add('done'); btn.textContent = 'Confirmado ✓';
-    cnt.textContent = cur + 1; toast('Presença confirmada! 🎉');
-  }
-}
-
-async function saveMeetPoint() {
-  if (!ME?.id) { toast('Faça login para cadastrar pontos!'); return; }
-  const name     = document.getElementById('ponto-name')?.value?.trim();
-  const address  = document.getElementById('ponto-address')?.value?.trim();
-  const city     = document.getElementById('ponto-city')?.value?.trim();
-  const state    = (document.getElementById('ponto-state')?.value?.trim() || 'PE').toUpperCase().slice(0,2);
-  const typeVal  = document.getElementById('ponto-type')?.value || 'informal';
-  const schedule = document.getElementById('ponto-schedule')?.value?.trim();
-  const desc     = document.getElementById('ponto-desc')?.value?.trim();
-
-  if (!name)  { toast('Informe o nome do local!'); return; }
-  if (!city)  { toast('Informe a cidade!'); return; }
-  if (!state) { toast('Informe o estado!'); return; }
-
-  // Recupera lat/lng se o usuário usou a geolocalização
-  const cityEl = document.getElementById('ponto-city');
-  const lat = cityEl?.dataset?.lat ? parseFloat(cityEl.dataset.lat) : null;
-  const lng = cityEl?.dataset?.lng ? parseFloat(cityEl.dataset.lng) : null;
-
-  const payload = {
-    creator_id: ME.id, name, city, state,
-    address: address || null, type: typeVal,
-    schedule: schedule || null, lat, lng, active: true
-  };
-
-  const { error } = await sb.from('meet_points').insert(payload);
-  if (error) { toast('Erro ao cadastrar: ' + error.message); return; }
-
-  // Limpa campos
-  ['ponto-name','ponto-address','ponto-city','ponto-schedule','ponto-desc'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) { el.value = ''; delete el.dataset?.lat; delete el.dataset?.lng; }
-  });
-  document.getElementById('ponto-state').value = 'PE';
-
-  closeModal('modal-ponto');
-  toast(`Ponto "${name}" cadastrado! 📍`);
-  await loadMeetPoints();
-}
-
-// ============================================================
-// ÁLBUM — upsert corrigido (delete + insert para evitar conflito)
-// ============================================================
-async function toggleStickerQuick(num, card, currentStatus) {
-  if (!ME?.id) { toast('Faça login para gerenciar seu álbum!'); return; }
-  const cycle = { empty: 'have', have: 'dup', dup: 'need', need: 'empty' };
-  const newStatus = cycle[currentStatus] || 'have';
-
-  if (newStatus === 'empty') {
-    await sb.from('user_stickers').delete().eq('user_id', ME.id).eq('number', num);
-    delete albumStickers[num];
-  } else {
-    const qty = newStatus === 'dup' ? 2 : 1;
-    const dbStatus = newStatus === 'dup' ? 'have' : newStatus;
-    // Delete primeiro para evitar conflito de constraint, depois insert
-    await sb.from('user_stickers').delete().eq('user_id', ME.id).eq('number', num);
-    const { error } = await sb.from('user_stickers').insert({ user_id: ME.id, number: num, status: dbStatus, quantity: qty });
-    if (error) { toast('Erro ao salvar figurinha: ' + error.message); return; }
-    albumStickers[num] = { status: dbStatus, quantity: qty };
-  }
-  const labels = { have: '✓ Tenho', dup: '+ Repetida', need: '✗ Falta', empty: '− Removida' };
-  toast(`#${num.toString().padStart(3,'0')} — ${labels[newStatus]}`);
-  renderAlbumGrid();
-  updateAlbumProgress();
-}
-
-async function saveSingleSticker() {
-  const num = parseInt(document.getElementById('fig-num').value);
-  if (!num || num < 1 || num > 640) { toast('Número inválido (1-640)!'); return; }
-  if (!ME?.id) { toast('Faça login primeiro!'); return; }
-  const qty = selectedFigStatus === 'dup' ? (parseInt(document.getElementById('fig-qty').value)||2) : 1;
-  const dbStatus = selectedFigStatus === 'dup' ? 'have' : selectedFigStatus;
-  await sb.from('user_stickers').delete().eq('user_id', ME.id).eq('number', num);
-  const { error } = await sb.from('user_stickers').insert({ user_id: ME.id, number: num, status: dbStatus, quantity: qty });
-  if (error) { toast('Erro: ' + error.message); return; }
-  albumStickers[num] = { status: dbStatus, quantity: qty };
-  renderAlbumGrid(); updateAlbumProgress();
-  closeModal('modal-figurinha');
-  document.getElementById('fig-num').value = '';
-  const labels = { have: 'Tenho', dup: 'Repetida', need: 'Falta' };
-  toast(`Figurinha #${num.toString().padStart(3,'0')} marcada como ${labels[selectedFigStatus]}!`);
-}
-
-async function bulkAddStickers(status) {
-  if (!bulkSelected.size) { toast('Toque nas figurinhas para selecionar primeiro!'); return; }
-  if (!ME?.id) { toast('Faça login primeiro!'); return; }
-  const dbStatus = status === 'dup' ? 'have' : status;
-  const qty = status === 'dup' ? 2 : 1;
-  const nums = [...bulkSelected];
-  // Delete + insert para evitar conflito
-  await sb.from('user_stickers').delete().eq('user_id', ME.id).in('number', nums);
-  const rows = nums.map(n => ({ user_id: ME.id, number: n, status: dbStatus, quantity: qty }));
-  const { error } = await sb.from('user_stickers').insert(rows);
-  if (error) { toast('Erro ao salvar: ' + error.message); return; }
-  nums.forEach(n => { albumStickers[n] = { status: dbStatus, quantity: qty }; });
-  const count = bulkSelected.size;
-  bulkSelected.clear();
-  renderAlbumGrid(); updateAlbumProgress();
-  toast(`${count} figurinhas atualizadas! ✓`);
-}
-
-// ============================================================
-// OVERRIDE goTo para carregar álbum
+// OVERRIDE goTo para carregar álbum, pontos e grupos
 // ============================================================
 const _origGoTo = goTo;
 goTo = function(page) {
   _origGoTo(page);
-  if (page === 'album') loadAlbum();
+  if (page === 'album')  loadAlbum();
+  if (page === 'pontos') loadMeetPoints();
 };
 
-// Sobrescrever showSub para carregar grupos
+// Sobrescrever showSub para carregar grupos quando abrir aba Grupos
 const _origShowSub = showSub;
 showSub = function(id, btn) {
   _origShowSub(id, btn);
   if (id === 'grupos') loadGroups();
 };
 
-// ============================================================
-// OVERRIDE loadPosts — garante comentários funcionando
-// ============================================================
+// Atualizar loadPosts para incluir botão de comentários real
+const _origLoadPosts = loadPosts;
 loadPosts = async function() {
   const { data: posts } = await sb.from('posts')
-    .select('*,author:profiles(full_name,username,avatar_url),comments:post_comments(count)')
+    .select('*,author:profiles(full_name,username,avatar_url)')
     .order('created_at', { ascending: false }).limit(20);
   if (!posts) return;
   const container = document.getElementById('posts-container');
@@ -3083,7 +2738,6 @@ loadPosts = async function() {
     const name = author?.full_name || author?.username || 'Usuário';
     const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     const timeStr = timeAgo(post.created_at);
-    const commentCount = post.comments?.[0]?.count || post.comment_count || 0;
     const cid = 'post-db-' + post.id;
     const div = document.createElement('div');
     div.className = 'post';
@@ -3097,9 +2751,8 @@ loadPosts = async function() {
       ${post.image_url ? `<div class="post-img-preview"><img src="${post.image_url}" alt="" onclick="openImgFull(this)"></div>` : ''}
       <div class="post-bod">${post.content}</div>
       <div class="pa-row">
-        <button class="pa" onclick="togglePostLike(this,'${post.id}',${post.likes||0})">❤️ ${post.likes||0}</button>
-        <button class="pa" id="comm-btn-${cid}" onclick="toggleComments(this,'${cid}','${post.id}')">💬 <span id="comm-count-${cid}">${commentCount}</span></button>
-        <button class="pa" onclick="navigator.clipboard?.writeText(window.location.href).then(()=>toast('Link copiado!'))">↗️</button>
+        <button class="pa" onclick="togglePostLike(this,'${post.id}',${post.likes})">❤️ ${post.likes}</button>
+        <button class="pa" onclick="toggleComments(this,'${cid}','${post.id}')">💬 ${post.comment_count||0}</button>
       </div>
       <div class="comments-section" id="${cid}">
         <div class="comment-list" id="clist-${cid}"></div>
@@ -3110,116 +2763,6 @@ loadPosts = async function() {
       </div>`;
     container.appendChild(div);
   });
-};
-
-// ============================================================
-// COMENTÁRIOS — reescrita completa para funcionar
-// ============================================================
-async function loadComments(postId, containerId) {
-  const listEl = document.getElementById('clist-' + containerId);
-  if (!listEl) return;
-  listEl.innerHTML = '<div style="padding:8px;text-align:center;color:var(--t2);font-size:12px;">Carregando comentários...</div>';
-
-  if (!postId || postId === 'null' || postId === 'undefined') {
-    // Post estático — usa localStorage
-    const stored = JSON.parse(localStorage.getItem('comments_' + containerId) || '[]');
-    renderCommentList(stored, listEl);
-    return;
-  }
-
-  const { data: comments } = await sb.from('post_comments')
-    .select('*,author:profiles(full_name,username,avatar_url)')
-    .eq('post_id', postId)
-    .order('created_at', { ascending: true })
-    .limit(50);
-  renderCommentList(comments || [], listEl);
-}
-
-function renderCommentList(comments, listEl) {
-  if (!comments.length) {
-    listEl.innerHTML = '<div style="padding:8px;text-align:center;color:var(--t2);font-size:12px;">Seja o primeiro a comentar!</div>';
-    return;
-  }
-  listEl.innerHTML = comments.map(c => {
-    const name = c.author?.full_name || c.author?.username || c.author_name || 'Usuário';
-    const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const timeStr = c.created_at ? timeAgo(c.created_at) : 'agora mesmo';
-    return `<div class="comment-item">
-      <div class="av" style="width:30px;height:30px;background:var(--gl);color:var(--gd);font-size:10px;flex-shrink:0;">${c.author?.avatar_url ? `<img src="${c.author.avatar_url}" alt="">` : initials}</div>
-      <div class="comment-bubble">
-        <div class="comment-name">${name}</div>
-        <div class="comment-text">${c.content}</div>
-        <div class="comment-time">${timeStr}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function toggleComments(btn, containerId, postId) {
-  const section = document.getElementById(containerId);
-  if (!section) return;
-  const isOpen = section.classList.contains('open');
-  if (!isOpen) {
-    section.classList.add('open');
-    const realPostId = (!postId || postId === 'null' || postId === 'undefined') ? null : postId;
-    loadComments(realPostId, containerId);
-  } else {
-    section.classList.remove('open');
-  }
-}
-
-async function submitComment(containerId, postId) {
-  const inp = document.getElementById('cinp-' + containerId);
-  const text = inp?.value?.trim();
-  if (!text) return;
-  if (!ME?.id) { toast('Faça login para comentar!'); return; }
-
-  const realPostId = (!postId || postId === 'null' || postId === 'undefined') ? null : postId;
-  const listEl = document.getElementById('clist-' + containerId);
-
-  // Remove mensagem "Seja o primeiro"
-  const emptyMsg = listEl?.querySelector('[style*="text-align:center"]');
-  if (emptyMsg) emptyMsg.remove();
-
-  // Adiciona otimisticamente
-  const name = ME.full_name || ME.username || 'Você';
-  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  const div = document.createElement('div');
-  div.className = 'comment-item';
-  div.innerHTML = `
-    <div class="av" style="width:30px;height:30px;background:var(--y);color:var(--b);font-size:10px;flex-shrink:0;">${ME.avatar_url ? `<img src="${ME.avatar_url}" alt="">` : initials}</div>
-    <div class="comment-bubble">
-      <div class="comment-name">${name}</div>
-      <div class="comment-text">${text}</div>
-      <div class="comment-time">agora mesmo</div>
-    </div>`;
-  listEl?.appendChild(div);
-  inp.value = '';
-
-  // Atualiza contador
-  const countEl = document.getElementById('comm-count-' + containerId);
-  if (countEl) countEl.textContent = parseInt(countEl.textContent||'0') + 1;
-
-  if (realPostId) {
-    const { error } = await sb.from('post_comments').insert({ post_id: realPostId, author_id: ME.id, content: text });
-    if (error) toast('Erro ao enviar comentário: ' + error.message);
-  } else {
-    // Persiste no localStorage para posts estáticos
-    const key = 'comments_' + containerId;
-    const stored = JSON.parse(localStorage.getItem(key) || '[]');
-    stored.push({ content: text, author_name: name, created_at: new Date().toISOString() });
-    localStorage.setItem(key, JSON.stringify(stored));
-  }
-}
-
-// ============================================================
-// OVERRIDE loadPosts também no loadHomeData (garante que é chamado)
-// ============================================================
-const _origLoadHomeData = loadHomeData;
-loadHomeData = async function() {
-  await _origLoadHomeData();
-  // Recarrega posts com a versão corrigida
-  await loadPosts();
 };
 
 window.addEventListener('DOMContentLoaded', boot);
