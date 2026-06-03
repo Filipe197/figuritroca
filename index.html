@@ -1556,21 +1556,7 @@ async function confirmMeetPoint(pointId) {
   toast('Presença confirmada! 🎉');
 }
 
-async function saveMeetPoint() {
-  if (!ME?.id) { toast('Faça login para cadastrar pontos!'); return; }
-  const name = document.querySelector('#modal-ponto .mf-inp[placeholder="Nome do local"]')?.value.trim();
-  const address = document.querySelector('#modal-ponto .mf-inp[placeholder="Endereço completo"]')?.value.trim();
-  const city = document.querySelector('#modal-ponto .mf-inp[placeholder="Cidade"]')?.value.trim();
-  const state = document.querySelector('#modal-ponto .mf-sel')?.value || 'PE';
-  const type = document.querySelector('#modal-ponto select:last-of-type')?.value || 'informal';
-  const schedule = document.querySelector('#modal-ponto .mf-inp[placeholder="Horário / Frequência"]')?.value.trim();
-  if (!name || !address || !city) { toast('Preencha os campos obrigatórios!'); return; }
-  const { error } = await sb.from('meet_points').insert({creator_id:ME.id, name, address, city, state, type, schedule: schedule || null, active:true});
-  if (error) { toast('Erro: ' + error.message); return; }
-  closeModal('modal-ponto');
-  toast('Ponto cadastrado! 📍');
-  await loadMeetPoints();
-}
+// saveMeetPoint — versão completa definida mais abaixo
 
 // ============================================================
 // PRÓXIMOS EVENTOS (home)
@@ -3012,29 +2998,74 @@ function toggleConfirm(id) {
 
 async function saveMeetPoint() {
   if (!ME?.id) { toast('Faça login para cadastrar pontos!'); return; }
-  const name    = document.getElementById('ponto-name')?.value?.trim();
-  const address = document.getElementById('ponto-address')?.value?.trim();
-  const city    = document.getElementById('ponto-city')?.value?.trim();
-  const state   = (document.getElementById('ponto-state')?.value?.trim()||'PE').toUpperCase().slice(0,2);
-  const typeVal = document.getElementById('ponto-type')?.value || 'informal';
-  const sched   = document.getElementById('ponto-schedule')?.value?.trim();
-  if (!name) { toast('Informe o nome do local!'); return; }
-  if (!city) { toast('Informe a cidade!'); return; }
-  const cityEl = document.getElementById('ponto-city');
-  const lat = cityEl?.dataset?.lat ? parseFloat(cityEl.dataset.lat) : null;
-  const lng = cityEl?.dataset?.lng ? parseFloat(cityEl.dataset.lng) : null;
+
+  const nameEl  = document.getElementById('ponto-name');
+  const addrEl  = document.getElementById('ponto-address');
+  const cityEl  = document.getElementById('ponto-city');
+  const stateEl = document.getElementById('ponto-state');
+  const typeEl  = document.getElementById('ponto-type');
+  const schedEl = document.getElementById('ponto-schedule');
+
+  const name    = nameEl?.value?.trim();
+  const address = addrEl?.value?.trim();
+  const city    = cityEl?.value?.trim();
+  const state   = (stateEl?.value?.trim() || 'PE').toUpperCase().slice(0,2);
+  const typeVal = typeEl?.value || 'informal';
+  const sched   = schedEl?.value?.trim();
+
+  if (!name)  { toast('Informe o nome do local!');  return; }
+  if (!city)  { toast('Informe a cidade!'); return; }
+
+  const saveBtn = document.querySelector('#modal-ponto .btn.bv:last-of-type');
+  if (saveBtn) { saveBtn.textContent = 'Salvando...'; saveBtn.disabled = true; }
+
+  // Pega lat/lng do botão de geolocalização se disponível
+  let lat = cityEl?.dataset?.lat ? parseFloat(cityEl.dataset.lat) : null;
+  let lng = cityEl?.dataset?.lng ? parseFloat(cityEl.dataset.lng) : null;
+
+  // Se não tem GPS, tenta geocoding pelo endereço via Nominatim
+  if (!lat || !lng) {
+    const query = [address, city, state, 'Brasil'].filter(Boolean).join(', ');
+    try {
+      const res = await fetch(
+        'https://nominatim.openstreetmap.org/search?q=' +
+        encodeURIComponent(query) +
+        '&format=json&limit=1&accept-language=pt-BR'
+      );
+      const results = await res.json();
+      if (results?.length) {
+        lat = parseFloat(results[0].lat);
+        lng = parseFloat(results[0].lon);
+        console.log('Geocoding:', query, '->', lat, lng);
+      }
+    } catch(e) {
+      console.warn('Geocoding falhou, salvando sem coordenadas:', e);
+    }
+  }
+
   const { error } = await sb.from('meet_points').insert({
-    creator_id:ME.id, name, city, state, address:address||null,
-    type:typeVal, schedule:sched||null, lat, lng, active:true
+    creator_id: ME.id,
+    name, city, state,
+    address: address || null,
+    type: typeVal,
+    schedule: sched || null,
+    lat, lng,
+    active: true
   });
-  if (error) { toast('Erro: '+error.message); return; }
-  ['ponto-name','ponto-address','ponto-city','ponto-schedule','ponto-desc'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) { el.value=''; if(el.dataset){delete el.dataset.lat;delete el.dataset.lng;} }
+
+  if (saveBtn) { saveBtn.textContent = 'Cadastrar ponto'; saveBtn.disabled = false; }
+
+  if (error) { toast('Erro ao cadastrar: ' + error.message); return; }
+
+  // Limpa campos
+  [nameEl, addrEl, schedEl, document.getElementById('ponto-desc')].forEach(el => {
+    if (el) { el.value = ''; if (el.dataset) { delete el.dataset.lat; delete el.dataset.lng; } }
   });
-  const se = document.getElementById('ponto-state'); if(se) se.value='PE';
+  if (cityEl)  { cityEl.value = '';   if (cityEl.dataset) { delete cityEl.dataset.lat; delete cityEl.dataset.lng; } }
+  if (stateEl) stateEl.value = 'PE';
+
   closeModal('modal-ponto');
-  toast(`"${name}" cadastrado! 📍`);
+  toast(lat ? '"' + name + '" cadastrado com localização! 📍' : '"' + name + '" cadastrado! (sem coordenadas GPS)');
   await loadMeetPoints();
 }
 
