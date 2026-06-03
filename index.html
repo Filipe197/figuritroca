@@ -918,21 +918,15 @@ input,textarea{font-family:var(--font);}
             <button class="btn bv bsm" onclick="toast('Busque um usuário nas Trocas para iniciar conversa!')">✏️ Nova</button>
           </div>
         </div>
-        <div class="fbar"><button class="fc on">Trocas (3)</button><button class="fc">Grupos (2)</button><button class="fc">Comunidade</button></div>
-        <div class="card" style="margin:12px 16px;">
-          <div class="cli" onclick="openConv('Ana Martins','AM','var(--bl)','var(--b)')">
-            <div class="av" style="width:44px;height:44px;background:var(--bl);color:var(--b);">AM</div>
-            <div style="flex:1;min-width:0;"><div class="rsb"><div style="font-size:14px;font-weight:800;">Ana Martins</div><div style="font-size:11px;color:var(--t2);">14:32</div></div><div style="font-size:12px;color:var(--t2);">Nos encontramos no sábado?</div></div>
-            <div class="cu">2</div>
-          </div>
-          <div class="cli" onclick="openConv('Carlos Silva','CS','var(--gl)','var(--gd)')">
-            <div class="av" style="width:44px;height:44px;background:var(--gl);color:var(--gd);">CS</div>
-            <div style="flex:1;min-width:0;"><div class="rsb"><div style="font-size:14px;font-weight:800;">Carlos Silva</div><div style="font-size:11px;color:var(--t2);">11:15</div></div><div style="font-size:12px;color:var(--t2);">Perfeito, confirmado então!</div></div>
-          </div>
-          <div class="cli" onclick="openConv('Brasil Copa 2026','🏆','var(--yl)','var(--yd)')">
-            <div class="av" style="width:44px;height:44px;background:var(--yl);color:var(--yd);font-size:22px;">🏆</div>
-            <div style="flex:1;min-width:0;"><div class="rsb"><div style="font-size:14px;font-weight:800;">Brasil Copa 2026</div><div style="font-size:11px;color:var(--t2);">Ontem</div></div><div style="font-size:12px;color:var(--t2);">João: Alguém tem a 312?</div></div>
-            <div class="cu">7</div>
+        <div class="fbar" id="chat-filter-bar">
+          <button class="fc on" onclick="chatFilter('all',this)">Todas</button>
+          <button class="fc" onclick="chatFilter('direct',this)">Diretas</button>
+          <button class="fc" onclick="chatFilter('group',this)">Grupos</button>
+        </div>
+        <div id="chat-list-container" style="padding:8px 16px 0;">
+          <div style="padding:40px 20px;text-align:center;color:var(--t2);">
+            <div style="font-size:36px;margin-bottom:8px;">💬</div>
+            <div style="font-size:14px;font-weight:700;">Carregando conversas...</div>
           </div>
         </div>
       </div>
@@ -945,13 +939,7 @@ input,textarea{font-family:var(--font);}
           <div style="flex:1;"><div style="font-size:15px;font-weight:800;color:#fff;" id="cv-name">Ana Martins</div><div style="font-size:11px;color:rgba(255,255,255,.72);" id="cv-status">Online agora</div></div>
           <button class="iBtn" onclick="toast('Opções da conversa')">···</button>
         </div>
-        <div class="msgs" id="msgs-wrap">
-          <div class="mi2"><div class="bub bi">Oi! Vi que você tem a figurinha 147 🇧🇷<div class="btime">14:28</div></div></div>
-          <div class="mo"><div class="bub bo2">Tenho! Você tem a 089 do Vini?<div class="btime">14:30</div></div></div>
-          <div class="mi2"><div class="bub bi">Tenho sim, topas trocar? 🤝<div class="btime">14:31</div></div></div>
-          <div class="mo"><div class="bub bo2">Toppo! Sábado no Parque da Cidade?<div class="btime">14:31</div></div></div>
-          <div class="mi2"><div class="bub bi">Combinado! Nos vemos lá 😊<div class="btime">14:32</div></div></div>
-        </div>
+        <div class="msgs" id="msgs-wrap"></div>
         <!-- INPUT ÁREA COMPLETA -->
         <div class="cia">
           <!-- EMOJI PICKER -->
@@ -1737,74 +1725,248 @@ async function checkAchievements(earned, allAch) {
 }
 
 // ============================================================
-// ABRIR CONVERSA COM BANCO
+// CHAT — Lista de conversas reais do banco
 // ============================================================
-async function openConvDB(name, otherUserId, initials, bg, color) {
-  document.getElementById('cv-name').textContent = name;
-  const av = document.getElementById('cv-av');
-  av.innerHTML = '';
-  av.textContent = initials;
-  if (bg) av.style.background = bg;
-  if (color) av.style.color = color;
-  document.getElementById('chatconv').classList.add('on');
-  document.getElementById('msgs-wrap').innerHTML = '';
-  currentConvId = null;
+let _chatFilter = 'all';
+let currentConvType = 'direct'; // 'direct' ou 'group'
 
-  if (ME?.id && otherUserId) {
-    // Busca ou cria conversa
-    const { data: existing } = await sb.from('conversation_members')
-      .select('conversation_id,conversation:conversations(id,type)')
-      .eq('user_id', ME.id);
+async function loadChatList() {
+  const container = document.getElementById('chat-list-container');
+  if (!container) return;
 
-    let convId = null;
-    if (existing?.length) {
-      const { data: sharedConv } = await sb.from('conversation_members')
-        .select('conversation_id').eq('user_id', otherUserId)
-        .in('conversation_id', existing.map(e => e.conversation_id));
-      if (sharedConv?.length) convId = sharedConv[0].conversation_id;
+  if (!ME?.id) {
+    container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--t2);"><div style="font-size:36px;margin-bottom:8px;">💬</div><div style="font-size:14px;font-weight:700;">Faça login para ver suas conversas</div></div>';
+    return;
+  }
+
+  container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2);font-size:13px;">Carregando...</div>';
+
+  // Busca todas as conversas do usuário
+  const { data: myConvs, error } = await sb
+    .from('conversation_members')
+    .select('conversation_id,last_read_at')
+    .eq('user_id', ME.id);
+
+  if (error || !myConvs?.length) {
+    container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--t2);"><div style="font-size:36px;margin-bottom:8px;">💬</div><div style="font-size:14px;font-weight:700;color:var(--t0);">Nenhuma conversa ainda</div><div style="font-size:13px;margin-top:6px;">Vá em Trocas e inicie uma troca para começar a conversar!</div></div>';
+    updateChatBadge(0);
+    return;
+  }
+
+  const convIds = myConvs.map(m => m.conversation_id);
+
+  // Busca detalhes das conversas
+  const { data: convs } = await sb
+    .from('conversations')
+    .select('id,type,name,emoji,created_by')
+    .in('id', convIds);
+
+  // Busca última mensagem de cada conversa
+  const { data: lastMsgs } = await sb
+    .from('messages')
+    .select('conversation_id,content,image_url,created_at,sender_id,sender:profiles!messages_sender_id_fkey(full_name)')
+    .in('conversation_id', convIds)
+    .order('created_at', { ascending: false });
+
+  const lastMsgMap = {};
+  lastMsgs?.forEach(m => { if (!lastMsgMap[m.conversation_id]) lastMsgMap[m.conversation_id] = m; });
+
+  // Para conversas diretas, busca o outro participante
+  const directConvIds = (convs||[]).filter(c => c.type === 'direct').map(c => c.id);
+  const otherUserMap = {};
+  if (directConvIds.length) {
+    const { data: otherMembers } = await sb
+      .from('conversation_members')
+      .select('conversation_id,user_id,user:profiles!conversation_members_user_id_fkey(full_name,username,avatar_url)')
+      .in('conversation_id', directConvIds)
+      .neq('user_id', ME.id);
+    otherMembers?.forEach(m => { otherUserMap[m.conversation_id] = m.user; });
+  }
+
+  // Filtra por tipo se necessário
+  let filtered = (convs || []).filter(c => {
+    if (_chatFilter === 'direct') return c.type === 'direct';
+    if (_chatFilter === 'group')  return c.type === 'group';
+    return true;
+  });
+
+  // Ordena por última mensagem
+  filtered.sort((a, b) => {
+    const la = lastMsgMap[a.id]?.created_at || '0';
+    const lb = lastMsgMap[b.id]?.created_at || '0';
+    return lb.localeCompare(la);
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = '<div style="padding:30px 20px;text-align:center;color:var(--t2);font-size:13px;">Nenhuma conversa nesta categoria.</div>';
+    return;
+  }
+
+  // Conta não lidas
+  let totalUnread = 0;
+
+  container.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'card'; card.style.cssText = 'margin:0 0 12px;';
+
+  filtered.forEach(conv => {
+    const lastMsg = lastMsgMap[conv.id];
+    const myConvMeta = myConvs.find(m => m.conversation_id === conv.id);
+    const lastRead = myConvMeta?.last_read_at || '0';
+    const isUnread = lastMsg && lastMsg.sender_id !== ME.id && lastMsg.created_at > lastRead;
+    if (isUnread) totalUnread++;
+
+    let displayName, avatar, avBg, avColor;
+    if (conv.type === 'direct') {
+      const other = otherUserMap[conv.id];
+      displayName = other?.full_name || other?.username || 'Usuário';
+      const initials = displayName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      avatar = other?.avatar_url ? `<img src="${other.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : initials;
+      avBg = 'var(--bl)'; avColor = 'var(--b)';
+    } else {
+      displayName = conv.name || 'Grupo';
+      avatar = conv.emoji || '👥';
+      avBg = 'var(--gl)'; avColor = 'var(--gd)';
     }
 
+    const preview = lastMsg ? (lastMsg.image_url ? '📷 Imagem' : (lastMsg.content || '')) : 'Sem mensagens ainda';
+    const timeStr = lastMsg ? timeAgo(lastMsg.created_at) : '';
+    const otherId = conv.type === 'direct' ? (otherUserMap[conv.id]?.id || null) : null;
+
+    const div = document.createElement('div');
+    div.className = 'cli';
+    div.innerHTML =
+      '<div class="av" style="width:44px;height:44px;background:' + avBg + ';color:' + avColor + ';font-size:' + (conv.type==='group'?'22':'14') + 'px;">' + avatar + '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div class="rsb"><div style="font-size:14px;font-weight:' + (isUnread?'800':'600') + ';">' + displayName + '</div><div style="font-size:11px;color:var(--t2);">' + timeStr + '</div></div>' +
+        '<div style="font-size:12px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:' + (isUnread?'700':'400') + ';">' + preview + '</div>' +
+      '</div>' +
+      (isUnread ? '<div class="cu">●</div>' : '');
+    div.onclick = () => conv.type === 'group'
+      ? openGroupChat(conv.id, displayName, conv.emoji || '👥')
+      : openConvDB(displayName, otherId, null, avBg, avColor);
+    card.appendChild(div);
+  });
+
+  container.appendChild(card);
+  updateChatBadge(totalUnread);
+}
+
+function chatFilter(type, btn) {
+  _chatFilter = type;
+  document.querySelectorAll('#chat-filter-bar .fc').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  loadChatList();
+}
+
+function updateChatBadge(n) {
+  const badge = document.querySelector('#ni-chat .ni-badge');
+  if (!badge) return;
+  badge.textContent = n > 0 ? n : '';
+  badge.style.display = n > 0 ? 'flex' : 'none';
+}
+
+// ============================================================
+// ABRIR CONVERSA DIRETA
+// ============================================================
+async function openConvDB(name, otherUserId, initials, bg, color) {
+  const cvName = document.getElementById('cv-name');
+  const av = document.getElementById('cv-av');
+  const wrap = document.getElementById('msgs-wrap');
+  const conv = document.getElementById('chatconv');
+
+  if (cvName) cvName.textContent = name;
+  if (av) {
+    av.innerHTML = '';
+    const ini = initials || name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    av.textContent = ini;
+    if (bg) av.style.background = bg;
+    if (color) av.style.color = color;
+  }
+  conv?.classList.add('on');
+  if (wrap) wrap.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2);font-size:13px;">Carregando mensagens...</div>';
+  currentConvId = null;
+  if (msgChannel) { sb.removeChannel(msgChannel); msgChannel = null; }
+
+  if (!ME?.id) return;
+
+  let convId = null;
+  if (otherUserId) {
+    // Busca conversa direta existente
+    const { data: myM } = await sb.from('conversation_members').select('conversation_id').eq('user_id', ME.id);
+    if (myM?.length) {
+      const { data: shared } = await sb.from('conversation_members')
+        .select('conversation_id')
+        .eq('user_id', otherUserId)
+        .in('conversation_id', myM.map(m => m.conversation_id));
+      // Filtra apenas diretas
+      if (shared?.length) {
+        for (const s of shared) {
+          const { data: c } = await sb.from('conversations').select('type').eq('id', s.conversation_id).single();
+          if (c?.type === 'direct') { convId = s.conversation_id; break; }
+        }
+      }
+    }
     if (!convId) {
-      const { data: newConv } = await sb.from('conversations').insert({type:'direct',created_by:ME.id}).select().single();
-      if (newConv) {
-        convId = newConv.id;
+      // Cria nova conversa direta
+      const { data: nc } = await sb.from('conversations').insert({type:'direct',created_by:ME.id}).select('id').single();
+      if (nc) {
+        convId = nc.id;
         await sb.from('conversation_members').insert([
-          {conversation_id:convId, user_id:ME.id},
-          {conversation_id:convId, user_id:otherUserId}
+          {conversation_id:convId,user_id:ME.id},
+          {conversation_id:convId,user_id:otherUserId}
         ]);
       }
     }
+  }
 
-    currentConvId = convId;
+  currentConvId = convId;
+  if (wrap) wrap.innerHTML = '';
 
-    // Carrega mensagens
-    const { data: msgs } = await sb.from('messages').select('*,sender:profiles(full_name,avatar_url)').eq('conversation_id',convId).order('created_at',{ascending:true}).limit(50);
-    const wrap = document.getElementById('msgs-wrap');
-    wrap.innerHTML = '';
+  if (convId) {
+    const { data: msgs } = await sb.from('messages')
+      .select('*,sender:profiles!messages_sender_id_fkey(full_name,avatar_url)')
+      .eq('conversation_id', convId)
+      .order('created_at', {ascending:true})
+      .limit(50);
     msgs?.forEach(m => appendMessage(m));
-    wrap.scrollTop = wrap.scrollHeight;
-
+    if (wrap) wrap.scrollTop = wrap.scrollHeight;
     // Realtime
-    if (msgChannel) sb.removeChannel(msgChannel);
-    msgChannel = sb.channel(`conv-${convId}`)
-      .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`conversation_id=eq.${convId}`}, payload => {
-        if (payload.new.sender_id !== ME.id) appendMessage(payload.new);
+    msgChannel = sb.channel('conv-'+convId)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'conversation_id=eq.'+convId}, payload => {
+        if (payload.new.sender_id !== ME.id) {
+          appendMessage(payload.new);
+          if (wrap) wrap.scrollTop = wrap.scrollHeight;
+        }
       }).subscribe();
+    // Atualiza last_read_at
+    await sb.from('conversation_members').update({last_read_at: new Date().toISOString()}).eq('conversation_id',convId).eq('user_id',ME.id);
+  } else if (!otherUserId) {
+    if (wrap) wrap.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--t2);"><div style="font-size:32px;margin-bottom:8px;">💬</div><div style="font-size:14px;font-weight:700;">Inicie uma conversa</div><div style="font-size:13px;margin-top:4px;">Envie uma mensagem!</div></div>';
   }
 
   goTo('chat');
 }
 
+async function openConv(name, initials, bg, color) {
+  await openConvDB(name, null, initials, bg, color);
+}
+
 function appendMessage(msg) {
   const wrap = document.getElementById('msgs-wrap');
+  if (!wrap) return;
   const isMe = msg.sender_id === ME?.id;
   const timeStr = new Date(msg.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const senderName = msg.sender?.full_name || '';
   const div = document.createElement('div');
   div.className = isMe ? 'mo' : 'mi2';
-  let content = '';
-  if (msg.image_url) content += `<img src="${msg.image_url}" alt="" style="max-width:200px;border-radius:10px;display:block;" onclick="openImgFull(this)">`;
-  if (msg.content) content += (msg.image_url?'<div style="margin-top:6px;">':'')+msg.content+(msg.image_url?'</div>':'');
-  div.innerHTML = `<div class="bub ${isMe?'bo2':'bi'}">${content}<div class="btime">${timeStr}</div></div>`;
+  let bubble = '';
+  if (!isMe && senderName && currentConvType === 'group') {
+    bubble += '<div style="font-size:11px;font-weight:700;color:var(--g);margin-bottom:3px;">'+senderName+'</div>';
+  }
+  if (msg.image_url) bubble += '<img src="'+msg.image_url+'" alt="" style="max-width:200px;border-radius:10px;display:block;cursor:pointer;" onclick="openImgFull(this)">';
+  if (msg.content) bubble += (msg.image_url?'<div style="margin-top:6px;">':'')+msg.content+(msg.image_url?'</div>':'');
+  div.innerHTML = '<div class="bub '+(isMe?'bo2':'bi')+'">'+bubble+'<div class="btime">'+timeStr+'</div></div>';
   wrap.appendChild(div);
   wrap.scrollTop = wrap.scrollHeight;
 }
@@ -2611,95 +2773,46 @@ async function joinGroup(groupId, btn) {
 }
 
 async function openGroupChat(convId, name, emoji) {
-  document.getElementById('cv-name').textContent = emoji + ' ' + name;
+  currentConvType = 'group';
   const av = document.getElementById('cv-av');
-  av.innerHTML = emoji;
-  av.style.background = 'var(--g)';
-  av.style.color = '#fff';
-  document.getElementById('chatconv').classList.add('on');
-  document.getElementById('msgs-wrap').innerHTML = '';
+  if (av) { av.innerHTML = emoji; av.style.background = 'var(--g)'; av.style.color = '#fff'; av.style.fontSize = '22px'; }
+  const cvName = document.getElementById('cv-name');
+  if (cvName) cvName.textContent = (emoji || '') + ' ' + name;
+  const cvStatus = document.getElementById('cv-status');
+  if (cvStatus) cvStatus.textContent = 'Grupo';
+  document.getElementById('chatconv')?.classList.add('on');
+  const wrap = document.getElementById('msgs-wrap');
+  if (wrap) wrap.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2);font-size:13px;">Carregando...</div>';
   currentConvId = convId;
+  if (msgChannel) { sb.removeChannel(msgChannel); msgChannel = null; }
 
   const { data: msgs } = await sb.from('messages')
-    .select('*,sender:profiles(full_name,avatar_url)')
+    .select('*,sender:profiles!messages_sender_id_fkey(full_name,avatar_url)')
     .eq('conversation_id', convId)
-    .order('created_at', { ascending: true })
+    .order('created_at', {ascending:true})
     .limit(50);
-  const wrap = document.getElementById('msgs-wrap');
-  msgs?.forEach(m => appendMessage(m));
-  wrap.scrollTop = wrap.scrollHeight;
+  if (wrap) wrap.innerHTML = '';
+  if (!msgs?.length && wrap) {
+    wrap.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--t2);"><div style="font-size:32px;margin-bottom:8px;">' + (emoji||'👥') + '</div><div style="font-size:14px;font-weight:700;">Bem-vindo ao ' + name + '!</div><div style="font-size:13px;margin-top:4px;">Seja o primeiro a enviar uma mensagem.</div></div>';
+  } else {
+    msgs?.forEach(m => appendMessage(m));
+    if (wrap) wrap.scrollTop = wrap.scrollHeight;
+  }
 
-  if (msgChannel) sb.removeChannel(msgChannel);
-  msgChannel = sb.channel(`grp-${convId}`)
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${convId}` }, payload => {
-      if (payload.new.sender_id !== ME?.id) appendMessage(payload.new);
+  msgChannel = sb.channel('conv-'+convId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'conversation_id=eq.'+convId}, payload => {
+      if (payload.new.sender_id !== ME?.id) {
+        appendMessage(payload.new);
+        if (wrap) wrap.scrollTop = wrap.scrollHeight;
+      }
     }).subscribe();
 
+  if (ME?.id) {
+    await sb.from('conversation_members').update({last_read_at: new Date().toISOString()}).eq('conversation_id',convId).eq('user_id',ME.id);
+  }
   goTo('chat');
 }
 
-// ============================================================
-// LEAFLET MAP
-// ============================================================
-let _map = null, _markers = [], _userMarker = null;
-let _userLat = null, _userLng = null, _geoSortActive = false;
-
-function initMap() {
-  if (_map) { setTimeout(()=>_map.invalidateSize(),100); return; }
-  _map = L.map('leaflet-map',{zoomControl:true,attributionControl:false,scrollWheelZoom:true})
-    .setView([-8.0576,-34.8829],11);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(_map);
-  setTimeout(()=>_map.invalidateSize(),200);
-}
-
-function getMarkerIcon(type) {
-  const color = type==='event' ? '#009C3B' : '#C9A800';
-  return L.divIcon({
-    html:`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42"><path d="M16 0C7.2 0 0 7.2 0 16c0 10.9 14.4 24.8 15 25.4a1.4 1.4 0 0 0 2 0C17.6 40.8 32 26.9 32 16 32 7.2 24.8 0 16 0z" fill="${color}"/><circle cx="16" cy="16" r="7" fill="white"/></svg>`,
-    iconSize:[32,42],iconAnchor:[16,42],popupAnchor:[0,-44],className:''
-  });
-}
-
-function distKm(lat1,lng1,lat2,lng2) {
-  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lng2-lng1)*Math.PI/180;
-  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-}
-
-function mapFilterAll(btn) {
-  _geoSortActive=false; _userLat=null; _userLng=null;
-  if(_userMarker){_userMarker.remove();_userMarker=null;}
-  document.querySelectorAll('.mfb').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  loadMeetPoints();
-}
-
-function mapFilterNearby(btn) {
-  if(!navigator.geolocation){toast('Geolocalização não suportada.');return;}
-  const orig=btn.textContent; btn.textContent='⏳ Localizando...'; btn.disabled=true;
-  navigator.geolocation.getCurrentPosition(
-    pos=>{
-      _userLat=pos.coords.latitude; _userLng=pos.coords.longitude; _geoSortActive=true;
-      btn.textContent=orig; btn.disabled=false;
-      document.querySelectorAll('.mfb').forEach(b=>b.classList.remove('on'));
-      btn.classList.add('on');
-      if(_map) _map.setView([_userLat,_userLng],13);
-      if(_userMarker) _userMarker.remove();
-      _userMarker=L.marker([_userLat,_userLng],{icon:L.divIcon({
-        html:'<div style="width:16px;height:16px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 3px rgba(26,115,232,.3);"></div>',
-        iconSize:[16,16],iconAnchor:[8,8],className:''
-      })}).addTo(_map).bindPopup('<b>📍 Você está aqui</b>');
-      toast('📍 Mostrando pontos mais próximos!');
-      loadMeetPoints();
-    },
-    err=>{
-      btn.textContent=orig; btn.disabled=false;
-      const msgs={1:'Permissão negada. Habilite a localização no navegador.',2:'Não foi possível obter localização.',3:'Tempo esgotado.'};
-      toast(msgs[err.code]||'Erro de geolocalização.');
-    },
-    {enableHighAccuracy:true,timeout:12000,maximumAge:60000}
-  );
-}
 
 async function usarMinhaLocalizacao() {
   if(!navigator.geolocation){toast('Geolocalização não suportada.');return;}
@@ -3042,6 +3155,7 @@ goTo = function(page) {
   _origGoTo(page);
   if (page === 'album')  loadAlbum();
   if (page === 'pontos') { initMap(); setTimeout(()=>{_map?.invalidateSize();loadMeetPoints();},150); }
+  if (page === 'chat' && !document.getElementById('chatconv')?.classList.contains('on')) loadChatList();
 };
 const _origShowSub = showSub;
 showSub = function(id, btn) {
