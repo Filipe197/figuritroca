@@ -2815,6 +2815,81 @@ async function usarMinhaLocalizacao() {
 }
 
 // ============================================================
+// LEAFLET MAP — funções de mapa
+// ============================================================
+let _map = null, _markers = [], _userMarker = null;
+let _userLat = null, _userLng = null, _geoSortActive = false;
+
+function initMap() {
+  if (_map) { setTimeout(()=>{ try{_map.invalidateSize();}catch(e){} },100); return; }
+  const el = document.getElementById('leaflet-map');
+  if (!el) return;
+  _map = L.map('leaflet-map', {zoomControl:true, attributionControl:false, scrollWheelZoom:true})
+    .setView([-8.0576, -34.8829], 11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(_map);
+  setTimeout(()=>{ try{_map.invalidateSize();}catch(e){} }, 300);
+}
+
+function getMarkerIcon(type) {
+  const color = type === 'event' ? '#009C3B' : '#C9A800';
+  return L.divIcon({
+    html: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42"><path d="M16 0C7.2 0 0 7.2 0 16c0 10.9 14.4 24.8 15 25.4a1.4 1.4 0 0 0 2 0C17.6 40.8 32 26.9 32 16 32 7.2 24.8 0 16 0z" fill="' + color + '"/><circle cx="16" cy="16" r="7" fill="white"/></svg>',
+    iconSize: [32, 42], iconAnchor: [16, 42], popupAnchor: [0, -44], className: ''
+  });
+}
+
+function distKm(lat1, lng1, lat2, lng2) {
+  const R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLon = (lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function mapFilterAll(btn) {
+  _geoSortActive = false; _userLat = null; _userLng = null;
+  if (_userMarker) { _userMarker.remove(); _userMarker = null; }
+  document.querySelectorAll('.mfb').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  loadMeetPoints();
+}
+
+function mapFilterNearby(btn) {
+  if (!navigator.geolocation) { toast('Geolocalização não suportada.'); return; }
+  const orig = btn.textContent;
+  btn.textContent = '⏳ Localizando...'; btn.disabled = true;
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      _userLat = pos.coords.latitude; _userLng = pos.coords.longitude; _geoSortActive = true;
+      btn.textContent = orig; btn.disabled = false;
+      document.querySelectorAll('.mfb').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      if (_map) _map.setView([_userLat, _userLng], 13);
+      if (_userMarker) _userMarker.remove();
+      _userMarker = L.marker([_userLat, _userLng], {icon: L.divIcon({
+        html: '<div style="width:16px;height:16px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 3px rgba(26,115,232,.3);"></div>',
+        iconSize: [16,16], iconAnchor: [8,8], className: ''
+      })}).addTo(_map).bindPopup('<b>📍 Você está aqui</b>');
+      toast('📍 Mostrando pontos mais próximos!');
+      loadMeetPoints();
+    },
+    err => {
+      btn.textContent = orig; btn.disabled = false;
+      const msgs = {1:'Permissão negada. Habilite a localização.', 2:'Não foi possível obter localização.', 3:'Tempo esgotado.'};
+      toast(msgs[err.code] || 'Erro de geolocalização.');
+    },
+    {enableHighAccuracy: true, timeout: 12000, maximumAge: 60000}
+  );
+}
+
+function scrollToPoint(id) {
+  const el = document.getElementById('point-card-'+id);
+  if (el) { el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.outline='2px solid var(--g)'; setTimeout(()=>el.style.outline='',2000); }
+}
+
+function flyToPoint(lat, lng) {
+  if (_map && lat && lng) _map.flyTo([parseFloat(lat), parseFloat(lng)], 16, {animate:true, duration:1});
+}
+
+// ============================================================
 // PONTOS DE TROCA — Leaflet real + geocoding
 // ============================================================
 async function loadMeetPoints() {
