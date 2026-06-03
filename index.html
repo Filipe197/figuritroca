@@ -574,6 +574,8 @@ input,textarea{font-family:var(--font);}
 .group-av.gv3{background:var(--yl);}
 .group-badge{background:var(--g);color:#fff;border-radius:10px;font-size:10px;font-weight:800;padding:2px 7px;min-width:20px;text-align:center;}
 #modal-grupo .mf-inp, #modal-grupo .mf-ta{width:100%;}
+.grp-em.on{background:var(--g)!important;color:#fff!important;border-color:var(--g)!important;transform:scale(1.15);}
+.grp-em{transition:all .15s;font-size:18px!important;padding:6px 10px!important;}
 
 /* ======================================================
    INSTALL BANNER
@@ -2497,7 +2499,7 @@ async function loadGroups() {
   if (!container) return;
 
   const { data: groups } = await sb.from('conversations')
-    .select('*,members:conversation_members(count)')
+    .select('id,name,emoji,type,created_at,created_by,members:conversation_members(count)')
     .eq('type','group')
     .order('created_at', { ascending: false })
     .limit(20);
@@ -2567,9 +2569,11 @@ async function createGroup() {
   const desc = document.getElementById('grp-desc').value.trim();
   if (!name) { toast('Dê um nome ao grupo!'); return; }
 
-  const { data: newConv, error } = await sb.from('conversations').insert({
-    type: 'group', name, description: desc || null, emoji: selectedGrpEmoji, created_by: ME.id
-  }).select().single();
+  // Tenta inserir com description, se falhar tenta sem
+  let newConv, error;
+  const payload = {type:'group', name, emoji:selectedGrpEmoji, created_by:ME.id};
+  try { payload.description = desc || null; } catch(e) {}
+  ({data:newConv, error} = await sb.from('conversations').insert(payload).select('id,name,emoji,type').single());
 
   if (error) { toast('Erro ao criar grupo: ' + error.message); return; }
 
