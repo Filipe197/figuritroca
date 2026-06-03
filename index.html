@@ -122,7 +122,7 @@ input,textarea{font-family:var(--font);}
   content:'';position:absolute;top:0;left:25%;right:25%;
   height:2.5px;background:var(--g);border-radius:0 0 3px 3px;
 }
-.ni-ic{font-size:21px;line-height:1;}
+.ni-ic{font-size:18px;line-height:1;}
 .ni-badge{
   position:absolute;top:4px;right:calc(50% - 22px);
   background:var(--red);color:#fff;border-radius:10px;
@@ -256,18 +256,28 @@ input,textarea{font-family:var(--font);}
 /* ======================================================
    PONTOS PAGE
 ====================================================== */
-/* Leaflet real map */
 #map-cont{height:260px;position:relative;border-bottom:0.5px solid var(--border);}
+
+
+
+
+
+
+
+.map-filt{position:absolute;top:8px;left:8px;display:flex;gap:6px;}
+.mfb{background:rgba(255,255,255,.92);border:0.5px solid var(--border);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:800;cursor:pointer;color:var(--t0);}
+.mfb.on{background:var(--g);color:#fff;border-color:var(--g);}
 #leaflet-map{height:100%;width:100%;z-index:1;}
 .map-filt{position:absolute;top:8px;left:8px;display:flex;gap:6px;z-index:1000;}
-.mfb{background:rgba(255,255,255,.95);border:0.5px solid var(--border);border-radius:20px;padding:5px 13px;font-size:11px;font-weight:800;cursor:pointer;color:var(--t0);box-shadow:0 1px 4px rgba(0,0,0,.15);}
-.mfb.on{background:var(--g);color:#fff;border-color:var(--g);}
-.leaflet-popup-content-wrapper{border-radius:10px!important;box-shadow:0 4px 16px rgba(0,0,0,.15)!important;font-family:'Nunito',sans-serif!important;padding:0!important;}
+.leaflet-popup-content-wrapper{border-radius:10px!important;font-family:'Nunito',sans-serif!important;padding:0!important;}
 .leaflet-popup-content{margin:0!important;padding:10px 14px!important;font-size:13px!important;min-width:160px;}
 .l-popup-name{font-weight:800;font-size:13px;margin-bottom:3px;}
-.l-popup-meta{font-size:11px;color:#9A9A95;}
+.l-popup-meta{font-size:11px;color:#9A9A95;margin-top:2px;}
 .l-popup-btn{margin-top:8px;width:100%;padding:7px;background:#009C3B;color:#fff;border:none;border-radius:7px;font-weight:800;font-size:12px;cursor:pointer;font-family:'Nunito',sans-serif;}
 .leaflet-control-zoom{display:none!important;}
+
+
+
 .pc{display:flex;gap:12px;padding:14px;border-bottom:0.5px solid var(--border);}
 .pc:last-child{border-bottom:none;}
 .pi{width:48px;height:48px;border-radius:12px;background:var(--gl);border:0.5px solid rgba(0,156,59,.15);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
@@ -1066,16 +1076,17 @@ input,textarea{font-family:var(--font);}
   <div class="modal">
     <div class="modal-h"><div class="modal-t">📍 Cadastrar ponto de troca</div><button class="modal-cl" onclick="closeModal('modal-ponto')">✕</button></div>
     <div class="mform">
-      <div><div class="mf-lbl">Nome do local</div><input class="mf-inp" placeholder="Ex: Praça Central de Recife"></div>
-      <div><div class="mf-lbl">Endereço completo</div><input class="mf-inp" placeholder="Rua, número, bairro"></div>
+      <div><div class="mf-lbl">Nome do local *</div><input class="mf-inp" id="ponto-name" placeholder="Ex: Praça Central de Recife"></div>
+      <div><div class="mf-lbl">Endereço completo</div><input class="mf-inp" id="ponto-address" placeholder="Rua, número, bairro"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div><div class="mf-lbl">Cidade</div><input class="mf-inp" placeholder="Recife"></div>
-        <div><div class="mf-lbl">Estado</div><input class="mf-inp" placeholder="PE" maxlength="2"></div>
+        <div><div class="mf-lbl">Cidade *</div><input class="mf-inp" id="ponto-city" placeholder="Recife"></div>
+        <div><div class="mf-lbl">Estado *</div><input class="mf-inp" id="ponto-state" placeholder="PE" maxlength="2" value="PE"></div>
       </div>
-      <div><div class="mf-lbl">Tipo</div><select class="mf-sel"><option>Evento fixo (mensal)</option><option>Evento único</option><option>Ponto informal</option></select></div>
-      <div><div class="mf-lbl">Horário / Frequência</div><input class="mf-inp" placeholder="Ex: Todo 1º sábado do mês, 9h–13h"></div>
-      <div><div class="mf-lbl">Descrição</div><textarea class="mf-ta" rows="3" placeholder="Conta um pouco sobre o local..."></textarea></div>
-      <button class="btn bv" style="width:100%;padding:12px;" onclick="saveMeetPoint()">Cadastrar ponto</button>
+      <button class="btn bv bsm" style="width:100%;justify-content:center;" onclick="usarMinhaLocalizacao()">📍 Usar minha localização atual</button>
+      <div><div class="mf-lbl">Tipo</div><select class="mf-sel" id="ponto-type"><option value="event">Evento fixo (mensal)</option><option value="event">Evento único</option><option value="informal">Ponto informal</option></select></div>
+      <div><div class="mf-lbl">Horário / Frequência</div><input class="mf-inp" id="ponto-schedule" placeholder="Ex: Todo 1º sábado do mês, 9h–13h"></div>
+      <div><div class="mf-lbl">Descrição</div><textarea class="mf-ta" id="ponto-desc" rows="3" placeholder="Conta um pouco sobre o local..."></textarea></div>
+      <button class="btn bv" id="ponto-save-btn" style="width:100%;padding:12px;" onclick="saveMeetPoint()">Cadastrar ponto</button>
     </div>
   </div>
 </div>
@@ -1556,7 +1567,7 @@ async function confirmMeetPoint(pointId) {
   toast('Presença confirmada! 🎉');
 }
 
-// saveMeetPoint — versão completa definida mais abaixo
+/* saveMeetPoint — versão corrigida abaixo */
 
 // ============================================================
 // PRÓXIMOS EVENTOS (home)
@@ -1591,61 +1602,7 @@ async function loadNextEvents() {
 // ============================================================
 // POSTS (banco real)
 // ============================================================
-async function loadPosts() {
-  const { data: posts, error } = await sb.from('posts')
-    .select('*,author:profiles!posts_author_id_fkey(full_name,username,avatar_url),comments:post_comments(count)')
-    .order('created_at', { ascending: false }).limit(20);
-  if (error) { console.error('loadPosts:', error.message); return; }
-  if (!posts) return;
-
-  const container = document.getElementById('posts-container');
-  if (!container) return;
-  container.querySelectorAll('.post').forEach(p => p.remove());
-
-  let myLikes = new Set();
-  if (ME?.id) {
-    const { data: lk } = await sb.from('post_likes').select('post_id').eq('user_id', ME.id);
-    lk?.forEach(l => myLikes.add(l.post_id));
-  }
-
-  posts.forEach(post => {
-    const author = post.author;
-    const name = author?.full_name || author?.username || 'Usuário';
-    const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const cid = 'post-db-' + post.id;
-    const likes = post.likes || 0;
-    const commentCount = post.comments?.[0]?.count || 0;
-    const iLiked = myLikes.has(post.id);
-    const div = document.createElement('div');
-    div.className = 'post';
-    div.innerHTML =
-      '<div class="post-h">' +
-        '<div class="av" style="width:40px;height:40px;background:var(--gl);color:var(--gd);font-size:13px;">' +
-          (author?.avatar_url ? '<img src="' + author.avatar_url + '" alt="">' : initials) +
-        '</div>' +
-        '<div style="flex:1;">' +
-          '<div style="font-size:14px;font-weight:800;">' + name + '</div>' +
-          '<div style="font-size:11px;color:var(--t2);">' + timeAgo(post.created_at) + '</div>' +
-        '</div>' +
-      '</div>' +
-      (post.image_url ? '<div class="post-img-preview"><img src="' + post.image_url + '" alt="" onclick="openImgFull(this)"></div>' : '') +
-      '<div class="post-bod">' + post.content + '</div>' +
-      '<div class="pa-row">' +
-        '<button class="pa' + (iLiked ? ' liked' : '') + '" onclick="togglePostLike(this,\'' + post.id + '\',' + likes + ')">❤️ ' + likes + '</button>' +
-        '<button class="pa" onclick="toggleComments(this,\'' + cid + '\',\'' + post.id + '\')">💬 <span>' + commentCount + '</span></button>' +
-        '<button class="pa" onclick="navigator.clipboard?.writeText(window.location.href).then(()=>toast(\'Link copiado!\'))">↗️</button>' +
-      '</div>' +
-      '<div class="comments-section" id="' + cid + '">' +
-        '<div class="comment-list" id="clist-' + cid + '"></div>' +
-        '<div class="comment-input-row">' +
-          '<input class="comment-inp" placeholder="Escreva um comentário..." id="cinp-' + cid + '">' +
-          '<button class="comment-send" onclick="submitComment(\'' + cid + '\',\'' + post.id + '\')">➤</button>' +
-        '</div>' +
-      '</div>';
-    container.appendChild(div);
-  });
-}
-
+/* loadPosts — versão corrigida abaixo */
 async function togglePostLike(btn, postId, baseCount) {
   btn.classList.toggle('liked');
   const liked = btn.classList.contains('liked');
@@ -1819,7 +1776,7 @@ async function openConvDB(name, otherUserId, initials, bg, color) {
     currentConvId = convId;
 
     // Carrega mensagens
-    const { data: msgs } = await sb.from('messages').select('*,sender:profiles!messages_sender_id_fkey(full_name,avatar_url)').eq('conversation_id',convId).order('created_at',{ascending:true}).limit(50);
+    const { data: msgs } = await sb.from('messages').select('*,sender:profiles(full_name,avatar_url)').eq('conversation_id',convId).order('created_at',{ascending:true}).limit(50);
     const wrap = document.getElementById('msgs-wrap');
     wrap.innerHTML = '';
     msgs?.forEach(m => appendMessage(m));
@@ -2089,64 +2046,54 @@ async function submitPost() {
   const text = ta.value.trim();
   if (!text) { toast('Escreva algo para publicar!'); return; }
 
-  if (!ME?.id) { toast('Faça login para publicar!'); return; }
-
-  let imageUrl = null;
-  const imgInp = document.getElementById('post-img-inp');
-  if (imgInp.files[0]) {
-    const file = imgInp.files[0];
-    const path = ME.id + '/' + Date.now() + '.' + file.name.split('.').pop();
-    const { data: up, error: upErr } = await sb.storage.from('post-images').upload(path, file, { contentType: file.type });
-    if (up) {
-      const { data: pu } = sb.storage.from('post-images').getPublicUrl(path);
-      imageUrl = pu?.publicUrl;
+  if (ME?.id) {
+    let imageUrl = null;
+    const imgInp = document.getElementById('post-img-inp');
+    if (imgInp.files[0]) {
+      const file = imgInp.files[0];
+      const path = `${ME.id}/${Date.now()}.${file.name.split('.').pop()}`;
+      const { data: up } = await sb.storage.from('post-images').upload(path, file, { contentType: file.type });
+      if (up) {
+        const { data: pu } = sb.storage.from('post-images').getPublicUrl(path);
+        imageUrl = pu?.publicUrl;
+      }
     }
-    if (upErr) console.warn('Upload erro:', upErr.message);
+    await sb.from('posts').insert({ author_id: ME.id, content: text, type: 'general', image_url: imageUrl });
   }
 
-  const { data: inserted, error: insertErr } = await sb.from('posts')
-    .insert({ author_id: ME.id, content: text, type: 'general', image_url: imageUrl })
-    .select('*,author:profiles!posts_author_id_fkey(full_name,username,avatar_url)')
-    .single();
-
-  if (insertErr) {
-    toast('Erro ao publicar: ' + insertErr.message);
-    console.error('Insert post error:', insertErr);
-    return;
-  }
-
-  // Insere o novo post no topo da lista imediatamente (sem esperar reload)
-  const container = document.getElementById('posts-container');
-  const cid = 'post-db-' + inserted.id;
-  const author = inserted.author;
-  const name = author?.full_name || author?.username || ME.full_name || 'Você';
-  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  // Adiciona localmente no topo
+  const now = new Date();
+  const timeStr = 'há alguns segundos';
+  const initials = (ME?.full_name || 'Você').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const imgSrc = document.getElementById('post-img-prev').src;
+  const localCid = 'post-local-' + Date.now();
   const newPost = document.createElement('div');
-  newPost.className = 'post';
-  newPost.innerHTML =
-    '<div class="post-h">' +
-      '<div class="av" style="width:40px;height:40px;background:var(--y);color:var(--b);font-size:13px;">' +
-        (author?.avatar_url ? '<img src="' + author.avatar_url + '" alt="">' : initials) +
-      '</div>' +
-      '<div style="flex:1;">' +
-        '<div style="font-size:14px;font-weight:800;">' + name + ' <span class="tag tv" style="font-size:10px;margin-left:4px;">Novo</span></div>' +
-        '<div style="font-size:11px;color:var(--t2);">agora mesmo</div>' +
-      '</div>' +
-    '</div>' +
-    (inserted.image_url ? '<div class="post-img-preview"><img src="' + inserted.image_url + '" alt="" onclick="openImgFull(this)"></div>' : '') +
-    '<div class="post-bod">' + inserted.content + '</div>' +
-    '<div class="pa-row">' +
-      '<button class="pa" onclick="togglePostLike(this,\'' + inserted.id + '\',0)">❤️ 0</button>' +
-      '<button class="pa" onclick="toggleComments(this,\'' + cid + '\',\'' + inserted.id + '\')">💬 0</button>' +
-      '<button class="pa" onclick="navigator.clipboard?.writeText(window.location.href).then(()=>toast(\'Link copiado!\'))">↗️</button>' +
-    '</div>' +
-    '<div class="comments-section" id="' + cid + '">' +
-      '<div class="comment-list" id="clist-' + cid + '"></div>' +
-      '<div class="comment-input-row">' +
-        '<input class="comment-inp" placeholder="Escreva um comentário..." id="cinp-' + cid + '">' +
-        '<button class="comment-send" onclick="submitComment(\'' + cid + '\',\'' + inserted.id + '\')">➤</button>' +
-      '</div>' +
-    '</div>';
+  newPost.className = 'post local-post';
+
+  // Monta HTML sem template literals aninhados para evitar erro de sintaxe
+  let postHtml = '';
+  postHtml += '<div class="post-h">';
+  postHtml += '<div class="av" style="width:40px;height:40px;background:var(--y);color:var(--b);font-size:13px;">' + initials + '</div>';
+  postHtml += '<div style="flex:1;"><div style="font-size:14px;font-weight:800;">' + (ME?.full_name || 'Você') + ' <span class="tag tv" style="font-size:10px;margin-left:4px;">Novo</span></div>';
+  postHtml += '<div style="font-size:11px;color:var(--t2);">' + timeStr + '</div></div>';
+  postHtml += '</div>';
+  if (imgSrc && imgSrc !== '') {
+    postHtml += '<div class="post-img-preview"><img src="' + imgSrc + '" alt="" onclick="openImgFull(this)"></div>';
+  }
+  postHtml += '<div class="post-bod">' + text + '</div>';
+  postHtml += '<div class="pa-row">';
+  postHtml += '<button class="pa" onclick="this.classList.toggle(&apos;liked&apos;);this.textContent=this.classList.contains(&apos;liked&apos;)?&apos;\u2764\uFE0F 1&apos;:&apos;\u2764\uFE0F 0&apos;">❤️ 0</button>';
+  postHtml += '<button class="pa" data-cid="' + localCid + '" onclick="toggleComments(this,this.dataset.cid,null)">\uD83D\uDCAC 0</button>';
+  postHtml += '</div>';
+  postHtml += '<div class="comments-section" id="' + localCid + '">';
+  postHtml += '<div class="comment-list" id="clist-' + localCid + '"></div>';
+  postHtml += '<div class="comment-input-row">';
+  postHtml += '<input class="comment-inp" placeholder="Escreva um coment\u00E1rio..." id="cinp-' + localCid + '">';
+  postHtml += '<button class="comment-send" data-cid="' + localCid + '" onclick="submitComment(this.dataset.cid,null)">\u27A4</button>';
+  postHtml += '</div></div>';
+  newPost.innerHTML = postHtml;
+
+  const container = document.getElementById('posts-container');
   container.insertBefore(newPost, container.firstChild);
 
   ta.value = '';
@@ -2446,7 +2393,7 @@ async function loadComments(postId, containerId) {
   }
 
   const { data: comments } = await sb.from('post_comments')
-    .select('*,author:profiles!post_comments_author_id_fkey(full_name,username,avatar_url)')
+    .select('*,author:profiles(full_name,username,avatar_url)')
     .eq('post_id', postId)
     .order('created_at', { ascending: true })
     .limit(50);
@@ -2670,7 +2617,7 @@ async function openGroupChat(convId, name, emoji) {
   currentConvId = convId;
 
   const { data: msgs } = await sb.from('messages')
-    .select('*,sender:profiles!messages_sender_id_fkey(full_name,avatar_url)')
+    .select('*,sender:profiles(full_name,avatar_url)')
     .eq('conversation_id', convId)
     .order('created_at', { ascending: true })
     .limit(50);
@@ -2688,409 +2635,415 @@ async function openGroupChat(convId, name, emoji) {
 }
 
 // ============================================================
-// LEAFLET MAP — mapa real com OpenStreetMap
+// LEAFLET MAP
 // ============================================================
-let _map = null;
-let _markers = [];
-let _userMarker = null;
+let _map = null, _markers = [], _userMarker = null;
 let _userLat = null, _userLng = null, _geoSortActive = false;
 
 function initMap() {
-  if (_map) return; // já inicializado
-  // Centraliza em Recife por padrão (pode ser overridden pela geoloc)
-  _map = L.map('leaflet-map', {
-    zoomControl: true,
-    attributionControl: false,
-    scrollWheelZoom: true
-  }).setView([-8.0576, -34.8829], 12);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19
-  }).addTo(_map);
-
-  // Atribuição discreta
-  L.control.attribution({prefix: false}).addTo(_map);
-
-  // Invalida tamanho quando a aba Pontos é aberta (necessário para Leaflet)
-  setTimeout(() => _map.invalidateSize(), 200);
+  if (_map) { setTimeout(()=>_map.invalidateSize(),100); return; }
+  _map = L.map('leaflet-map',{zoomControl:true,attributionControl:false,scrollWheelZoom:true})
+    .setView([-8.0576,-34.8829],11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(_map);
+  setTimeout(()=>_map.invalidateSize(),200);
 }
 
 function getMarkerIcon(type) {
-  const color = type === 'event' ? '#009C3B' : '#C9A800';
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">
-    <path d="M16 0C7.2 0 0 7.2 0 16c0 10.9 14.4 24.8 15 25.4a1.4 1.4 0 0 0 2 0C17.6 40.8 32 26.9 32 16 32 7.2 24.8 0 16 0z" fill="${color}"/>
-    <circle cx="16" cy="16" r="7" fill="white"/>
-  </svg>`;
+  const color = type==='event' ? '#009C3B' : '#C9A800';
   return L.divIcon({
-    html: svg,
-    iconSize: [32, 42],
-    iconAnchor: [16, 42],
-    popupAnchor: [0, -44],
-    className: ''
+    html:`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42"><path d="M16 0C7.2 0 0 7.2 0 16c0 10.9 14.4 24.8 15 25.4a1.4 1.4 0 0 0 2 0C17.6 40.8 32 26.9 32 16 32 7.2 24.8 0 16 0z" fill="${color}"/><circle cx="16" cy="16" r="7" fill="white"/></svg>`,
+    iconSize:[32,42],iconAnchor:[16,42],popupAnchor:[0,-44],className:''
   });
 }
 
-function getUserIcon() {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
-    <circle cx="10" cy="10" r="8" fill="#1a73e8" stroke="white" stroke-width="2.5"/>
-    <circle cx="10" cy="10" r="3" fill="white" opacity="0.8"/>
-  </svg>`;
-  return L.divIcon({
-    html: svg,
-    iconSize: [20, 20],
-    iconAnchor: [10, 10],
-    className: ''
-  });
-}
-
-function clearMarkers() {
-  _markers.forEach(m => m.remove());
-  _markers = [];
-}
-
-function addPointToMap(p, count) {
-  if (!_map || !p.lat || !p.lng) return;
-  const lat = parseFloat(p.lat), lng = parseFloat(p.lng);
-  const marker = L.marker([lat, lng], { icon: getMarkerIcon(p.type) });
-
-  const distLine = (_geoSortActive && p._dist !== null)
-    ? `<div class="l-popup-meta">${p._dist < 1 ? Math.round(p._dist*1000)+'m de você' : p._dist.toFixed(1)+'km de você'}</div>`
-    : '';
-
-  marker.bindPopup(`
-    <div class="l-popup-name">${p.name}</div>
-    <div class="l-popup-meta">${p.city}${p.state?', '+p.state:''}${p.schedule?' · '+p.schedule:''}</div>
-    <div class="l-popup-meta">✓ ${count} confirmado${count!==1?'s':''}</div>
-    ${distLine}
-    <button class="l-popup-btn" onclick="scrollToPoint('${p.id}')">Ver detalhes</button>
-  `, { maxWidth: 220 });
-
-  marker.addTo(_map);
-  _markers.push(marker);
-}
-
-function scrollToPoint(pointId) {
-  const el = document.getElementById('mp-' + pointId);
-  if (el) {
-    el.closest('.card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    el.closest('.card').style.outline = '2px solid var(--g)';
-    setTimeout(() => { if(el.closest('.card')) el.closest('.card').style.outline = ''; }, 2000);
-  }
-}
-
-function fitMapToBounds(points) {
-  if (!_map) return;
-  const withCoords = points.filter(p => p.lat && p.lng);
-  if (!withCoords.length) return;
-  if (withCoords.length === 1) {
-    _map.setView([parseFloat(withCoords[0].lat), parseFloat(withCoords[0].lng)], 14);
-    return;
-  }
-  const bounds = L.latLngBounds(withCoords.map(p => [parseFloat(p.lat), parseFloat(p.lng)]));
-  _map.fitBounds(bounds, { padding: [40, 40] });
-}
-
-function distKm(lat1, lng1, lat2, lng2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lng2 - lng1) * Math.PI / 180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+function distKm(lat1,lng1,lat2,lng2) {
+  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
 
 function mapFilterAll(btn) {
-  _geoSortActive = false; _userLat = null; _userLng = null;
-  if (_userMarker) { _userMarker.remove(); _userMarker = null; }
-  document.querySelectorAll('.mfb').forEach(b => b.classList.remove('on'));
+  _geoSortActive=false; _userLat=null; _userLng=null;
+  if(_userMarker){_userMarker.remove();_userMarker=null;}
+  document.querySelectorAll('.mfb').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   loadMeetPoints();
 }
 
 function mapFilterNearby(btn) {
-  if (!navigator.geolocation) { toast('Geolocalização não suportada neste navegador.'); return; }
-  const orig = btn.textContent;
-  btn.textContent = '⏳ Localizando...';
-  btn.disabled = true;
+  if(!navigator.geolocation){toast('Geolocalização não suportada.');return;}
+  const orig=btn.textContent; btn.textContent='⏳ Localizando...'; btn.disabled=true;
   navigator.geolocation.getCurrentPosition(
-    pos => {
-      _userLat = pos.coords.latitude;
-      _userLng = pos.coords.longitude;
-      _geoSortActive = true;
-      btn.textContent = orig; btn.disabled = false;
-      document.querySelectorAll('.mfb').forEach(b => b.classList.remove('on'));
+    pos=>{
+      _userLat=pos.coords.latitude; _userLng=pos.coords.longitude; _geoSortActive=true;
+      btn.textContent=orig; btn.disabled=false;
+      document.querySelectorAll('.mfb').forEach(b=>b.classList.remove('on'));
       btn.classList.add('on');
-      // Centraliza mapa na posição do usuário
-      if (_map) _map.setView([_userLat, _userLng], 13);
-      // Adiciona pin do usuário
-      if (_userMarker) _userMarker.remove();
-      _userMarker = L.marker([_userLat, _userLng], { icon: getUserIcon() })
-        .addTo(_map)
-        .bindPopup('<div style="font-weight:800;font-size:13px;">📍 Você está aqui</div>');
+      if(_map) _map.setView([_userLat,_userLng],13);
+      if(_userMarker) _userMarker.remove();
+      _userMarker=L.marker([_userLat,_userLng],{icon:L.divIcon({
+        html:'<div style="width:16px;height:16px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 3px rgba(26,115,232,.3);"></div>',
+        iconSize:[16,16],iconAnchor:[8,8],className:''
+      })}).addTo(_map).bindPopup('<b>📍 Você está aqui</b>');
       toast('📍 Mostrando pontos mais próximos!');
       loadMeetPoints();
     },
-    err => {
-      btn.textContent = orig; btn.disabled = false;
-      const msgs = {1:'Permissão de localização negada. Habilite nas configurações do navegador.', 2:'Não foi possível obter sua localização.', 3:'Tempo esgotado. Tente novamente.'};
-      toast(msgs[err.code] || 'Erro de geolocalização.');
+    err=>{
+      btn.textContent=orig; btn.disabled=false;
+      const msgs={1:'Permissão negada. Habilite a localização no navegador.',2:'Não foi possível obter localização.',3:'Tempo esgotado.'};
+      toast(msgs[err.code]||'Erro de geolocalização.');
     },
-    { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
+    {enableHighAccuracy:true,timeout:12000,maximumAge:60000}
   );
 }
 
 async function usarMinhaLocalizacao() {
-  if (!navigator.geolocation) { toast('Geolocalização não suportada.'); return; }
-  const btn = event.currentTarget || event.target;
-  const orig = btn.textContent;
-  btn.textContent = '⏳ Obtendo localização...'; btn.disabled = true;
+  if(!navigator.geolocation){toast('Geolocalização não suportada.');return;}
+  const btn=event.currentTarget||event.target;
+  const orig=btn.textContent; btn.textContent='⏳ Obtendo localização...'; btn.disabled=true;
   navigator.geolocation.getCurrentPosition(
-    async pos => {
-      const lat = pos.coords.latitude, lng = pos.coords.longitude;
-      const cityEl = document.getElementById('ponto-city');
-      if (cityEl) { cityEl.dataset.lat = lat; cityEl.dataset.lng = lng; }
-      try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pt-BR`);
-        const data = await res.json();
-        const addr = data.address || {};
-        const city = addr.city || addr.town || addr.village || addr.municipality || addr.suburb || '';
-        const stateMap = {'Pernambuco':'PE','São Paulo':'SP','Rio de Janeiro':'RJ','Bahia':'BA','Minas Gerais':'MG','Ceará':'CE','Paraná':'PR','Rio Grande do Sul':'RS','Santa Catarina':'SC','Paraíba':'PB','Alagoas':'AL','Sergipe':'SE','Piauí':'PI','Maranhão':'MA','Rio Grande do Norte':'RN','Goiás':'GO','Mato Grosso':'MT','Mato Grosso do Sul':'MS','Pará':'PA','Amazonas':'AM','Espírito Santo':'ES','Distrito Federal':'DF','Tocantins':'TO','Rondônia':'RO','Roraima':'RR','Amapá':'AP','Acre':'AC'};
-        const rawState = addr.state || '';
-        const stateAbbr = stateMap[rawState] || rawState.slice(-2).toUpperCase() || 'PE';
-        if (cityEl && city) cityEl.value = city;
-        const stateEl = document.getElementById('ponto-state');
-        if (stateEl) stateEl.value = stateAbbr;
-        const addrEl = document.getElementById('ponto-address');
-        if (addrEl && !addrEl.value) {
-          const parts = [addr.road || addr.pedestrian || '', addr.house_number || '', addr.suburb || addr.neighbourhood || ''].filter(Boolean);
-          addrEl.value = parts.join(', ');
-        }
-        toast('Localização preenchida! Confira os dados ✓');
-      } catch(e) { toast('Coordenadas salvas. Preencha a cidade manualmente.'); }
-      btn.textContent = orig; btn.disabled = false;
+    async pos=>{
+      const lat=pos.coords.latitude,lng=pos.coords.longitude;
+      const cityEl=document.getElementById('ponto-city');
+      if(cityEl){cityEl.dataset.lat=lat;cityEl.dataset.lng=lng;}
+      try{
+        const res=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pt-BR`);
+        const data=await res.json();
+        const addr=data.address||{};
+        const city=addr.city||addr.town||addr.village||addr.municipality||addr.suburb||'';
+        const stateMap={'Pernambuco':'PE','São Paulo':'SP','Rio de Janeiro':'RJ','Bahia':'BA','Minas Gerais':'MG','Ceará':'CE','Paraná':'PR','Rio Grande do Sul':'RS','Santa Catarina':'SC','Paraíba':'PB','Alagoas':'AL','Sergipe':'SE','Piauí':'PI','Maranhão':'MA','Rio Grande do Norte':'RN','Goiás':'GO','Mato Grosso':'MT','Mato Grosso do Sul':'MS','Pará':'PA','Amazonas':'AM','Espírito Santo':'ES','Distrito Federal':'DF','Tocantins':'TO'};
+        const stateAbbr=stateMap[addr.state||'']||(addr.state||'PE').slice(-2).toUpperCase();
+        if(cityEl&&city)cityEl.value=city;
+        const se=document.getElementById('ponto-state');if(se)se.value=stateAbbr;
+        const ae=document.getElementById('ponto-address');
+        if(ae&&!ae.value)ae.value=[addr.road||'',addr.house_number||'',addr.suburb||''].filter(Boolean).join(', ');
+        toast('Localização preenchida! ✓');
+      }catch(e){toast('Coordenadas salvas. Preencha a cidade manualmente.');}
+      btn.textContent=orig; btn.disabled=false;
     },
-    err => {
-      btn.textContent = orig; btn.disabled = false;
-      toast(err.code === 1 ? 'Permissão negada. Habilite a localização.' : 'Não foi possível obter localização.');
-    },
-    { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
+    err=>{btn.textContent=orig;btn.disabled=false;toast(err.code===1?'Permissão negada.':'Não foi possível obter localização.');},
+    {enableHighAccuracy:true,timeout:12000,maximumAge:60000}
   );
 }
 
 // ============================================================
-// PONTOS DE TROCA — versão com mapa Leaflet real
+// PONTOS DE TROCA — Leaflet real + geocoding
 // ============================================================
 async function loadMeetPoints() {
-  initMap(); // garante que o mapa foi inicializado
-
-  const list = document.getElementById('pontos-list');
-  const countEl = document.querySelector('#page-pontos .rsb span');
-  if (list) list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2);font-size:13px;">Carregando pontos...</div>';
-
-  const { data: points, error } = await sb.from('meet_points')
-    .select('*,confirmations:meet_confirmations(count)')
-    .eq('active', true)
-    .order('created_at', { ascending: false });
-
-  if (error || !points) {
-    if (list) list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--red);">Erro ao carregar. Tente novamente.</div>';
-    return;
-  }
-
-  // Calcula distância e ordena
-  let sorted = points.map(p => ({
-    ...p,
-    _dist: (_geoSortActive && _userLat !== null && p.lat && p.lng)
-      ? distKm(_userLat, _userLng, parseFloat(p.lat), parseFloat(p.lng))
-      : null
-  }));
-  if (_geoSortActive) sorted.sort((a,b) => (a._dist ?? 9e9) - (b._dist ?? 9e9));
-
-  if (countEl) countEl.textContent = `${sorted.length} ponto${sorted.length!==1?'s':''} encontrado${sorted.length!==1?'s':''}`;
-
-  // Atualiza mapa Leaflet
-  clearMarkers();
-  sorted.forEach(p => {
-    const count = p.confirmations?.[0]?.count || 0;
-    addPointToMap(p, count);
+  initMap();
+  const list=document.getElementById('pontos-list');
+  const countEl=document.querySelector('#page-pontos .rsb span');
+  if(list)list.innerHTML='<div style="padding:20px;text-align:center;color:var(--t2);font-size:13px;">Carregando pontos...</div>';
+  const {data:points,error}=await sb.from('meet_points').select('*,confirmations:meet_confirmations(count)').eq('active',true).order('created_at',{ascending:false});
+  if(error||!points){if(list)list.innerHTML='<div style="padding:20px;text-align:center;color:var(--red);">Erro ao carregar.</div>';return;}
+  let sorted=points.map(p=>({...p,_dist:(_geoSortActive&&_userLat!==null&&p.lat&&p.lng)?distKm(_userLat,_userLng,parseFloat(p.lat),parseFloat(p.lng)):null}));
+  if(_geoSortActive)sorted.sort((a,b)=>(a._dist??9e9)-(b._dist??9e9));
+  if(countEl)countEl.textContent=`${sorted.length} ponto${sorted.length!==1?'s':''} encontrado${sorted.length!==1?'s':''}`;
+  // Mapa
+  _markers.forEach(m=>m.remove()); _markers=[];
+  sorted.forEach(p=>{
+    if(!p.lat||!p.lng)return;
+    const cnt=p.confirmations?.[0]?.count||0;
+    const dist=(_geoSortActive&&p._dist!==null)?(p._dist<1?Math.round(p._dist*1000)+'m de você':p._dist.toFixed(1)+'km de você'):'';
+    const m=L.marker([parseFloat(p.lat),parseFloat(p.lng)],{icon:getMarkerIcon(p.type)});
+    m.bindPopup(`<div class="l-popup-name">${p.name}</div><div class="l-popup-meta">${p.city}${p.state?', '+p.state:''}${p.schedule?' · '+p.schedule:''}</div><div class="l-popup-meta">✓ ${cnt} confirmado${cnt!==1?'s':''}</div>${dist?'<div class="l-popup-meta">📍 '+dist+'</div>':''}<button class="l-popup-btn" onclick="scrollToPoint('${p.id}')">Ver detalhes</button>`,{maxWidth:220});
+    m.addTo(_map); _markers.push(m);
   });
-  // Ajusta viewport para mostrar todos os pins
-  if (sorted.some(p => p.lat && p.lng)) {
-    fitMapToBounds(sorted);
-  } else if (_map) {
-    // Sem coords no banco — mapa default em Recife
-    _map.setView([-8.0576, -34.8829], 11);
-  }
-
-  // Atualiza lista
-  if (!list) return;
-  if (!sorted.length) {
-    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--t2);">Nenhum ponto cadastrado ainda.<br><strong>Seja o primeiro! 📍</strong></div>';
-    return;
-  }
-  list.innerHTML = '';
-  let myConfirmed = new Set();
-  if (ME?.id) {
-    const { data: myConfs } = await sb.from('meet_confirmations').select('point_id').eq('user_id', ME.id);
-    myConfs?.forEach(c => myConfirmed.add(c.point_id));
-  }
-  sorted.forEach(p => {
-    const count = p.confirmations?.[0]?.count || 0;
-    const typeIcon = p.type === 'event' ? '🎪' : '📍';
-    const typeTag  = p.type === 'event' ? '<span class="tag tv">Evento</span>' : '<span class="tag ta">Informal</span>';
-    const isConf   = myConfirmed.has(p.id);
-    const distStr  = p._dist !== null ? (p._dist < 1 ? ` · ${Math.round(p._dist*1000)}m` : ` · ${p._dist.toFixed(1)}km`) : '';
-    const card = document.createElement('div');
-    card.className = 'card'; card.style.margin = '12px 16px';
-    card.id = 'point-card-' + p.id;
-    card.innerHTML = `
-      <div class="pc">
-        <div class="pi ${p.type!=='event'?'am':''}" style="cursor:pointer;" onclick="flyToPoint(${p.lat||'-8.05'},${p.lng||'-34.88'})">${typeIcon}</div>
-        <div style="flex:1;">
-          <div class="rsb"><div style="font-size:15px;font-weight:800;">${p.name}</div>${typeTag}</div>
-          <div style="font-size:12px;color:var(--t2);margin-top:2px;">${p.city}${p.state?', '+p.state:''}${distStr}${p.schedule?' · '+p.schedule:''}</div>
-          ${p.address?`<div style="font-size:11px;color:var(--t2);margin-top:1px;">📌 ${p.address}</div>`:''}
-          <div class="rsb" style="margin-top:8px;">
-            <span style="font-size:12px;font-weight:700;color:var(--g);" id="ccount-${p.id}">✓ ${count} confirmado${count!==1?'s':''}</span>
-            <button class="cbtn ${isConf?'done':''}" id="mp-${p.id}" onclick="toggleMeetConfirm('${p.id}',this)">${isConf?'Confirmado ✓':'Confirmar presença'}</button>
-          </div>
-        </div>
-      </div>`;
+  const withCoords=sorted.filter(p=>p.lat&&p.lng);
+  if(withCoords.length===1) _map.setView([parseFloat(withCoords[0].lat),parseFloat(withCoords[0].lng)],14);
+  else if(withCoords.length>1) _map.fitBounds(L.latLngBounds(withCoords.map(p=>[parseFloat(p.lat),parseFloat(p.lng)])),{padding:[40,40]});
+  // Lista
+  if(!list)return;
+  if(!sorted.length){list.innerHTML='<div style="padding:24px;text-align:center;color:var(--t2);">Nenhum ponto cadastrado ainda.<br><strong>Seja o primeiro! 📍</strong></div>';return;}
+  list.innerHTML='';
+  let myConf=new Set();
+  if(ME?.id){const{data:mc}=await sb.from('meet_confirmations').select('point_id').eq('user_id',ME.id);mc?.forEach(c=>myConf.add(c.point_id));}
+  sorted.forEach(p=>{
+    const cnt=p.confirmations?.[0]?.count||0;
+    const ti=p.type==='event'?'🎪':'📍';
+    const tt=p.type==='event'?'<span class="tag tv">Evento</span>':'<span class="tag ta">Informal</span>';
+    const ic=myConf.has(p.id);
+    const ds=p._dist!==null?(p._dist<1?' · '+Math.round(p._dist*1000)+'m':' · '+p._dist.toFixed(1)+'km'):'';
+    const card=document.createElement('div');card.className='card';card.style.margin='12px 16px';card.id='point-card-'+p.id;
+    card.innerHTML=`<div class="pc"><div class="pi ${p.type!=='event'?'am':''}" style="cursor:pointer;" onclick="flyToPoint(${p.lat||0},${p.lng||0})">${ti}</div><div style="flex:1;"><div class="rsb"><div style="font-size:15px;font-weight:800;">${p.name}</div>${tt}</div><div style="font-size:12px;color:var(--t2);margin-top:2px;">${p.city}${p.state?', '+p.state:''}${ds}${p.schedule?' · '+p.schedule:''}</div>${p.address?`<div style="font-size:11px;color:var(--t2);margin-top:1px;">📌 ${p.address}</div>`:''}<div class="rsb" style="margin-top:8px;"><span style="font-size:12px;font-weight:700;color:var(--g);" id="ccount-${p.id}">✓ ${cnt} confirmado${cnt!==1?'s':''}</span><button class="cbtn ${ic?'done':''}" id="mp-${p.id}" onclick="toggleMeetConfirm('${p.id}',this)">${ic?'Confirmado ✓':'Confirmar presença'}</button></div></div></div>`;
     list.appendChild(card);
   });
-  // Revalida tamanho do mapa após renderização da lista
-  setTimeout(() => _map?.invalidateSize(), 100);
+  setTimeout(()=>_map?.invalidateSize(),100);
 }
 
-function flyToPoint(lat, lng) {
-  if (!_map || !lat || !lng) return;
-  _map.flyTo([parseFloat(lat), parseFloat(lng)], 16, { animate: true, duration: 1 });
-}
+function scrollToPoint(id){const el=document.getElementById('point-card-'+id);if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='2px solid var(--g)';setTimeout(()=>el.style.outline='',2000);}}
+function flyToPoint(lat,lng){if(_map&&lat&&lng)_map.flyTo([parseFloat(lat),parseFloat(lng)],16,{animate:true,duration:1});}
 
-async function toggleMeetConfirm(pointId, btn) {
-  if (!ME?.id) { toast('Faça login para confirmar presença!'); return; }
-  const isDone = btn.classList.contains('done');
-  const countEl = document.getElementById('ccount-' + pointId);
-  const cur = parseInt(countEl?.textContent?.replace(/\D/g,'') || '0');
-  if (isDone) {
-    const { error } = await sb.from('meet_confirmations').delete().eq('point_id', pointId).eq('user_id', ME.id);
-    if (error) { toast('Erro ao cancelar.'); return; }
-    btn.classList.remove('done'); btn.textContent = 'Confirmar presença';
-    if (countEl) countEl.textContent = `✓ ${Math.max(0,cur-1)} confirmado${(cur-1)!==1?'s':''}`;
+async function toggleMeetConfirm(pointId,btn){
+  if(!ME?.id){toast('Faça login para confirmar presença!');return;}
+  const isDone=btn.classList.contains('done');
+  const countEl=document.getElementById('ccount-'+pointId);
+  const cur=parseInt(countEl?.textContent?.replace(/\D/g,'')||'0');
+  if(isDone){
+    const{error}=await sb.from('meet_confirmations').delete().eq('point_id',pointId).eq('user_id',ME.id);
+    if(error){toast('Erro ao cancelar.');return;}
+    btn.classList.remove('done');btn.textContent='Confirmar presença';
+    if(countEl)countEl.textContent=`✓ ${Math.max(0,cur-1)} confirmado${(cur-1)!==1?'s':''}`;
     toast('Presença cancelada.');
-  } else {
-    const today = new Date().toISOString().split('T')[0];
-    const { error } = await sb.from('meet_confirmations').insert({point_id:pointId, user_id:ME.id, event_date:today});
-    if (error && !error.code?.includes('23505') && !error.message?.includes('duplicate')) { toast('Erro ao confirmar.'); return; }
-    btn.classList.add('done'); btn.textContent = 'Confirmado ✓';
-    if (countEl) countEl.textContent = `✓ ${cur+1} confirmado${(cur+1)!==1?'s':''}`;
+  }else{
+    const today=new Date().toISOString().split('T')[0];
+    const{error}=await sb.from('meet_confirmations').insert({point_id:pointId,user_id:ME.id,event_date:today});
+    if(error&&!error.code?.includes('23505')&&!error.message?.includes('duplicate')){toast('Erro ao confirmar.');return;}
+    btn.classList.add('done');btn.textContent='Confirmado ✓';
+    if(countEl)countEl.textContent=`✓ ${cur+1} confirmado${(cur+1)!==1?'s':''}`;
     toast('Presença confirmada! 🎉');
   }
 }
-
-// Compatibilidade com pins HTML estáticos (não há mais, mas mantemos)
-function toggleConfirm(id) {
-  const btn = document.getElementById(id+'-btn'), cnt = document.getElementById(id+'-count');
-  if (!btn||!cnt) return;
-  const cur = parseInt(cnt.textContent);
-  if (btn.classList.contains('done')) { btn.classList.remove('done');btn.textContent='Confirmar';cnt.textContent=cur-1;toast('Presença cancelada.'); }
-  else { btn.classList.add('done');btn.textContent='Confirmado ✓';cnt.textContent=cur+1;toast('Presença confirmada! 🎉'); }
+function toggleConfirm(id){
+  const btn=document.getElementById(id+'-btn'),cnt=document.getElementById(id+'-count');
+  if(!btn||!cnt)return;
+  const cur=parseInt(cnt.textContent);
+  if(btn.classList.contains('done')){btn.classList.remove('done');btn.textContent='Confirmar';cnt.textContent=cur-1;toast('Presença cancelada.');}
+  else{btn.classList.add('done');btn.textContent='Confirmado ✓';cnt.textContent=cur+1;toast('Presença confirmada! 🎉');}
 }
 
 async function saveMeetPoint() {
-  if (!ME?.id) { toast('Faça login para cadastrar pontos!'); return; }
-
-  const nameEl  = document.getElementById('ponto-name');
-  const addrEl  = document.getElementById('ponto-address');
-  const cityEl  = document.getElementById('ponto-city');
-  const stateEl = document.getElementById('ponto-state');
-  const typeEl  = document.getElementById('ponto-type');
-  const schedEl = document.getElementById('ponto-schedule');
-
-  const name    = nameEl?.value?.trim();
-  const address = addrEl?.value?.trim();
-  const city    = cityEl?.value?.trim();
-  const state   = (stateEl?.value?.trim() || 'PE').toUpperCase().slice(0,2);
-  const typeVal = typeEl?.value || 'informal';
-  const sched   = schedEl?.value?.trim();
-
-  if (!name)  { toast('Informe o nome do local!');  return; }
-  if (!city)  { toast('Informe a cidade!'); return; }
-
-  const saveBtn = document.querySelector('#modal-ponto .btn.bv:last-of-type');
-  if (saveBtn) { saveBtn.textContent = 'Salvando...'; saveBtn.disabled = true; }
-
-  // Pega lat/lng do botão de geolocalização se disponível
-  let lat = cityEl?.dataset?.lat ? parseFloat(cityEl.dataset.lat) : null;
-  let lng = cityEl?.dataset?.lng ? parseFloat(cityEl.dataset.lng) : null;
-
-  // Se não tem GPS, tenta geocoding pelo endereço via Nominatim
-  if (!lat || !lng) {
-    const query = [address, city, state, 'Brasil'].filter(Boolean).join(', ');
-    try {
-      const res = await fetch(
-        'https://nominatim.openstreetmap.org/search?q=' +
-        encodeURIComponent(query) +
-        '&format=json&limit=1&accept-language=pt-BR'
-      );
-      const results = await res.json();
-      if (results?.length) {
-        lat = parseFloat(results[0].lat);
-        lng = parseFloat(results[0].lon);
-        console.log('Geocoding:', query, '->', lat, lng);
-      }
-    } catch(e) {
-      console.warn('Geocoding falhou, salvando sem coordenadas:', e);
-    }
+  if(!ME?.id){toast('Faça login para cadastrar pontos!');return;}
+  const nameEl=document.getElementById('ponto-name');
+  const addrEl=document.getElementById('ponto-address');
+  const cityEl=document.getElementById('ponto-city');
+  const stateEl=document.getElementById('ponto-state');
+  const typeEl=document.getElementById('ponto-type');
+  const schedEl=document.getElementById('ponto-schedule');
+  const name=nameEl?.value?.trim();
+  const address=addrEl?.value?.trim();
+  const city=cityEl?.value?.trim();
+  const state=(stateEl?.value?.trim()||'PE').toUpperCase().slice(0,2);
+  const typeVal=typeEl?.value||'informal';
+  const sched=schedEl?.value?.trim();
+  if(!name){toast('Informe o nome do local!');return;}
+  if(!city){toast('Informe a cidade!');return;}
+  const saveBtn=document.getElementById('ponto-save-btn');
+  if(saveBtn){saveBtn.textContent='Salvando...';saveBtn.disabled=true;}
+  let lat=cityEl?.dataset?.lat?parseFloat(cityEl.dataset.lat):null;
+  let lng=cityEl?.dataset?.lng?parseFloat(cityEl.dataset.lng):null;
+  if(!lat||!lng){
+    const q=[address,city,state,'Brasil'].filter(Boolean).join(', ');
+    try{
+      const res=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q)+'&format=json&limit=1&accept-language=pt-BR');
+      const results=await res.json();
+      if(results?.length){lat=parseFloat(results[0].lat);lng=parseFloat(results[0].lon);}
+    }catch(e){console.warn('Geocoding falhou:',e);}
   }
-
-  const { error } = await sb.from('meet_points').insert({
-    creator_id: ME.id,
-    name, city, state,
-    address: address || null,
-    type: typeVal,
-    schedule: sched || null,
-    lat, lng,
-    active: true
-  });
-
-  if (saveBtn) { saveBtn.textContent = 'Cadastrar ponto'; saveBtn.disabled = false; }
-
-  if (error) { toast('Erro ao cadastrar: ' + error.message); return; }
-
-  // Limpa campos
-  [nameEl, addrEl, schedEl, document.getElementById('ponto-desc')].forEach(el => {
-    if (el) { el.value = ''; if (el.dataset) { delete el.dataset.lat; delete el.dataset.lng; } }
-  });
-  if (cityEl)  { cityEl.value = '';   if (cityEl.dataset) { delete cityEl.dataset.lat; delete cityEl.dataset.lng; } }
-  if (stateEl) stateEl.value = 'PE';
-
+  const{error}=await sb.from('meet_points').insert({creator_id:ME.id,name,city,state,address:address||null,type:typeVal,schedule:sched||null,lat,lng,active:true});
+  if(saveBtn){saveBtn.textContent='Cadastrar ponto';saveBtn.disabled=false;}
+  if(error){toast('Erro: '+error.message);return;}
+  [nameEl,addrEl,schedEl,document.getElementById('ponto-desc')].forEach(el=>{if(el){el.value='';if(el.dataset){delete el.dataset.lat;delete el.dataset.lng;}}});
+  if(cityEl){cityEl.value='';if(cityEl.dataset){delete cityEl.dataset.lat;delete cityEl.dataset.lng;}}
+  if(stateEl)stateEl.value='PE';
   closeModal('modal-ponto');
-  toast(lat ? '"' + name + '" cadastrado com localização! 📍' : '"' + name + '" cadastrado! (sem coordenadas GPS)');
+  toast(lat?`"${name}" cadastrado com localização! 📍`:`"${name}" cadastrado!`);
   await loadMeetPoints();
 }
 
 // ============================================================
-// OVERRIDE goTo para carregar álbum e grupos
+// ÁLBUM — upsert corrigido
+// ============================================================
+async function toggleStickerQuick(num,card,currentStatus){
+  if(!ME?.id){toast('Faça login para gerenciar seu álbum!');return;}
+  const cycle={empty:'have',have:'dup',dup:'need',need:'empty'};
+  const ns=cycle[currentStatus]||'have';
+  if(ns==='empty'){await sb.from('user_stickers').delete().eq('user_id',ME.id).eq('number',num);delete albumStickers[num];}
+  else{const qty=ns==='dup'?2:1,dbs=ns==='dup'?'have':ns;
+    await sb.from('user_stickers').delete().eq('user_id',ME.id).eq('number',num);
+    const{error}=await sb.from('user_stickers').insert({user_id:ME.id,number:num,status:dbs,quantity:qty});
+    if(error){toast('Erro: '+error.message);return;}
+    albumStickers[num]={status:dbs,quantity:qty};}
+  const labels={have:'✓ Tenho',dup:'+ Repetida',need:'✗ Falta',empty:'− Removida'};
+  toast(`#${num.toString().padStart(3,'0')} — ${labels[ns]}`);
+  renderAlbumGrid();updateAlbumProgress();
+}
+async function saveSingleSticker(){
+  const num=parseInt(document.getElementById('fig-num').value);
+  if(!num||num<1||num>640){toast('Número inválido (1-640)!');return;}
+  if(!ME?.id){toast('Faça login primeiro!');return;}
+  const qty=selectedFigStatus==='dup'?(parseInt(document.getElementById('fig-qty').value)||2):1;
+  const dbs=selectedFigStatus==='dup'?'have':selectedFigStatus;
+  await sb.from('user_stickers').delete().eq('user_id',ME.id).eq('number',num);
+  const{error}=await sb.from('user_stickers').insert({user_id:ME.id,number:num,status:dbs,quantity:qty});
+  if(error){toast('Erro: '+error.message);return;}
+  albumStickers[num]={status:dbs,quantity:qty};
+  renderAlbumGrid();updateAlbumProgress();
+  closeModal('modal-figurinha');document.getElementById('fig-num').value='';
+  toast(`Figurinha #${num.toString().padStart(3,'0')} salva!`);
+}
+async function bulkAddStickers(status){
+  if(!bulkSelected.size){toast('Selecione figurinhas primeiro!');return;}
+  if(!ME?.id){toast('Faça login primeiro!');return;}
+  const dbs=status==='dup'?'have':status,qty=status==='dup'?2:1;
+  const nums=[...bulkSelected];
+  await sb.from('user_stickers').delete().eq('user_id',ME.id).in('number',nums);
+  const{error}=await sb.from('user_stickers').insert(nums.map(n=>({user_id:ME.id,number:n,status:dbs,quantity:qty})));
+  if(error){toast('Erro: '+error.message);return;}
+  nums.forEach(n=>{albumStickers[n]={status:dbs,quantity:qty};});
+  const count=bulkSelected.size;bulkSelected.clear();
+  renderAlbumGrid();updateAlbumProgress();
+  toast(`${count} figurinhas atualizadas! ✓`);
+}
+
+// ============================================================
+// POSTS — versão com FK explícita e comentários funcionando
+// ============================================================
+async function loadPosts(){
+  const{data:posts,error}=await sb.from('posts')
+    .select('*,author:profiles!posts_author_id_fkey(full_name,username,avatar_url),comments:post_comments(count)')
+    .order('created_at',{ascending:false}).limit(20);
+  if(error){console.error('loadPosts:',error.message);return;}
+  if(!posts)return;
+  const container=document.getElementById('posts-container');
+  if(!container)return;
+  container.querySelectorAll('.post').forEach(p=>p.remove());
+  let myLikes=new Set();
+  if(ME?.id){const{data:lk}=await sb.from('post_likes').select('post_id').eq('user_id',ME.id);lk?.forEach(l=>myLikes.add(l.post_id));}
+  posts.forEach(post=>{
+    const author=post.author;
+    const name=author?.full_name||author?.username||'Usuário';
+    const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const cid='post-db-'+post.id;
+    const likes=post.likes||0;
+    const cc=post.comments?.[0]?.count||0;
+    const iLiked=myLikes.has(post.id);
+    const div=document.createElement('div');div.className='post';
+    div.innerHTML='<div class="post-h">'+
+      '<div class="av" style="width:40px;height:40px;background:var(--gl);color:var(--gd);font-size:13px;">'+(author?.avatar_url?'<img src="'+author.avatar_url+'" alt="">':initials)+'</div>'+
+      '<div style="flex:1;"><div style="font-size:14px;font-weight:800;">'+name+'</div><div style="font-size:11px;color:var(--t2);">'+timeAgo(post.created_at)+'</div></div>'+
+      '</div>'+
+      (post.image_url?'<div class="post-img-preview"><img src="'+post.image_url+'" alt="" onclick="openImgFull(this)"></div>':'')+
+      '<div class="post-bod">'+post.content+'</div>'+
+      '<div class="pa-row">'+
+        '<button class="pa'+(iLiked?' liked':'')+'" onclick="togglePostLike(this,\''+post.id+'\','+likes+')">❤️ '+likes+'</button>'+
+        '<button class="pa" onclick="toggleComments(this,\''+cid+'\',\''+post.id+'\')">💬 <span>'+cc+'</span></button>'+
+        '<button class="pa" onclick="navigator.clipboard?.writeText(window.location.href).then(()=>toast(\'Link copiado!\'))">↗️</button>'+
+      '</div>'+
+      '<div class="comments-section" id="'+cid+'">'+
+        '<div class="comment-list" id="clist-'+cid+'"></div>'+
+        '<div class="comment-input-row">'+
+          '<input class="comment-inp" placeholder="Escreva um comentário..." id="cinp-'+cid+'">'+
+          '<button class="comment-send" onclick="submitComment(\''+cid+'\',\''+post.id+'\')">➤</button>'+
+        '</div>'+
+      '</div>';
+    container.appendChild(div);
+  });
+}
+
+async function submitPost(){
+  const ta=document.getElementById('post-ta');
+  const text=ta.value.trim();
+  if(!text){toast('Escreva algo para publicar!');return;}
+  if(!ME?.id){toast('Faça login para publicar!');return;}
+  let imageUrl=null;
+  const imgInp=document.getElementById('post-img-inp');
+  if(imgInp.files[0]){
+    const file=imgInp.files[0];
+    const path=ME.id+'/'+Date.now()+'.'+file.name.split('.').pop();
+    const{data:up}=await sb.storage.from('post-images').upload(path,file,{contentType:file.type});
+    if(up){const{data:pu}=sb.storage.from('post-images').getPublicUrl(path);imageUrl=pu?.publicUrl;}
+  }
+  const{data:inserted,error}=await sb.from('posts')
+    .insert({author_id:ME.id,content:text,type:'general',image_url:imageUrl})
+    .select('*,author:profiles!posts_author_id_fkey(full_name,username,avatar_url)')
+    .single();
+  if(error){toast('Erro ao publicar: '+error.message);return;}
+  const container=document.getElementById('posts-container');
+  const cid='post-db-'+inserted.id;
+  const author=inserted.author;
+  const name=author?.full_name||author?.username||ME.full_name||'Você';
+  const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const div=document.createElement('div');div.className='post';
+  div.innerHTML='<div class="post-h">'+
+    '<div class="av" style="width:40px;height:40px;background:var(--y);color:var(--b);font-size:13px;">'+(author?.avatar_url?'<img src="'+author.avatar_url+'" alt="">':initials)+'</div>'+
+    '<div style="flex:1;"><div style="font-size:14px;font-weight:800;">'+name+' <span class="tag tv" style="font-size:10px;margin-left:4px;">Novo</span></div><div style="font-size:11px;color:var(--t2);">agora mesmo</div></div>'+
+    '</div>'+
+    (imageUrl?'<div class="post-img-preview"><img src="'+imageUrl+'" alt="" onclick="openImgFull(this)"></div>':'')+
+    '<div class="post-bod">'+inserted.content+'</div>'+
+    '<div class="pa-row">'+
+      '<button class="pa" onclick="togglePostLike(this,\''+inserted.id+'\',0)">❤️ 0</button>'+
+      '<button class="pa" onclick="toggleComments(this,\''+cid+'\',\''+inserted.id+'\')">💬 0</button>'+
+    '</div>'+
+    '<div class="comments-section" id="'+cid+'">'+
+      '<div class="comment-list" id="clist-'+cid+'"></div>'+
+      '<div class="comment-input-row">'+
+        '<input class="comment-inp" placeholder="Escreva um comentário..." id="cinp-'+cid+'">'+
+        '<button class="comment-send" onclick="submitComment(\''+cid+'\',\''+inserted.id+'\')">➤</button>'+
+      '</div>'+
+    '</div>';
+  container.insertBefore(div,container.firstChild);
+  ta.value='';clearPostImg();
+  toast('Post publicado! 🎉');
+}
+
+async function togglePostLike(btn,postId,baseCount){
+  if(!ME?.id){toast('Faça login para curtir!');return;}
+  const wasLiked=btn.classList.contains('liked');
+  btn.classList.toggle('liked');
+  const liked=!wasLiked;
+  const newCount=liked?baseCount+1:Math.max(0,baseCount-1);
+  btn.innerHTML='❤️ '+newCount;
+  if(liked){await sb.from('post_likes').upsert({post_id:postId,user_id:ME.id});await sb.from('posts').update({likes:newCount}).eq('id',postId);toast('Curtido! ❤️');}
+  else{await sb.from('post_likes').delete().eq('post_id',postId).eq('user_id',ME.id);await sb.from('posts').update({likes:newCount}).eq('id',postId);}
+}
+
+// ============================================================
+// COMENTÁRIOS
+// ============================================================
+async function loadComments(postId,containerId){
+  const listEl=document.getElementById('clist-'+containerId);
+  if(!listEl)return;
+  listEl.innerHTML='<div style="padding:8px;text-align:center;color:var(--t2);font-size:12px;">Carregando...</div>';
+  if(!postId||postId==='null'){const stored=JSON.parse(localStorage.getItem('comments_'+containerId)||'[]');renderCommentList(stored,listEl);return;}
+  const{data}=await sb.from('post_comments').select('*,author:profiles!post_comments_author_id_fkey(full_name,username,avatar_url)').eq('post_id',postId).order('created_at',{ascending:true}).limit(50);
+  renderCommentList(data||[],listEl);
+}
+function renderCommentList(comments,listEl){
+  if(!comments.length){listEl.innerHTML='<div style="padding:8px;text-align:center;color:var(--t2);font-size:12px;">Seja o primeiro a comentar!</div>';return;}
+  listEl.innerHTML=comments.map(c=>{
+    const name=c.author?.full_name||c.author?.username||c.author_name||'Usuário';
+    const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return '<div class="comment-item"><div class="av" style="width:30px;height:30px;background:var(--gl);color:var(--gd);font-size:10px;flex-shrink:0;">'+(c.author?.avatar_url?'<img src="'+c.author.avatar_url+'" alt="">':initials)+'</div><div class="comment-bubble"><div class="comment-name">'+name+'</div><div class="comment-text">'+c.content+'</div><div class="comment-time">'+(c.created_at?timeAgo(c.created_at):'agora mesmo')+'</div></div></div>';
+  }).join('');
+}
+function toggleComments(btn,containerId,postId){
+  const section=document.getElementById(containerId);if(!section)return;
+  const isOpen=section.classList.toggle('open');
+  if(isOpen){const rid=(!postId||postId==='null'||postId==='undefined')?null:postId;loadComments(rid,containerId);}
+}
+async function submitComment(containerId,postId){
+  const inp=document.getElementById('cinp-'+containerId);
+  const text=inp?.value?.trim();if(!text)return;
+  if(!ME?.id){toast('Faça login para comentar!');return;}
+  const realId=(!postId||postId==='null'||postId==='undefined')?null:postId;
+  const listEl=document.getElementById('clist-'+containerId);
+  const empty=listEl?.querySelector('[style*="Seja o primeiro"]');if(empty)empty.remove();
+  const name=ME.full_name||ME.username||'Você';
+  const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const div=document.createElement('div');div.className='comment-item';
+  div.innerHTML='<div class="av" style="width:30px;height:30px;background:var(--y);color:var(--b);font-size:10px;flex-shrink:0;">'+(ME.avatar_url?'<img src="'+ME.avatar_url+'" alt="">':initials)+'</div><div class="comment-bubble"><div class="comment-name">'+name+'</div><div class="comment-text">'+text+'</div><div class="comment-time">agora mesmo</div></div>';
+  listEl?.appendChild(div);inp.value='';
+  const cntEl=listEl?.closest('.post')?.querySelector('.pa:nth-child(2) span');
+  if(cntEl)cntEl.textContent=parseInt(cntEl.textContent||'0')+1;
+  if(realId){const{error}=await sb.from('post_comments').insert({post_id:realId,author_id:ME.id,content:text});if(error)toast('Erro ao enviar comentário.');}
+  else{const key='comments_'+containerId,stored=JSON.parse(localStorage.getItem(key)||'[]');stored.push({content:text,author_name:name,created_at:new Date().toISOString()});localStorage.setItem(key,JSON.stringify(stored));}
+}
+
+// ============================================================
+// OVERRIDES — goTo e showSub
 // ============================================================
 const _origGoTo = goTo;
 goTo = function(page) {
   _origGoTo(page);
   if (page === 'album')  loadAlbum();
-  if (page === 'pontos') {
-    initMap();
-    setTimeout(() => { _map?.invalidateSize(); loadMeetPoints(); }, 150);
-  }
+  if (page === 'pontos') { initMap(); setTimeout(()=>{_map?.invalidateSize();loadMeetPoints();},150); }
 };
-
-// Sobrescrever showSub para carregar grupos quando abrir aba Grupos
 const _origShowSub = showSub;
 showSub = function(id, btn) {
   _origShowSub(id, btn);
   if (id === 'grupos') loadGroups();
 };
-
-// Atualizar loadPosts para incluir botão de comentários real
-// loadPosts já definido acima — sem override necessário
 
 window.addEventListener('DOMContentLoaded', boot);
 </script>
