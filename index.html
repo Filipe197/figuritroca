@@ -1606,47 +1606,56 @@ async function loadNextEvents() {
 // POSTS (banco real)
 // ============================================================
 async function loadPosts() {
-  const { data: posts } = await sb.from('posts')
-    .select('*,author:profiles(full_name,username,avatar_url)')
-    .order('created_at',{ascending:false}).limit(20);
+  const { data: posts, error } = await sb.from('posts')
+    .select('*,author:profiles(full_name,username,avatar_url),comments:post_comments(count)')
+    .order('created_at', { ascending: false }).limit(20);
+  if (error) { console.error('loadPosts:', error.message); return; }
   if (!posts) return;
 
   const container = document.getElementById('posts-container');
   if (!container) return;
-  // Mantém posts locais e adiciona os do banco no final
-  const existingLocal = container.querySelectorAll('.post.local-post');
+  container.querySelectorAll('.post').forEach(p => p.remove());
 
-  // Limpa posts de banco anteriores
-  container.querySelectorAll('.post:not(.local-post)').forEach(p => p.remove());
+  let myLikes = new Set();
+  if (ME?.id) {
+    const { data: lk } = await sb.from('post_likes').select('post_id').eq('user_id', ME.id);
+    lk?.forEach(l => myLikes.add(l.post_id));
+  }
 
   posts.forEach(post => {
     const author = post.author;
     const name = author?.full_name || author?.username || 'Usuário';
     const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const timeStr = timeAgo(post.created_at);
+    const cid = 'post-db-' + post.id;
+    const likes = post.likes || 0;
+    const commentCount = post.comments?.[0]?.count || 0;
+    const iLiked = myLikes.has(post.id);
     const div = document.createElement('div');
     div.className = 'post';
-    div.innerHTML = `
-      <div class="post-h">
-        <div class="av" style="width:40px;height:40px;background:var(--gl);color:var(--gd);font-size:13px;">
-          ${author?.avatar_url ? `<img src="${author.avatar_url}" alt="">` : initials}
-        </div>
-        <div style="flex:1;"><div style="font-size:14px;font-weight:800;">${name}</div><div style="font-size:11px;color:var(--t2);">${timeStr}</div></div>
-      </div>
-      ${post.image_url ? `<div class="post-img-preview"><img src="${post.image_url}" alt="" onclick="openImgFull(this)"></div>` : ''}
-      <div class="post-bod">${post.content}</div>
-      <div class="pa-row">
-        <button class="pa" onclick="togglePostLike(this,'${post.id}',${post.likes})">❤️ ${post.likes}</button>
-        <button class="pa" onclick="toggleComments(this,'post-db-${post.id}','${post.id}')">💬 0</button>
-      </div>
-      <div class="comments-section" id="post-db-${post.id}">
-        <div class="comment-list" id="clist-post-db-${post.id}"></div>
-        <div class="comment-input-row">
-          <input class="comment-inp" placeholder="Escreva um comentário..." id="cinp-post-db-${post.id}">
-          <button class="comment-send" onclick="submitComment('post-db-${post.id}','${post.id}')">➤</button>
-        </div>
-      </div>
-    `;
+    div.innerHTML =
+      '<div class="post-h">' +
+        '<div class="av" style="width:40px;height:40px;background:var(--gl);color:var(--gd);font-size:13px;">' +
+          (author?.avatar_url ? '<img src="' + author.avatar_url + '" alt="">' : initials) +
+        '</div>' +
+        '<div style="flex:1;">' +
+          '<div style="font-size:14px;font-weight:800;">' + name + '</div>' +
+          '<div style="font-size:11px;color:var(--t2);">' + timeAgo(post.created_at) + '</div>' +
+        '</div>' +
+      '</div>' +
+      (post.image_url ? '<div class="post-img-preview"><img src="' + post.image_url + '" alt="" onclick="openImgFull(this)"></div>' : '') +
+      '<div class="post-bod">' + post.content + '</div>' +
+      '<div class="pa-row">' +
+        '<button class="pa' + (iLiked ? ' liked' : '') + '" onclick="togglePostLike(this,\'' + post.id + '\',' + likes + ')">❤️ ' + likes + '</button>' +
+        '<button class="pa" onclick="toggleComments(this,\'' + cid + '\',\'' + post.id + '\')">💬 <span>' + commentCount + '</span></button>' +
+        '<button class="pa" onclick="navigator.clipboard?.writeText(window.location.href).then(()=>toast(\'Link copiado!\'))">↗️</button>' +
+      '</div>' +
+      '<div class="comments-section" id="' + cid + '">' +
+        '<div class="comment-list" id="clist-' + cid + '"></div>' +
+        '<div class="comment-input-row">' +
+          '<input class="comment-inp" placeholder="Escreva um comentário..." id="cinp-' + cid + '">' +
+          '<button class="comment-send" onclick="submitComment(\'' + cid + '\',\'' + post.id + '\')">➤</button>' +
+        '</div>' +
+      '</div>';
     container.appendChild(div);
   });
 }
@@ -2094,54 +2103,64 @@ async function submitPost() {
   const text = ta.value.trim();
   if (!text) { toast('Escreva algo para publicar!'); return; }
 
-  if (ME?.id) {
-    let imageUrl = null;
-    const imgInp = document.getElementById('post-img-inp');
-    if (imgInp.files[0]) {
-      const file = imgInp.files[0];
-      const path = `${ME.id}/${Date.now()}.${file.name.split('.').pop()}`;
-      const { data: up } = await sb.storage.from('post-images').upload(path, file, { contentType: file.type });
-      if (up) {
-        const { data: pu } = sb.storage.from('post-images').getPublicUrl(path);
-        imageUrl = pu?.publicUrl;
-      }
+  if (!ME?.id) { toast('Faça login para publicar!'); return; }
+
+  let imageUrl = null;
+  const imgInp = document.getElementById('post-img-inp');
+  if (imgInp.files[0]) {
+    const file = imgInp.files[0];
+    const path = ME.id + '/' + Date.now() + '.' + file.name.split('.').pop();
+    const { data: up, error: upErr } = await sb.storage.from('post-images').upload(path, file, { contentType: file.type });
+    if (up) {
+      const { data: pu } = sb.storage.from('post-images').getPublicUrl(path);
+      imageUrl = pu?.publicUrl;
     }
-    await sb.from('posts').insert({ author_id: ME.id, content: text, type: 'general', image_url: imageUrl });
+    if (upErr) console.warn('Upload erro:', upErr.message);
   }
 
-  // Adiciona localmente no topo
-  const now = new Date();
-  const timeStr = 'há alguns segundos';
-  const initials = (ME?.full_name || 'Você').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  const imgSrc = document.getElementById('post-img-prev').src;
-  const localCid = 'post-local-' + Date.now();
-  const newPost = document.createElement('div');
-  newPost.className = 'post local-post';
+  const { data: inserted, error: insertErr } = await sb.from('posts')
+    .insert({ author_id: ME.id, content: text, type: 'general', image_url: imageUrl })
+    .select('*,author:profiles(full_name,username,avatar_url)')
+    .single();
 
-  // Monta HTML sem template literals aninhados para evitar erro de sintaxe
-  let postHtml = '';
-  postHtml += '<div class="post-h">';
-  postHtml += '<div class="av" style="width:40px;height:40px;background:var(--y);color:var(--b);font-size:13px;">' + initials + '</div>';
-  postHtml += '<div style="flex:1;"><div style="font-size:14px;font-weight:800;">' + (ME?.full_name || 'Você') + ' <span class="tag tv" style="font-size:10px;margin-left:4px;">Novo</span></div>';
-  postHtml += '<div style="font-size:11px;color:var(--t2);">' + timeStr + '</div></div>';
-  postHtml += '</div>';
-  if (imgSrc && imgSrc !== '') {
-    postHtml += '<div class="post-img-preview"><img src="' + imgSrc + '" alt="" onclick="openImgFull(this)"></div>';
+  if (insertErr) {
+    toast('Erro ao publicar: ' + insertErr.message);
+    console.error('Insert post error:', insertErr);
+    return;
   }
-  postHtml += '<div class="post-bod">' + text + '</div>';
-  postHtml += '<div class="pa-row">';
-  postHtml += '<button class="pa" onclick="this.classList.toggle(&apos;liked&apos;);this.textContent=this.classList.contains(&apos;liked&apos;)?&apos;\u2764\uFE0F 1&apos;:&apos;\u2764\uFE0F 0&apos;">❤️ 0</button>';
-  postHtml += '<button class="pa" data-cid="' + localCid + '" onclick="toggleComments(this,this.dataset.cid,null)">\uD83D\uDCAC 0</button>';
-  postHtml += '</div>';
-  postHtml += '<div class="comments-section" id="' + localCid + '">';
-  postHtml += '<div class="comment-list" id="clist-' + localCid + '"></div>';
-  postHtml += '<div class="comment-input-row">';
-  postHtml += '<input class="comment-inp" placeholder="Escreva um coment\u00E1rio..." id="cinp-' + localCid + '">';
-  postHtml += '<button class="comment-send" data-cid="' + localCid + '" onclick="submitComment(this.dataset.cid,null)">\u27A4</button>';
-  postHtml += '</div></div>';
-  newPost.innerHTML = postHtml;
 
+  // Insere o novo post no topo da lista imediatamente (sem esperar reload)
   const container = document.getElementById('posts-container');
+  const cid = 'post-db-' + inserted.id;
+  const author = inserted.author;
+  const name = author?.full_name || author?.username || ME.full_name || 'Você';
+  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const newPost = document.createElement('div');
+  newPost.className = 'post';
+  newPost.innerHTML =
+    '<div class="post-h">' +
+      '<div class="av" style="width:40px;height:40px;background:var(--y);color:var(--b);font-size:13px;">' +
+        (author?.avatar_url ? '<img src="' + author.avatar_url + '" alt="">' : initials) +
+      '</div>' +
+      '<div style="flex:1;">' +
+        '<div style="font-size:14px;font-weight:800;">' + name + ' <span class="tag tv" style="font-size:10px;margin-left:4px;">Novo</span></div>' +
+        '<div style="font-size:11px;color:var(--t2);">agora mesmo</div>' +
+      '</div>' +
+    '</div>' +
+    (inserted.image_url ? '<div class="post-img-preview"><img src="' + inserted.image_url + '" alt="" onclick="openImgFull(this)"></div>' : '') +
+    '<div class="post-bod">' + inserted.content + '</div>' +
+    '<div class="pa-row">' +
+      '<button class="pa" onclick="togglePostLike(this,\'' + inserted.id + '\',0)">❤️ 0</button>' +
+      '<button class="pa" onclick="toggleComments(this,\'' + cid + '\',\'' + inserted.id + '\')">💬 0</button>' +
+      '<button class="pa" onclick="navigator.clipboard?.writeText(window.location.href).then(()=>toast(\'Link copiado!\'))">↗️</button>' +
+    '</div>' +
+    '<div class="comments-section" id="' + cid + '">' +
+      '<div class="comment-list" id="clist-' + cid + '"></div>' +
+      '<div class="comment-input-row">' +
+        '<input class="comment-inp" placeholder="Escreva um comentário..." id="cinp-' + cid + '">' +
+        '<button class="comment-send" onclick="submitComment(\'' + cid + '\',\'' + inserted.id + '\')">➤</button>' +
+      '</div>' +
+    '</div>';
   container.insertBefore(newPost, container.firstChild);
 
   ta.value = '';
@@ -3040,46 +3059,7 @@ showSub = function(id, btn) {
 };
 
 // Atualizar loadPosts para incluir botão de comentários real
-const _origLoadPosts = loadPosts;
-loadPosts = async function() {
-  const { data: posts } = await sb.from('posts')
-    .select('*,author:profiles(full_name,username,avatar_url)')
-    .order('created_at', { ascending: false }).limit(20);
-  if (!posts) return;
-  const container = document.getElementById('posts-container');
-  if (!container) return;
-  container.querySelectorAll('.post:not(.local-post)').forEach(p => p.remove());
-  posts.forEach(post => {
-    const author = post.author;
-    const name = author?.full_name || author?.username || 'Usuário';
-    const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const timeStr = timeAgo(post.created_at);
-    const cid = 'post-db-' + post.id;
-    const div = document.createElement('div');
-    div.className = 'post';
-    div.innerHTML = `
-      <div class="post-h">
-        <div class="av" style="width:40px;height:40px;background:var(--gl);color:var(--gd);font-size:13px;">
-          ${author?.avatar_url ? `<img src="${author.avatar_url}" alt="">` : initials}
-        </div>
-        <div style="flex:1;"><div style="font-size:14px;font-weight:800;">${name}</div><div style="font-size:11px;color:var(--t2);">${timeStr}</div></div>
-      </div>
-      ${post.image_url ? `<div class="post-img-preview"><img src="${post.image_url}" alt="" onclick="openImgFull(this)"></div>` : ''}
-      <div class="post-bod">${post.content}</div>
-      <div class="pa-row">
-        <button class="pa" onclick="togglePostLike(this,'${post.id}',${post.likes})">❤️ ${post.likes}</button>
-        <button class="pa" onclick="toggleComments(this,'${cid}','${post.id}')">💬 ${post.comment_count||0}</button>
-      </div>
-      <div class="comments-section" id="${cid}">
-        <div class="comment-list" id="clist-${cid}"></div>
-        <div class="comment-input-row">
-          <input class="comment-inp" placeholder="Escreva um comentário..." id="cinp-${cid}">
-          <button class="comment-send" onclick="submitComment('${cid}','${post.id}')">➤</button>
-        </div>
-      </div>`;
-    container.appendChild(div);
-  });
-};
+// loadPosts já definido acima — sem override necessário
 
 window.addEventListener('DOMContentLoaded', boot);
 </script>
