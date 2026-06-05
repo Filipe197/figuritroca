@@ -925,11 +925,12 @@ async function loadMatches(){
 
 async function proposeTradeDB(receiverId,stickerGive,stickerGet,receiverName){
   if(!ME?.id){toast('Faça login para propor trocas!');return;}
-  const{data:album}=await sb.from('albums').select('id').eq('active',true).limit(1);
-  const albumId=album?.[0]?.id;
-  if(!albumId){toast('Álbum não encontrado.');return;}
-  const{error}=await sb.from('trades').insert({proposer_id:ME.id,receiver_id:receiverId,album_id:albumId,sticker_give:parseInt(stickerGive),sticker_get:parseInt(stickerGet),status:'pending'});
-  if(error){toast('Erro: '+error.message);return;}
+  let albumId=null;
+  try{const{data:album}=await sb.from('albums').select('id').eq('active',true).limit(1);albumId=album?.[0]?.id||null;}catch(e){albumId=null;}
+  const payload={proposer_id:ME.id,receiver_id:receiverId,sticker_give:parseInt(stickerGive),sticker_get:parseInt(stickerGet),status:'pending'};
+  if(albumId)payload.album_id=albumId;
+  const{error}=await sb.from('trades').insert(payload);
+  if(error){toast('Erro ao propor troca: '+error.message);return;}
   toast('Proposta enviada para '+receiverName+'! 🤝');
   await loadTrades();
 }
@@ -945,10 +946,10 @@ async function sendTradeFromModal(){
   if(!give||!get){toast('Informe os números das figurinhas!');return;}
   if(!receiverVal){toast('Informe o nome de usuário!');return;}
   let found=null;
-  // Busca por username exato (case insensitive)
+  // Busca por username exato
   const{data:r1}=await sb.from('profiles').select('id,full_name,username').ilike('username',receiverVal).limit(1);
   if(r1?.length)found=r1[0];
-  // Fallback: busca por email
+  // Fallback: busca por email (requer coluna email na tabela profiles)
   if(!found){
     const{data:r2}=await sb.from('profiles').select('id,full_name,username').ilike('email',receiverVal).limit(1);
     if(r2?.length)found=r2[0];
@@ -958,7 +959,7 @@ async function sendTradeFromModal(){
     const{data:r3}=await sb.from('profiles').select('id,full_name,username').ilike('full_name','%'+receiverVal+'%').limit(1);
     if(r3?.length)found=r3[0];
   }
-  if(!found){toast('Usuário "'+receiverVal+'" não encontrado. Use o @username ou e-mail cadastrado.');return;}
+  if(!found){toast('Usuário "'+receiverVal+'" não encontrado. Use @username ou e-mail.');return;}
   if(found.id===ME.id){toast('Você não pode propor troca para si mesmo!');return;}
   await proposeTradeDB(found.id,give,get,found.full_name||found.username);
   closeModal('modal-troca');
