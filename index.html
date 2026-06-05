@@ -10,6 +10,7 @@
 <meta name="description" content="Trocas de figurinhas Copa 2026">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23009C3B'/%3E%3Cpolygon points='16,3 29,10 29,22 16,29 3,22 3,10' fill='%23FFDF00'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23002776'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -152,8 +153,8 @@ input,textarea{font-family:var(--font);}
 .fc.on{background:var(--g);color:#fff;border-color:var(--g);}
 .tc{padding:14px;border-bottom:0.5px solid var(--border);}
 .tc:last-child{border-bottom:none;}
-.swapa{display:flex;align-items:center;justify-content:center;gap:14px;padding:12px;background:var(--f0);border-radius:var(--rsm);margin:10px 0;}
-.sbig{width:54px;height:54px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;border:0.5px solid var(--border);}
+.swapa{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;background:var(--f0);border-radius:var(--rsm);margin:10px 0;}
+.sbig{width:72px;min-height:64px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:20px;font-weight:800;border:0.5px solid var(--border);padding:8px 6px;gap:2px;}
 .sg-give{background:var(--gl);color:var(--gd);border-color:rgba(0,156,59,.2);}
 .sg-get{background:var(--redl);color:var(--red);border-color:rgba(229,57,53,.15);}
 .ta-row{display:flex;gap:8px;}
@@ -925,12 +926,11 @@ async function loadMatches(){
 
 async function proposeTradeDB(receiverId,stickerGive,stickerGet,receiverName){
   if(!ME?.id){toast('Faça login para propor trocas!');return;}
-  let albumId=null;
-  try{const{data:album}=await sb.from('albums').select('id').eq('active',true).limit(1);albumId=album?.[0]?.id||null;}catch(e){albumId=null;}
-  const payload={proposer_id:ME.id,receiver_id:receiverId,sticker_give:parseInt(stickerGive),sticker_get:parseInt(stickerGet),status:'pending'};
-  if(albumId)payload.album_id=albumId;
-  const{error}=await sb.from('trades').insert(payload);
-  if(error){toast('Erro ao propor troca: '+error.message);return;}
+  const{data:album}=await sb.from('albums').select('id').eq('active',true).limit(1);
+  const albumId=album?.[0]?.id;
+  if(!albumId){toast('Álbum não encontrado.');return;}
+  const{error}=await sb.from('trades').insert({proposer_id:ME.id,receiver_id:receiverId,album_id:albumId,sticker_give:parseInt(stickerGive),sticker_get:parseInt(stickerGet),status:'pending'});
+  if(error){toast('Erro: '+error.message);return;}
   toast('Proposta enviada para '+receiverName+'! 🤝');
   await loadTrades();
 }
@@ -946,20 +946,15 @@ async function sendTradeFromModal(){
   if(!give||!get){toast('Informe os números das figurinhas!');return;}
   if(!receiverVal){toast('Informe o nome de usuário!');return;}
   let found=null;
-  // Busca por username exato
+  // Busca por username exato (case insensitive)
   const{data:r1}=await sb.from('profiles').select('id,full_name,username').ilike('username',receiverVal).limit(1);
   if(r1?.length)found=r1[0];
-  // Fallback: busca por email (requer coluna email na tabela profiles)
-  if(!found){
-    const{data:r2}=await sb.from('profiles').select('id,full_name,username').ilike('email',receiverVal).limit(1);
-    if(r2?.length)found=r2[0];
-  }
   // Fallback: busca por nome completo
   if(!found){
-    const{data:r3}=await sb.from('profiles').select('id,full_name,username').ilike('full_name','%'+receiverVal+'%').limit(1);
-    if(r3?.length)found=r3[0];
+    const{data:r2}=await sb.from('profiles').select('id,full_name,username').ilike('full_name','%'+receiverVal+'%').limit(1);
+    if(r2?.length)found=r2[0];
   }
-  if(!found){toast('Usuário "'+receiverVal+'" não encontrado. Use @username ou e-mail.');return;}
+  if(!found){toast('Usuário "'+receiverVal+'" não encontrado.');return;}
   if(found.id===ME.id){toast('Você não pode propor troca para si mesmo!');return;}
   await proposeTradeDB(found.id,give,get,found.full_name||found.username);
   closeModal('modal-troca');
@@ -994,7 +989,7 @@ async function loadTrades(){
       const ini=otherName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
       const div=document.createElement('div');div.className='tc';
       div.innerHTML='<div class="rsb" style="margin-bottom:8px;"><div class="row"><div class="av" style="width:32px;height:32px;background:var(--gl);color:var(--gd);font-size:11px;">'+ini+'</div><div style="font-size:14px;font-weight:800;margin-left:4px;">'+otherName+'</div></div><span class="tag '+tagCls+'" style="font-size:10px;">'+(sMap[t.status]||t.status)+'</span></div>'
-        +'<div class="swapa"><div class="sbig sg-give"><div style="font-size:11px;color:var(--t2);margin-bottom:2px;">Dou</div>'+myS.toString().padStart(3,'0')+'</div><div style="font-size:20px;">⇄</div><div class="sbig sg-get"><div style="font-size:11px;color:var(--t2);margin-bottom:2px;">Recebo</div>'+theirS.toString().padStart(3,'0')+'</div></div>'
+        +'<div class="swapa"><div class="sbig sg-give"><span style="font-size:10px;font-weight:700;opacity:.7;">Dou</span><span>'+myS.toString().padStart(3,'0')+'</span></div><div style="font-size:18px;">⇄</div><div class="sbig sg-get"><span style="font-size:10px;font-weight:700;opacity:.7;">Recebo</span><span>'+theirS.toString().padStart(3,'0')+'</span></div></div>'
         +(t.status==='pending'&&!isP?'<div class="ta-row"><button class="btn bv" style="flex:1;" onclick="respondTrade(\''+t.id+'\',\'accepted\')">Aceitar ✓</button><button class="btn bo" style="flex:1;" onclick="respondTrade(\''+t.id+'\',\'rejected\')">Recusar</button></div>':'')
         +(t.status==='accepted'?'<button class="btn bv" style="width:100%;" onclick="completeTrade(\''+t.id+'\')">✅ Marcar como concluída</button>':'');
       container.appendChild(div);
