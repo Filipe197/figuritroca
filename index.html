@@ -948,12 +948,17 @@ async function sendTradeFromModal(){
   // Busca por username exato (case insensitive)
   const{data:r1}=await sb.from('profiles').select('id,full_name,username').ilike('username',receiverVal).limit(1);
   if(r1?.length)found=r1[0];
-  // Fallback: busca por nome completo
+  // Fallback: busca por email
   if(!found){
-    const{data:r2}=await sb.from('profiles').select('id,full_name,username').ilike('full_name','%'+receiverVal+'%').limit(1);
+    const{data:r2}=await sb.from('profiles').select('id,full_name,username').ilike('email',receiverVal).limit(1);
     if(r2?.length)found=r2[0];
   }
-  if(!found){toast('Usuário "'+receiverVal+'" não encontrado.');return;}
+  // Fallback: busca por nome completo
+  if(!found){
+    const{data:r3}=await sb.from('profiles').select('id,full_name,username').ilike('full_name','%'+receiverVal+'%').limit(1);
+    if(r3?.length)found=r3[0];
+  }
+  if(!found){toast('Usuário "'+receiverVal+'" não encontrado. Use o @username ou e-mail cadastrado.');return;}
   if(found.id===ME.id){toast('Você não pode propor troca para si mesmo!');return;}
   await proposeTradeDB(found.id,give,get,found.full_name||found.username);
   closeModal('modal-troca');
