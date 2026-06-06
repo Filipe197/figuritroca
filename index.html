@@ -13,6 +13,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <title>FiguriTroca</title>
 <style>
 /* ======================================================
@@ -265,6 +267,14 @@ input,textarea{font-family:var(--font);}
 .map-filt{position:absolute;top:8px;left:8px;display:flex;gap:6px;}
 .mfb{background:rgba(255,255,255,.92);border:0.5px solid var(--border);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:800;cursor:pointer;color:var(--t0);}
 .mfb.on{background:var(--g);color:#fff;border-color:var(--g);}
+#leaflet-map{height:100%;width:100%;z-index:1;}
+.map-filt{position:absolute;top:8px;left:8px;display:flex;gap:6px;z-index:1000;}
+.leaflet-popup-content-wrapper{border-radius:10px!important;font-family:'Nunito',sans-serif!important;padding:0!important;}
+.leaflet-popup-content{margin:0!important;padding:10px 14px!important;font-size:13px!important;min-width:160px;}
+.l-popup-name{font-weight:800;font-size:13px;margin-bottom:3px;}
+.l-popup-meta{font-size:11px;color:#9A9A95;margin-top:2px;}
+.l-popup-btn{margin-top:8px;width:100%;padding:7px;background:#009C3B;color:#fff;border:none;border-radius:7px;font-weight:800;font-size:12px;cursor:pointer;}
+.leaflet-control-zoom{display:none!important;}
 .map-zc{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;background:#fff;border-radius:8px;border:0.5px solid var(--border);overflow:hidden;}
 .mzb{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:18px;border:none;background:none;color:var(--t0);}
 .mzb:first-child{border-bottom:0.5px solid var(--border);}
@@ -288,8 +298,8 @@ input,textarea{font-family:var(--font);}
 .fc.on{background:var(--g);color:#fff;border-color:var(--g);}
 .tc{padding:14px;border-bottom:0.5px solid var(--border);}
 .tc:last-child{border-bottom:none;}
-.swapa{display:flex;align-items:center;justify-content:center;gap:14px;padding:12px;background:var(--f0);border-radius:var(--rsm);margin:10px 0;}
-.sbig{width:54px;height:54px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;border:0.5px solid var(--border);}
+.swapa{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:var(--f0);border-radius:var(--rsm);margin:10px 0;overflow:hidden;}
+.sbig{width:64px;min-height:58px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:18px;font-weight:800;border:0.5px solid var(--border);padding:6px 4px;gap:2px;}
 .sg-give{background:var(--gl);color:var(--gd);border-color:rgba(0,156,59,.2);}
 .sg-get{background:var(--redl);color:var(--red);border-color:rgba(229,57,53,.15);}
 .ta-row{display:flex;gap:8px;}
@@ -372,7 +382,7 @@ input,textarea{font-family:var(--font);}
   display:flex;align-items:center;gap:10px;flex-shrink:0;
 }
 .cback{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.15);border:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;}
-.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:0;}.msgs::before{content:"";flex:1;min-height:10px;}.msgs::before{content:"";flex:1;}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:0;}.msgs::before{content:'';flex:1;min-height:10px;}
 .mo{display:flex;justify-content:flex-end;}
 .mi2{display:flex;justify-content:flex-start;align-items:flex-end;gap:6px;}
 .bub{padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.5;max-width:78%;}
@@ -652,7 +662,7 @@ input,textarea{font-family:var(--font);}
         <div class="hero-sub">Você tem <strong>3 matches</strong> novos e um evento em 6 dias!</div>
         <div class="hero-btns">
           <button class="btn ba" onclick="goTo('trocas')">✦ Ver matches</button>
-          <button class="btn bgh" onclick="goTo('perfil')">Meu álbum</button>
+          <button class="btn bgh" onclick="goTo('album')">📒 Meu álbum</button>
         </div>
       </div>
       <div class="hero-stripe"><div class="hs-g"></div><div class="hs-y"></div><div class="hs-b"></div></div>
@@ -701,74 +711,18 @@ input,textarea{font-family:var(--font);}
 
     <!-- ===== PONTOS ===== -->
     <div class="page" id="page-pontos">
-      <div id="map-cont">
-        <div class="map-bg"></div>
-        <div class="map-road-h" style="top:40%;"></div>
-        <div class="map-road-h" style="top:70%;"></div>
-        <div class="map-road-v" style="left:35%;"></div>
-        <div class="map-road-v" style="left:65%;"></div>
-        <div class="map-pin" style="top:42%;left:38%;" onclick="toast('Parque da Cidade — 34 confirmados')">
-          <div class="pin-lbl" style="background:var(--g);">Parque da Cidade</div>
-          <div class="pin-dot" style="background:var(--g);"></div>
-        </div>
-        <div class="map-pin" style="top:36%;left:64%;" onclick="toast('Livraria Cultura — 8 confirmados')">
-          <div class="pin-lbl" style="background:var(--yd);">Livraria Cultura</div>
-          <div class="pin-dot" style="background:var(--yd);"></div>
-        </div>
-        <div class="map-pin" style="top:68%;left:30%;" onclick="toast('Shopping RioMar — 21 confirmados')">
-          <div class="pin-lbl" style="background:var(--g);">Shopping RioMar</div>
-          <div class="pin-dot" style="background:var(--g);"></div>
-        </div>
-        <div class="map-leg">
-          <div class="row" style="gap:5px;"><div style="width:9px;height:9px;border-radius:50%;background:var(--g);flex-shrink:0;"></div><span style="font-size:10px;font-weight:800;">Evento</span></div>
-          <div class="row" style="gap:5px;"><div style="width:9px;height:9px;border-radius:50%;background:var(--yd);flex-shrink:0;"></div><span style="font-size:10px;font-weight:800;">Informal</span></div>
-        </div>
-        <div class="map-filt">
-          <button class="mfb on">Todos</button>
-          <button class="mfb" onclick="toast('Localizando...')">Perto de mim</button>
-        </div>
-        <div class="map-zc">
-          <button class="mzb">+</button>
-          <button class="mzb">−</button>
+      <div id="map-cont" style="height:260px;position:relative;border-bottom:0.5px solid var(--border);">
+        <div id="leaflet-map" style="height:100%;width:100%;z-index:1;"></div>
+        <div class="map-filt" style="position:absolute;top:8px;left:8px;display:flex;gap:6px;z-index:1000;">
+          <button class="mfb on" onclick="mapFilterAll(this)">Todos</button>
+          <button class="mfb" onclick="mapFilterNearby(this)">📍 Perto de mim</button>
         </div>
       </div>
       <div class="rsb" style="padding:12px 16px;border-bottom:0.5px solid var(--border);">
-        <span style="font-size:15px;font-weight:800;">4 pontos encontrados</span>
+        <span style="font-size:15px;font-weight:800;" id="pontos-count">Carregando...</span>
         <button class="btn bv bsm" onclick="openModal('modal-ponto')">+ Cadastrar</button>
       </div>
-      <div id="pontos-list">
-        <div class="card" style="margin:12px 16px;">
-          <div class="pc">
-            <div class="pi">🌳</div>
-            <div style="flex:1;">
-              <div class="rsb"><div style="font-size:15px;font-weight:800;">Parque da Cidade</div><span class="tag tv">Evento</span></div>
-              <div style="font-size:12px;color:var(--t2);margin-top:2px;">Recife, PE · 1º sáb. do mês · 9h–13h</div>
-              <div class="rsb" style="margin-top:8px;">
-                <div class="row" style="gap:5px;">
-                  <div class="avmini"><div class="avm" style="background:var(--gl);color:var(--gd);">CS</div><div class="avm" style="background:var(--bl);color:var(--b);">AP</div><div class="avm" style="background:var(--yl);color:var(--yd);">JM</div></div>
-                  <span style="font-size:12px;color:var(--t2);" id="c1-count">34</span>
-                </div>
-                <button class="cbtn" id="c1-btn" onclick="toggleConfirm('c1')">Confirmar</button>
-              </div>
-            </div>
-          </div>
-          <div class="pc">
-            <div class="pi am">📚</div>
-            <div style="flex:1;">
-              <div class="rsb"><div style="font-size:15px;font-weight:800;">Livraria Cultura</div><span class="tag ta">Informal</span></div>
-              <div style="font-size:12px;color:var(--t2);margin-top:2px;">Shopping Recife · Sáb. 10h–13h</div>
-              <div class="rsb" style="margin-top:8px;">
-                <div class="row" style="gap:5px;">
-                  <div class="avmini"><div class="avm" style="background:var(--gl);color:var(--gd);">RF</div><div class="avm" style="background:var(--yl);color:var(--yd);">LM</div></div>
-                  <span style="font-size:12px;color:var(--t2);" id="c2-count">8</span>
-                </div>
-                <button class="cbtn" id="c2-btn" onclick="toggleConfirm('c2')">Confirmar</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <div id="pontos-list"><div style="padding:30px;text-align:center;color:var(--t2);">Carregando pontos...</div></div>
 
     <!-- ===== TROCAS ===== -->
     <div class="page" id="page-trocas">
@@ -1066,7 +1020,7 @@ input,textarea{font-family:var(--font);}
   <!-- BOTTOM NAV -->
   <nav id="bnav">
     <button class="ni on" id="ni-home" onclick="goTo('home')"><span class="ni-ic">🏠</span><span>Início</span></button>
-    <button class="ni" id="ni-album" onclick="goTo('album')"><span class="ni-ic">📒</span><span>Álbum</span></button>
+    <button class="ni" id="ni-pontos" onclick="goTo('pontos')"><span class="ni-ic">📍</span><span>Pontos</span></button>
     <button class="ni" id="ni-trocas" onclick="goTo('trocas')"><span class="ni-ic">🔄</span><span>Trocas</span><span class="ni-badge">3</span></button>
     <button class="ni" id="ni-comunidade" onclick="goTo('comunidade')"><span class="ni-ic">👥</span><span>Comunidade</span></button>
     <button class="ni" id="ni-chat" onclick="goTo('chat')"><span class="ni-ic">💬</span><span>Chat</span><span class="ni-badge" id="chat-badge">9</span></button>
@@ -1884,116 +1838,7 @@ function timeAgo(dateStr) {
 // ============================================================
 // NAVIGATION
 // ============================================================
-function goTo(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
-  document.getElementById('page-' + page).classList.add('on');
-  document.getElementById('ni-' + page).classList.add('on');
-}
-
-// ============================================================
-// SUBTABS COMUNIDADE
-// ============================================================
-function showSub(id, btn) {
-  document.querySelectorAll('.ss').forEach(s => s.classList.remove('on'));
-  document.querySelectorAll('.stab').forEach(b => b.classList.remove('on'));
-  document.getElementById('sub-' + id).classList.add('on');
-  btn.classList.add('on');
-}
-
-// ============================================================
-// EMOJI PICKER
-// ============================================================
-const EMOJI_CATS = {
-  '😊': ['😀','😁','😂','🤣','😊','😍','🥰','😘','😎','🤩','😅','😆','🙂','🙃','😉','😋','🥳','🤗','😏','😐','😑','😶','🤔','😮','😯','😲','🥺','😢','😭','😤','😠','😡','🤬','🤯','😱','😨','😰','😴','🥱'],
-  '🏆': ['⚽','🏆','🎖️','🥇','🥈','🥉','🎯','🎪','🎨','🃏','🎴','🀄','🎲','🎭','🎬','🎤','🎵','🎶','🎸','🥁','🎺','🎻','🎹'],
-  '🇧🇷': ['🇧🇷','🇦🇷','🇵🇹','🇫🇷','🇩🇪','🇪🇸','🏴󠁧󠁢󠁥󠁮󠁧󠁿','🇮🇹','🇺🇸','🇲🇽','🇳🇱','🇧🇪','🇨🇷','🇯🇵','🇰🇷','🇦🇺','🇲🇦','🇸🇳'],
-  '👍': ['👍','👎','👏','🙌','🤝','✌️','🤞','🤟','🤙','👋','🤚','✋','🖐️','👌','🤌','💪','🦵','🦶','👀','💀','❤️','🧡','💛','💚','💙','💜','🖤','❤️‍🔥'],
-  '🌟': ['⭐','🌟','✨','💫','🔥','❄️','🌈','⚡','🌊','🌸','🌺','🌻','🍀','🏠','🏟️','🎭','🌍','🗺️','📍','💎','🎁','🎉','🎊']
-};
-
-function buildEmojiPicker() {
-  const cats = document.getElementById('ep-cats');
-  const grid = document.getElementById('ep-grid');
-  cats.innerHTML = '';
-  const catKeys = Object.keys(EMOJI_CATS);
-  catKeys.forEach((cat, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'epc' + (i === 0 ? ' on' : '');
-    btn.textContent = cat;
-    btn.onclick = () => {
-      document.querySelectorAll('.epc').forEach(b => b.classList.remove('on'));
-      btn.classList.add('on');
-      renderEmojis(cat);
-    };
-    cats.appendChild(btn);
-  });
-  renderEmojis(catKeys[0]);
-}
-
-function renderEmojis(cat) {
-  const grid = document.getElementById('ep-grid');
-  grid.innerHTML = '';
-  EMOJI_CATS[cat].forEach(em => {
-    const btn = document.createElement('button');
-    btn.className = 'emo';
-    btn.textContent = em;
-    btn.onclick = () => insertEmoji(em);
-    grid.appendChild(btn);
-  });
-}
-
-function toggleEmojiPicker() {
-  const ep = document.getElementById('emoji-picker');
-  const btn = document.getElementById('emoji-btn');
-  if (!ep.classList.contains('on')) {
-    buildEmojiPicker();
-    ep.classList.add('on');
-    btn.classList.add('on');
-  } else {
-    ep.classList.remove('on');
-    btn.classList.remove('on');
-  }
-}
-
-function insertEmoji(em) {
-  const inp = document.getElementById('ci-inp');
-  const start = inp.selectionStart;
-  const val = inp.value;
-  inp.value = val.slice(0, start) + em + val.slice(inp.selectionEnd);
-  inp.selectionStart = inp.selectionEnd = start + em.length;
-  inp.focus();
-  autoResize(inp);
-}
-
-// ============================================================
-// CHAT — IMAGEM
-// ============================================================
-function triggerChatImg() { document.getElementById('chat-img-inp').click(); }
-function handleChatImg(input) {
-  const file = input.files[0];
-  if (!file) return;
-  if (file.size > 5 * 1024 * 1024) { toast('Imagem muito grande. Máx 5MB.'); return; }
-  const reader = new FileReader();
-  reader.onload = e => {
-    pendingChatImg = { file, dataUrl: e.target.result };
-    const wrap = document.getElementById('chat-img-wrap');
-    const prev = document.getElementById('chat-img-prev');
-    prev.src = e.target.result;
-    wrap.classList.add('on');
-  };
-  reader.readAsDataURL(file);
-}
-function clearChatImg() {
-  pendingChatImg = null;
-  document.getElementById('chat-img-wrap').classList.remove('on');
-  document.getElementById('chat-img-prev').src = '';
-  document.getElementById('chat-img-inp').value = '';
-}
-
-// ============================================================
-// CHAT — ENVIAR MENSAGEM
-// ============================================================
+/* goTo — versão unificada definida abaixo */
 async function sendMsg() {
   const inp = document.getElementById('ci-inp');
   const text = inp.value.trim();
@@ -2453,7 +2298,7 @@ async function loadComments(postId, containerId) {
   }
 
   const { data: comments } = await sb.from('post_comments')
-    .select('*,author:profiles(full_name,username,avatar_url)')
+    .select('*,author:profiles!post_comments_author_id_fkey(full_name,username,avatar_url)')
     .eq('post_id', postId)
     .order('created_at', { ascending: true })
     .limit(50);
@@ -2695,34 +2540,185 @@ async function openGroupChat(convId, name, emoji) {
 }
 
 // ============================================================
-// NAVEGAÇÃO — versão unificada (sem overrides)
+// LEAFLET MAP
 // ============================================================
-function goTo(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
-  document.getElementById('page-'+page)?.classList.add('on');
-  document.getElementById('ni-'+page)?.classList.add('on');
-  if(page==='album') loadAlbum();
-  if(page==='pontos'){initMap();setTimeout(()=>{_map?.invalidateSize();loadMeetPoints();},150);}
-  if(page==='chat'&&!document.getElementById('chatconv')?.classList.contains('on')) loadChatList();
+let _map=null,_markers=[],_userMarker=null,_userLat=null,_userLng=null,_geoSortActive=false;
+
+function initMap(){
+  if(_map){setTimeout(()=>{try{_map.invalidateSize();}catch(e){}},100);return;}
+  const el=document.getElementById('leaflet-map');if(!el)return;
+  _map=L.map('leaflet-map',{zoomControl:true,attributionControl:false,scrollWheelZoom:true}).setView([-8.0576,-34.8829],11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(_map);
+  setTimeout(()=>{try{_map.invalidateSize();}catch(e){}},300);
+}
+function getMarkerIcon(type){
+  const color=type==='event'?'#009C3B':'#C9A800';
+  return L.divIcon({html:'<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42"><path d="M16 0C7.2 0 0 7.2 0 16c0 10.9 14.4 24.8 15 25.4a1.4 1.4 0 0 0 2 0C17.6 40.8 32 26.9 32 16 32 7.2 24.8 0 16 0z" fill="'+color+'"/><circle cx="16" cy="16" r="7" fill="white"/></svg>',iconSize:[32,42],iconAnchor:[16,42],popupAnchor:[0,-44],className:''});
+}
+function distKm(lat1,lng1,lat2,lng2){const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lng2-lng1)*Math.PI/180,a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+function mapFilterAll(btn){_geoSortActive=false;_userLat=null;_userLng=null;if(_userMarker){_userMarker.remove();_userMarker=null;}document.querySelectorAll('.mfb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');loadMeetPoints();}
+function mapFilterNearby(btn){
+  if(!navigator.geolocation){toast('Geolocalização não suportada.');return;}
+  const orig=btn.textContent;btn.textContent='⏳ Localizando...';btn.disabled=true;
+  navigator.geolocation.getCurrentPosition(pos=>{
+    _userLat=pos.coords.latitude;_userLng=pos.coords.longitude;_geoSortActive=true;
+    btn.textContent=orig;btn.disabled=false;
+    document.querySelectorAll('.mfb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+    if(_map)_map.setView([_userLat,_userLng],13);
+    if(_userMarker)_userMarker.remove();
+    _userMarker=L.marker([_userLat,_userLng],{icon:L.divIcon({html:'<div style="width:16px;height:16px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 3px rgba(26,115,232,.3);"></div>',iconSize:[16,16],iconAnchor:[8,8],className:''})}).addTo(_map).bindPopup('<b>📍 Você está aqui</b>');
+    toast('📍 Mostrando pontos mais próximos!');loadMeetPoints();
+  },err=>{btn.textContent=orig;btn.disabled=false;const msgs={1:'Permissão negada.',2:'Não foi possível obter localização.',3:'Tempo esgotado.'};toast(msgs[err.code]||'Erro.');},{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+}
+function scrollToPoint(id){const el=document.getElementById('point-card-'+id);if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='2px solid var(--g)';setTimeout(()=>el.style.outline='',2000);}}
+function flyToPoint(lat,lng){if(_map&&lat&&lng)_map.flyTo([parseFloat(lat),parseFloat(lng)],16,{animate:true,duration:1});}
+
+async function loadMeetPoints(){
+  initMap();
+  const list=document.getElementById('pontos-list'),countEl=document.getElementById('pontos-count');
+  if(list)list.innerHTML='<div style="padding:20px;text-align:center;color:var(--t2);font-size:13px;">Carregando pontos...</div>';
+  const{data:points,error}=await sb.from('meet_points').select('*,confirmations:meet_confirmations(count)').eq('active',true).order('created_at',{ascending:false});
+  if(error||!points){if(list)list.innerHTML='<div style="padding:20px;text-align:center;color:var(--red);">Erro ao carregar.</div>';return;}
+  let sorted=points.map(p=>({...p,_dist:(_geoSortActive&&_userLat!==null&&p.lat&&p.lng)?distKm(_userLat,_userLng,parseFloat(p.lat),parseFloat(p.lng)):null}));
+  if(_geoSortActive)sorted.sort((a,b)=>(a._dist??9e9)-(b._dist??9e9));
+  const countTxt=sorted.length+' ponto'+(sorted.length!==1?'s':'')+' encontrado'+(sorted.length!==1?'s':'');
+  if(countEl)countEl.textContent=countTxt;
+  else{const rsb=document.querySelector('#page-pontos .rsb span');if(rsb)rsb.textContent=countTxt;}
+  _markers.forEach(m=>m.remove());_markers=[];
+  sorted.forEach(p=>{
+    if(!p.lat||!p.lng)return;
+    const cnt=p.confirmations?.[0]?.count||0,dist=(_geoSortActive&&p._dist!==null)?(p._dist<1?Math.round(p._dist*1000)+'m de você':p._dist.toFixed(1)+'km de você'):'';
+    const m=L.marker([parseFloat(p.lat),parseFloat(p.lng)],{icon:getMarkerIcon(p.type)});
+    m.bindPopup('<div class="l-popup-name">'+p.name+'</div><div class="l-popup-meta">'+p.city+(p.state?', '+p.state:'')+(p.schedule?' · '+p.schedule:'')+'</div><div class="l-popup-meta">✓ '+cnt+' confirmado'+(cnt!==1?'s':'')+'</div>'+(dist?'<div class="l-popup-meta">📍 '+dist+'</div>':'')+'<button class="l-popup-btn" onclick="scrollToPoint(\''+p.id+'\')">Ver detalhes</button>',{maxWidth:220});
+    m.addTo(_map);_markers.push(m);
+  });
+  const wc=sorted.filter(p=>p.lat&&p.lng);
+  if(wc.length===1)_map.setView([parseFloat(wc[0].lat),parseFloat(wc[0].lng)],14);
+  else if(wc.length>1)_map.fitBounds(L.latLngBounds(wc.map(p=>[parseFloat(p.lat),parseFloat(p.lng)])),{padding:[40,40]});
+  if(!list)return;
+  if(!sorted.length){list.innerHTML='<div style="padding:24px;text-align:center;color:var(--t2);">Nenhum ponto cadastrado ainda.<br><strong>Seja o primeiro! 📍</strong></div>';return;}
+  list.innerHTML='';
+  let myConf=new Set();
+  if(ME?.id){const{data:mc}=await sb.from('meet_confirmations').select('point_id').eq('user_id',ME.id);mc?.forEach(c=>myConf.add(c.point_id));}
+  sorted.forEach(p=>{
+    const cnt=p.confirmations?.[0]?.count||0,ti=p.type==='event'?'🎪':'📍',tt=p.type==='event'?'<span class="tag tv">Evento</span>':'<span class="tag ta">Informal</span>',ic=myConf.has(p.id),ds=p._dist!==null?(p._dist<1?' · '+Math.round(p._dist*1000)+'m':' · '+p._dist.toFixed(1)+'km'):'';
+    const card=document.createElement('div');card.className='card';card.style.margin='12px 16px';card.id='point-card-'+p.id;
+    card.innerHTML='<div class="pc"><div class="pi '+(p.type!=='event'?'am':'')+'" style="cursor:pointer;" onclick="flyToPoint('+p.lat+','+p.lng+')">'+ti+'</div><div style="flex:1;"><div class="rsb"><div style="font-size:15px;font-weight:800;">'+p.name+'</div>'+tt+'</div><div style="font-size:12px;color:var(--t2);margin-top:2px;">'+p.city+(p.state?', '+p.state:'')+ds+(p.schedule?' · '+p.schedule:'')+'</div>'+(p.address?'<div style="font-size:11px;color:var(--t2);margin-top:1px;">📌 '+p.address+'</div>':'')+'<div class="rsb" style="margin-top:8px;"><span style="font-size:12px;font-weight:700;color:var(--g);" id="ccount-'+p.id+'">✓ '+cnt+' confirmado'+(cnt!==1?'s':'')+'</span><button class="cbtn '+(ic?'done':'')+'" id="mp-'+p.id+'" onclick="toggleMeetConfirm(\''+p.id+'\',this)">'+(ic?'Confirmado ✓':'Confirmar presença')+'</button></div></div></div>';
+    list.appendChild(card);
+  });
+  setTimeout(()=>_map?.invalidateSize(),100);
 }
 
-function showSub(id,btn){
-  document.querySelectorAll('.ss').forEach(s=>s.classList.remove('on'));
-  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('on'));
-  document.getElementById('sub-'+id)?.classList.add('on');
-  btn.classList.add('on');
-  if(id==='grupos') loadGroups();
+async function toggleMeetConfirm(pointId,btn){
+  if(!ME?.id){toast('Faça login para confirmar presença!');return;}
+  const isDone=btn.classList.contains('done'),countEl=document.getElementById('ccount-'+pointId),cur=parseInt(countEl?.textContent?.replace(/\D/g,'')||'0');
+  if(isDone){const{error}=await sb.from('meet_confirmations').delete().eq('point_id',pointId).eq('user_id',ME.id);if(error){toast('Erro ao cancelar.');return;}btn.classList.remove('done');btn.textContent='Confirmar presença';if(countEl)countEl.textContent='✓ '+Math.max(0,cur-1)+' confirmado'+(Math.max(0,cur-1)!==1?'s':'');toast('Presença cancelada.');}
+  else{const today=new Date().toISOString().split('T')[0];const{error}=await sb.from('meet_confirmations').insert({point_id:pointId,user_id:ME.id,event_date:today});if(error&&!error.code?.includes('23505')&&!error.message?.includes('duplicate')){toast('Erro ao confirmar.');return;}btn.classList.add('done');btn.textContent='Confirmado ✓';if(countEl)countEl.textContent='✓ '+(cur+1)+' confirmado'+((cur+1)!==1?'s':'');toast('Presença confirmada! 🎉');}
+}
+
+async function usarMinhaLocalizacao(){
+  if(!navigator.geolocation){toast('Geolocalização não suportada.');return;}
+  const btn=event.currentTarget||event.target,orig=btn.textContent;btn.textContent='⏳ Obtendo localização...';btn.disabled=true;
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const lat=pos.coords.latitude,lng=pos.coords.longitude,cityEl=document.getElementById('ponto-city');
+    if(cityEl){cityEl.dataset.lat=lat;cityEl.dataset.lng=lng;}
+    try{const res=await fetch('https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lng+'&format=json&accept-language=pt-BR');const data=await res.json();const addr=data.address||{};const city=addr.city||addr.town||addr.village||addr.municipality||addr.suburb||'';const stateMap={'Pernambuco':'PE','São Paulo':'SP','Rio de Janeiro':'RJ','Bahia':'BA','Minas Gerais':'MG','Ceará':'CE','Paraná':'PR','Rio Grande do Sul':'RS','Santa Catarina':'SC','Paraíba':'PB','Alagoas':'AL','Sergipe':'SE','Piauí':'PI','Maranhão':'MA','Rio Grande do Norte':'RN','Goiás':'GO','Mato Grosso':'MT','Mato Grosso do Sul':'MS','Pará':'PA','Amazonas':'AM','Espírito Santo':'ES','Distrito Federal':'DF','Tocantins':'TO'};const stateAbbr=stateMap[addr.state||'']||(addr.state||'PE').slice(-2).toUpperCase();if(cityEl&&city)cityEl.value=city;const se=document.getElementById('ponto-state');if(se)se.value=stateAbbr;const ae=document.getElementById('ponto-address');if(ae&&!ae.value)ae.value=[addr.road||'',addr.house_number||'',addr.suburb||''].filter(Boolean).join(', ');toast('Localização preenchida! ✓');}catch(e){toast('Coordenadas salvas.');}
+    btn.textContent=orig;btn.disabled=false;
+  },err=>{btn.textContent=orig;btn.disabled=false;toast(err.code===1?'Permissão negada.':'Não foi possível obter localização.');},{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+}
+
+async function saveMeetPoint(){
+  if(!ME?.id){toast('Faça login para cadastrar pontos!');return;}
+  const nameEl=document.getElementById('ponto-name'),addrEl=document.getElementById('ponto-address'),cityEl=document.getElementById('ponto-city'),stateEl=document.getElementById('ponto-state'),typeEl=document.getElementById('ponto-type'),schedEl=document.getElementById('ponto-schedule');
+  const name=nameEl?.value?.trim(),address=addrEl?.value?.trim(),city=cityEl?.value?.trim(),state=(stateEl?.value?.trim()||'PE').toUpperCase().slice(0,2),typeVal=typeEl?.value||'informal',sched=schedEl?.value?.trim();
+  if(!name){toast('Informe o nome do local!');return;}if(!city){toast('Informe a cidade!');return;}
+  const saveBtn=document.getElementById('ponto-save-btn');if(saveBtn){saveBtn.textContent='Salvando...';saveBtn.disabled=true;}
+  let lat=cityEl?.dataset?.lat?parseFloat(cityEl.dataset.lat):null,lng=cityEl?.dataset?.lng?parseFloat(cityEl.dataset.lng):null;
+  if(!lat||!lng){try{const res=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent([address,city,state,'Brasil'].filter(Boolean).join(', '))+'&format=json&limit=1&accept-language=pt-BR');const results=await res.json();if(results?.length){lat=parseFloat(results[0].lat);lng=parseFloat(results[0].lon);}}catch(e){console.warn(e);}}
+  const{error}=await sb.from('meet_points').insert({creator_id:ME.id,name,city,state,address:address||null,type:typeVal,schedule:sched||null,lat,lng,active:true});
+  if(saveBtn){saveBtn.textContent='Cadastrar ponto';saveBtn.disabled=false;}
+  if(error){toast('Erro: '+error.message);return;}
+  [nameEl,addrEl,schedEl,document.getElementById('ponto-desc')].forEach(el=>{if(el){el.value='';if(el.dataset){delete el.dataset.lat;delete el.dataset.lng;}}});
+  if(cityEl){cityEl.value='';if(cityEl.dataset){delete cityEl.dataset.lat;delete cityEl.dataset.lng;}}
+  if(stateEl)stateEl.value='PE';
+  closeModal('modal-ponto');toast(lat?'"'+name+'" cadastrado com localização! 📍':'"'+name+'" cadastrado!');
+  await loadMeetPoints();
 }
 
 // ============================================================
-// CHAT — Lista dinâmica do banco
+// ÁLBUM — upsert corrigido
+// ============================================================
+async function toggleStickerQuick(num,card,currentStatus){
+  if(!ME?.id){toast('Faça login para gerenciar seu álbum!');return;}
+  const cycle={empty:'have',have:'dup',dup:'need',need:'empty'},ns=cycle[currentStatus]||'have';
+  if(ns==='empty'){await sb.from('user_stickers').delete().eq('user_id',ME.id).eq('number',num);delete albumStickers[num];}
+  else{const qty=ns==='dup'?2:1,dbs=ns==='dup'?'have':ns;await sb.from('user_stickers').delete().eq('user_id',ME.id).eq('number',num);const{error}=await sb.from('user_stickers').insert({user_id:ME.id,number:num,status:dbs,quantity:qty});if(error){toast('Erro: '+error.message);return;}albumStickers[num]={status:dbs,quantity:qty};}
+  toast('#'+num.toString().padStart(3,'0')+' — '+{have:'✓ Tenho',dup:'+ Repetida',need:'✗ Falta',empty:'− Removida'}[ns]);
+  renderAlbumGrid();updateAlbumProgress();
+}
+async function saveSingleSticker(){
+  const num=parseInt(document.getElementById('fig-num').value);if(!num||num<1||num>640){toast('Número inválido!');return;}if(!ME?.id){toast('Faça login!');return;}
+  const qty=selectedFigStatus==='dup'?(parseInt(document.getElementById('fig-qty').value)||2):1,dbs=selectedFigStatus==='dup'?'have':selectedFigStatus;
+  await sb.from('user_stickers').delete().eq('user_id',ME.id).eq('number',num);
+  const{error}=await sb.from('user_stickers').insert({user_id:ME.id,number:num,status:dbs,quantity:qty});
+  if(error){toast('Erro: '+error.message);return;}
+  albumStickers[num]={status:dbs,quantity:qty};renderAlbumGrid();updateAlbumProgress();
+  closeModal('modal-figurinha');document.getElementById('fig-num').value='';toast('Figurinha #'+num.toString().padStart(3,'0')+' salva!');
+}
+async function bulkAddStickers(status){
+  if(!bulkSelected.size){toast('Selecione figurinhas primeiro!');return;}if(!ME?.id){toast('Faça login!');return;}
+  const dbs=status==='dup'?'have':status,qty=status==='dup'?2:1,nums=[...bulkSelected];
+  await sb.from('user_stickers').delete().eq('user_id',ME.id).in('number',nums);
+  const{error}=await sb.from('user_stickers').insert(nums.map(n=>({user_id:ME.id,number:n,status:dbs,quantity:qty})));
+  if(error){toast('Erro: '+error.message);return;}
+  nums.forEach(n=>{albumStickers[n]={status:dbs,quantity:qty};});
+  const count=bulkSelected.size;bulkSelected.clear();renderAlbumGrid();updateAlbumProgress();toast(count+' figurinhas atualizadas! ✓');
+}
+
+// ============================================================
+// POSTS — FK explícita
+// ============================================================
+async function loadPosts(){
+  const{data:posts,error}=await sb.from('posts').select('*,author:profiles!posts_author_id_fkey(full_name,username,avatar_url),comments:post_comments(count)').order('created_at',{ascending:false}).limit(20);
+  if(error){console.error('loadPosts:',error.message);return;}if(!posts)return;
+  const container=document.getElementById('posts-container');if(!container)return;
+  container.querySelectorAll('.post').forEach(p=>p.remove());
+  let myLikes=new Set();
+  if(ME?.id){const{data:lk}=await sb.from('post_likes').select('post_id').eq('user_id',ME.id);lk?.forEach(l=>myLikes.add(l.post_id));}
+  const frag=document.createDocumentFragment();
+  posts.forEach(post=>{
+    const author=post.author,name=author?.full_name||author?.username||'Usuário',ini=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const cid='post-db-'+post.id,likes=post.likes||0,cc=post.comments?.[0]?.count||0,iLiked=myLikes.has(post.id);
+    const div=document.createElement('div');div.className='post';
+    div.innerHTML='<div class="post-h"><div class="av" style="width:40px;height:40px;background:var(--gl);color:var(--gd);font-size:13px;">'+(author?.avatar_url?'<img src="'+author.avatar_url+'" alt="">':ini)+'</div><div style="flex:1;"><div style="font-size:14px;font-weight:800;">'+name+'</div><div style="font-size:11px;color:var(--t2);">'+timeAgo(post.created_at)+'</div></div></div>'+(post.image_url?'<div class="post-img-preview"><img src="'+post.image_url+'" alt="" onclick="openImgFull(this)"></div>':'')+'<div class="post-bod">'+post.content+'</div>'+'<div class="pa-row"><button class="pa'+(iLiked?' liked':'')+'" onclick="togglePostLike(this,\''+post.id+'\','+likes+')">❤️ '+likes+'</button><button class="pa" onclick="toggleComments(this,\''+cid+'\',\''+post.id+'\')">💬 <span>'+cc+'</span></button><button class="pa" onclick="navigator.clipboard?.writeText(window.location.href).then(()=>toast(\'Link copiado!\'))">↗️</button></div>'+'<div class="comments-section" id="'+cid+'"><div class="comment-list" id="clist-'+cid+'"></div><div class="comment-input-row"><input class="comment-inp" placeholder="Escreva um comentário..." id="cinp-'+cid+'"><button class="comment-send" onclick="submitComment(\''+cid+'\',\''+post.id+'\')">➤</button></div></div>';
+    frag.appendChild(div);
+  });
+  const firstStatic=container.querySelector('.post[id]');
+  if(firstStatic)container.insertBefore(frag,firstStatic);else container.appendChild(frag);
+}
+
+async function submitPost(){
+  const ta=document.getElementById('post-ta'),text=ta.value.trim();
+  if(!text){toast('Escreva algo!');return;}if(!ME?.id){toast('Faça login para publicar!');return;}
+  let imageUrl=null;
+  const imgInp=document.getElementById('post-img-inp');
+  if(imgInp.files[0]){const file=imgInp.files[0],path=ME.id+'/'+Date.now()+'.'+file.name.split('.').pop();const{data:up}=await sb.storage.from('post-images').upload(path,file,{contentType:file.type});if(up){const{data:pu}=sb.storage.from('post-images').getPublicUrl(path);imageUrl=pu?.publicUrl;}}
+  const{data:inserted,error}=await sb.from('posts').insert({author_id:ME.id,content:text,type:'general',image_url:imageUrl}).select('*,author:profiles!posts_author_id_fkey(full_name,username,avatar_url)').single();
+  if(error){toast('Erro ao publicar: '+error.message);return;}
+  const cid='post-db-'+inserted.id,name=inserted.author?.full_name||ME.full_name||'Você',ini=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const div=document.createElement('div');div.className='post';
+  div.innerHTML='<div class="post-h"><div class="av" style="width:40px;height:40px;background:var(--y);color:var(--b);font-size:13px;">'+ini+'</div><div style="flex:1;"><div style="font-size:14px;font-weight:800;">'+name+' <span class="tag tv" style="font-size:10px;margin-left:4px;">Novo</span></div><div style="font-size:11px;color:var(--t2);">agora mesmo</div></div></div>'+(imageUrl?'<div class="post-img-preview"><img src="'+imageUrl+'" alt="" onclick="openImgFull(this)"></div>':'')+'<div class="post-bod">'+inserted.content+'</div>'+'<div class="pa-row"><button class="pa" onclick="togglePostLike(this,\''+inserted.id+'\',0)">❤️ 0</button><button class="pa" onclick="toggleComments(this,\''+cid+'\',\''+inserted.id+'\')">💬 0</button></div>'+'<div class="comments-section" id="'+cid+'"><div class="comment-list" id="clist-'+cid+'"></div><div class="comment-input-row"><input class="comment-inp" placeholder="Escreva um comentário..." id="cinp-'+cid+'"><button class="comment-send" onclick="submitComment(\''+cid+'\',\''+inserted.id+'\')">➤</button></div></div>';
+  document.getElementById('posts-container').insertBefore(div,document.getElementById('posts-container').firstChild);
+  ta.value='';clearPostImg();toast('Post publicado! 🎉');
+}
+
+// ============================================================
+// CHAT — Lista dinâmica
 // ============================================================
 let _chatFilter='all';
 
 async function loadChatList(){
-  const container=document.getElementById('chat-list-container');
-  if(!container)return;
+  const container=document.getElementById('chat-list-container');if(!container)return;
   if(!ME?.id){container.innerHTML='<div style="padding:40px 20px;text-align:center;color:var(--t2);"><div style="font-size:36px;margin-bottom:8px;">💬</div><div style="font-size:14px;font-weight:700;">Faça login para ver suas conversas</div></div>';return;}
   container.innerHTML='<div style="padding:20px;text-align:center;color:var(--t2);font-size:13px;">Carregando...</div>';
   const{data:myConvs,error}=await sb.from('conversation_members').select('conversation_id,last_read_at').eq('user_id',ME.id);
@@ -2763,6 +2759,25 @@ function closeConv(){
   if(msgChannel){sb.removeChannel(msgChannel);msgChannel=null;}
   currentConvId=null;currentConvType='direct';
   loadChatList();
+}
+
+// ============================================================
+// NAVEGAÇÃO — unificada
+// ============================================================
+function goTo(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  document.getElementById('page-'+page)?.classList.add('on');
+  document.getElementById('ni-'+page)?.classList.add('on');
+  if(page==='album')loadAlbum();
+  if(page==='pontos'){initMap();setTimeout(()=>{_map?.invalidateSize();loadMeetPoints();},150);}
+  if(page==='chat'&&!document.getElementById('chatconv')?.classList.contains('on'))loadChatList();
+}
+function showSub(id,btn){
+  document.querySelectorAll('.ss').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('sub-'+id)?.classList.add('on');btn.classList.add('on');
+  if(id==='grupos')loadGroups();
 }
 
 window.addEventListener('DOMContentLoaded',boot);
